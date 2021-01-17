@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/create/src/FileManager.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/create/src/FileWatcher.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/launcher/src/FileManager.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/launcher/src/FileManager.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/launcher/src/StaticStuff.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/launcher/src/StaticStuff.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/play/src/StaticStuff.java" charset="windows-1252" />
+  </component>
+</project>

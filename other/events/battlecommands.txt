@@ -1,0 +1,41 @@
+
+#battle add 0 x 3 obstacle c859375027884d30
+#battle add 0 x 4 npc 68ea85a4d077420d img 511309fde13f415f
+
+#battle remove 1 x 1 obstacle
+#battle remove 0 x 0 extragroundtile
+#battle remove 1 x 2 npc
+#battle remove 1 x 0 item
+
+#battle remove #type:npc#
+
+#battle set #38b6c40e45eb40b8# image #42134569243a4f76#
+#battle set groundtiles image #2afdec77bba14448#
+
+#battle set 1 x 0 item uid 67f0260423784927
+#battle set #67f0260423784927# uid e318489b06eb4aa6
+
+#battle set 1 x 1 obstacle image #name:bread#
+#battle set 2 x 3 obstacle image fef631eb8b8e434f
+
+
+#battle set #type:npc# xy 0 x 0
+#battle set 2 x 3 obstacle xy 1 x 4
+
+#{test} = 4
+#battle set {test} x {test} extragroundtile image #name:bread#
+
+#battle active false
+#battle active true
+
+battle refresh all
+
+#battle start #name:4#
+
+#clear console
+#{test} = {currentbattle}.battleInfo(item|x)
+#{hmm} = {currentbattle}.battleInfo(item|y)
+#evaluate {hmm}
+#evaluate {hmm}.get(index|1)
+#{hmm} == {hmm}.get(index|0) {test}.get(index|0)
+#evaluate {hmm}

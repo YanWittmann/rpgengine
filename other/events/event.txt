@@ -1,0 +1,12 @@
+
+{test} = 5
+
+MARKER:
+
+print counting: {test}
+{test} == {test} - 1
+pause 1 s
+
+if {test} >= 0 (
+  jumpto first MARKER
+)

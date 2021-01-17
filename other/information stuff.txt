@@ -1,0 +1,308 @@
+
+<optional>
+[insert]
+
+ALL OBJECT TYPES:
+	location
+	npc
+	item
+	inventory
+	battleMap
+	talent
+	eventCollection
+	lootTable
+	customCommand
+	color
+	audio
+	image
+	variable
+
+
+ALL ACTIONS:
+	[VARIABLE] = [VARIABLE OR MATHEMATICAL EXPRESSION WITH VALUES]
+	[VARIABLE] == [MATHEMATICAL EXPRESSION WITH VALUES/VARIABLES]
+	execute [event [EVENT];code {[CODE]}] as [SELECTOR] {[PARAMETERS]}
+	print [VALUE]
+	evaluate [VALUE/SELECTOR]
+	goto [SELECTOR]
+	[wait;pause;sleep] [VALUE] [ms;s;m;h]
+	[JUMPPOINT]:
+	jumpto [first;next;last] [JUMPPOINT]
+	tag [SELECTOR] [add;remove] [VALUE(tag)]
+	audio [play;stop] [AUDIO]
+	audio list
+	player input [true;false]
+	inventory add [SELECTOR(item)] to [SELECTOR(inventory)] amount [VALUE/VARIABLE]
+	inventory set [SELECTOR(item)] to [SELECTOR(inventory)] amount [VALUE/VARIABLE]
+	inventory remove [SELECTOR] from [SELECTOR] amount [VALUE/VARIABLE]
+	inventory move [SELECTOR] from [SELECTOR] amount [VALUE/VARIABLE] to [SELECTOR]				//'to selector' may only be one object
+	open image [SELECTOR(image)] text [VALUE] size [VALUE]
+	open object [SELECTOR] <[VALUE(text)]>
+	alert [VALUE]
+	drop [SELECTOR(lootTable)] to [SELECTOR(inventory)]
+	battle start [SELECTOR(battleMap)]
+	battle stop [OUTCOME]
+	battle set [X] x [Y] [npc;item;extragroundtile;obstacle] [x;y;xy;image;uid] [VALUE/VARIABLE] <x [VALUE/VARIABLE]>	//'uid' is only available for npc and item; 'image' is only for extragroundtile and obstacles
+	battle set [SELECTOR(npc|item);player;groundtiles] [x;y;xy;image;uid] [VALUE/VARIABLE] <x [VALUE/VARIABLE]>			//'uid' is only available for npc and item; 'image' is only for npc, player and groundtiles
+	battle add [X] x [Y] [npc;item;extragroundtile;obstacle] [SELECTOR(npc|item|image)] <img [SELECTOR(image)>			//the 'img' parameter is only required for the npc type
+	battle remove [X] x [Y] [npc;item;extragroundtile;obstacle]
+	battle remove [SELECTOR(npc)]
+	battle refresh [all;overlay;attackanimation;player;npc;item;obstacle;extra;ground]		//force the battleMap gui to be updated; split parameters with ',' or ';'
+	battle active [true;false]
+	battle canend [true;false]
+	battle freewalk [true;false]
+	battle action [SELECTOR(npc)] attack [SELECTOR(npc);player] <using [SELECTOR(item)]>	//requires battleMap to be inactive
+	battle action [SELECTOR(npc)] walk [X] x [Y]											//requires battleMap to be inactive
+	battle action [SELECTOR(npc)] approach [X] x [Y] distance [VALUE]						//requires battleMap to be inactive
+	clear [console;inventory] <[SELECTOR(inventory)]>
+	if<not> <selector> [SELECTOR] (																		//checks if selector returns at least one object
+	if<not> <expression> [VALUE/VARIABLE] [==;>;<;>=;<=;!=;contians;matches;equals] [VALUE/VARIABLE] (
+	if<not> talent [VALUE(talentname)] DC [VALUE(dc)] [true;false(visible)] [true;false(autoroll)] [VALUE(message);none] (
+	for each [SELECTOR] {																		//loops inside of loops are not allowed
+	}
+	return
+	break
+	continue
+	
+SELECTORS:
+	surrounded by '#' and split by ';':
+		uid:[UID]
+		name:[NAME]
+		tag:[TAG]
+		location:[LOCATION]
+		limit:[VALUE]
+		sort:[first;last;random]
+		expr:[VALUE/VARIABLE][==;>;<;>=;<=;!=][VALUE/VARIABLE]
+		type:[TYPE]
+		inventory:[INVENTORY]										//picks all items of the inventory
+	can also only contain a UID
+
+VARIABLES:
+	syntax:
+		between { and }. escape '|' with '\|'
+		{valuetype|attribute1|attribute2|...}.modifier1(attribute1|attribute2|...).modifier2(attribute1|attribute2|...)
+		replaces '%1' with the current value, %2 with the current index inside of the modifier parameters
+	event-specific (cannot use modifiers):
+		see 'SPECIAL EVENTS' below
+	object / variable data:
+		{selector|[SELECTOR]}.name()					//picks the name of the entity with the UID
+							 .description()				//picks the description of the entity with the UID
+							 .location()				//picks the location of the entity with the UID
+							 .image()					//picks the image of the entity with the UID
+							 .type()					//picks the type of the entity with the UID
+							 .inventory()				//picks the inventory of the entity with the UID
+							 .variable([VARIABLENAME])	//picks the variable with the name [VARIABLENAME] of the entity with the UID
+		{[VARIABLE]}
+	input:
+		{input|dice|[TEXT]|[SIDES]|[DURATION]|[AUTOROLL(boolean)]}
+		{input|button|[TEXT]|[BUTTON1];[BUTTON2];...}
+		{input|dropDown|[TEXT]|[OPTION1];[OPTION2];...}
+		{input|text|[TEXT]|[PRETEXT]}
+		{input|line}
+	other:
+		{player|[SETTING]}
+		{project|[SETTING]}
+		{this}				//contains UID of object that is executing code !!!CANNOT HAVE MODIFIERS (use {value|{this}}.name())!!!
+		{lastInput}			//contains text / number of last input
+		{inBattle}
+		{event|[SELECTOR]|[EVENT]}
+		{random|[MIN]|[MAX]}
+		{value|[STRING]}
+		{event|[SELECTOR]|[STRING(event name)]}
+		{amount|[SELECTOR(item)]|[SELECTOR(inventory)]}
+		{talent|[VALUE(talentname)]|[VALUE(dc)]|[true;false(visible)]|[true;false(autoroll)]|[VALUE(message);none]}
+		{empty}
+		{currentbattle}
+	other modifiers:
+		modify individual elements of results:
+			charAt([INDEX])
+			toUppercase()
+			toLowercase()
+			contains([STRING])
+			equals([VALUE])
+			endsWith([STRING])
+			replace([STRING]|[STRING])
+			replaceAll([STRING]|[STRING])
+			indexOf([STRING])
+			matches([STRING])
+			substring([INT]|[INT])
+			isType([STRING])
+			length()									//length of string
+			round()
+			math([STRING])								//sets value to a mathematical operation, replaces '[' with '(' and ']' with ')'
+			evalMath()
+			sort()										//alphabetical sort (0-9 A-Z a-z)
+			set([INT]|[STRING])
+			string([STRING])							//joins multiple string parts, replaces '[' with '(' and ']' with ')'
+			battleInfo([npc;item;extragroundtiles;obstacles;player;groundtiles]<|[x;y;uid;image]>)
+		create a new result-list:
+			get([equals,contains,matches]|[STRING])
+			get(index|[INT])
+			get(random<|[INT]|[INT]>)					//picks a random entry with the option to add from-to
+			remove([equals,contains,matches]|[STRING])	//removes entries from the list
+			remove(index|[INT])
+			remove(random<|[INT]|[INT]>)				//removes a random entry with the option to add from-to
+			append([VALUE])								//appends a new list (without '{' and '}') or a value if the variable is invalid
+			indexOfInList([STRING])
+			average([round,float])
+			sum([round,float])
+			min([round,float])
+			max([round,float])
+			count()
+			split([VALUE])
+
+DEFAULT PLAYER SETTINGS:
+	gold				//amount of gold
+	health				//HP the player has
+	location			//current location UID
+	inventory			//player inventory UID
+	battleMapImage		//image UID the player has on a battlemap
+	courage				//player attribute
+	wisdom				//player attribute
+	intuition			//player attribute
+	charisma			//player attribute
+	dexterity			//player attribute
+	agility				//player attribute
+	strength			//player attribute
+	holdingMain			//item UID
+	holdingSecond		//item UID
+	holdingArmor		//item UID
+			
+LOOT TABLE:
+	[SELECTOR(item)] [VALUE/VARIABLE(amount)] [VALUE/VARIABLE(chance in percent)]		//drops an item a certain amount of times into an inventory with a percentage chance
+	{
+		roll [VALUE/VARIABLE(from)] to [VALUE/VARIABLE(to)]								//drops this container a certain amount of times
+		[SELECTOR(item)] [VALUE/VARIABLE(amount)] [VALUE/VARIABLE(chance in percent)]
+	}
+
+SPECIAL TAGS:
+	items:
+		viewCanBeObstructed		//removes check if there is an obstacle between you and the enemy on battleMaps
+	npcs:
+		canNotChangeWeapon		//disables the option to change the selected item in a fight for the npc
+
+SPECIAL EVENTS:					//parameters {p1,p2} contain data regarding the event. !!!CANNOT HAVE MODIFIERS (use {value|{newLocation}}.name())!!!
+	locations:
+		examine			{name}							//when player uses 'examine' command. Compare {name} to check if entity should be examined
+		entry			{comeFromLocation,gotoLocation}	//when location is entered
+		exit			{comeFromLocation,gotoLocation}	//when leaving location
+		walk			{newLocation}					//executed when using walk command. Check here where to go next based on {newLocation}
+	NPCs:
+		talkTo			{name}							//every NPC at location of player calls their talkTo event when player uses CustomCommand 'talk to'
+		examine			{name}							//when player uses 'examine' command. Compare {name} to check if entity should be examined
+	items:
+		use				{}								//when player selects 'use' in inventory
+		pickup			{amount,inventory}				//when item goes into inventory
+		drop			{amount,inventory}				//when item leaves inventory
+		examine			{name}							//when player uses 'examine' command. Compare {name} to check if entity should be examined
+	inventories:
+		pickup			{amount,item}					//when item goes into inventory
+		drop			{amount,item}					//when item leaves into inventory
+	battleMaps:
+		start			{}								//when battlemap is opened and intro is done
+		end				{outcome}						//when either of the events 'fail' or 'win' take place
+		walkOnTile		{x,y,entity}					//when entity walks on a tile; {entity} = npc's uid / 'player'
+		damage			{attacker,victim,damage,item}	//when entity attacks entity; {attacker,victim} = npc's uid / 'player'
+		dies			{entity}						//when an entity reaches 0 HP
+		walkOnItem		{x,y,entity,item}				//when entity walks on item
+		rightClick		{x,y}							//when player right clicks on tile
+	lootTables:
+		dropLoot		{}								//when loot table is dropped into an inventory; may only contain a loot table, not actual code
+		dropLootCode	{inventory}						//when loot table is dropped into an inventory
+	eventCollections:
+		General
+			launch		{}								//when adventure is selected
+			intro		{}								//when character creaction is done and intro launches
+			exit		{}								//when adventure is stopped
+			audioStart	{uid}							//when audio starts playing
+			audioStop	{uid}							//when audio stops playing via 'audio stop'
+			audioEnd	{uid}							//when audio stops playing in any way
+	customCommands:
+		commandExecuted {...}							//when customCommand is executed; parameters depend on customCommand
+
+SPECIAL VARIABLES:
+	items:
+		armor					//reduces the amount of damage taken when equipped as armor item
+		color					//hex color value that determines the color of the item name
+
+PERMISSIONS:
+split them with a ','
+	web							//allows the use of the 'web' variable
+	fileread					//allows reading files from the advfiles folder
+	filewrite					//allows writing files to the advfiles folder
+	filereadanywhere			//allows reading files from the entire system
+	filewriteanywhere			//allows writing files to the entire system
+
+
+
+
+EXAMPLES/SOME CODE:
+	execute code {print {value|{this}}.name()} as ## {}
+	execute event {event|#uid:{player|location}#|examine} as #uid:{player|location}# {}
+	execute event {event|#uid:{player|location}#|{input|line}.toLowercase()} as #uid:{player|location}# {}
+	evaluate {selector|#inventory:{selector|#uid:{player|location}#}.inventory()#}.name()
+	
+	clear console
+	for each #type:npc# {
+	  if {value|{this}}.name() contains man (
+		print [[orange:STOPPP!]]
+		break
+	  ) else (
+		print ok can continue:
+	  )
+	  print I am [[green:{value|{this}}.name()]]!
+	  continue
+	  print [[red:you should not see this]]
+	}
+	print end
+
+
+
+abkürzungen
+MU courage		Mut
+KL wisdom		Klugheit
+IN intuition	Intuition
+CH charisma		Charisma
+FF dexterity	Fingerfertigkeit
+GE agility		Geschicklichkeit
+KK strength		Stärke / Körperkraft
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,109 @@
+<changelog>
+	<date_13.12.2020>
+		<bugfixes>
+			none
+		</bugfixes>
+		<new_and_mod>
+			continue writing the documentation
+			added inventory set command
+			you can now set the amount variable
+			made scrolling up and down the debugger faster
+		</new_and_mod>
+	</date_13.12.2020>
+	
+	<date_12.12.2020>
+		<bugfixes>
+			the {input|line} variable would still execute the text the player typed
+		</bugfixes>
+		<new_and_mod>
+			continue writing the documentation
+			added a logger / debugging frame
+		</new_and_mod>
+	</date_12.12.2020>
+	
+	<date_11.12.2020>
+		<bugfixes>
+			none
+		</bugfixes>
+		<new_and_mod>
+			started creating documentation using MkDocs
+		</new_and_mod>
+	</date_11.12.2020>
+	
+	<date_10.12.2020>
+		<bugfixes>
+			if the battle was over and then restarted, the engine would softlock
+			changing the location of an obstacle or extragroundtile or removing one of these would not remove them visually
+			image and button popups are now not that oversized
+			battle set parameters were sometimes misunderstood
+		</bugfixes>
+		<new_and_mod>
+			added battle add command: you can now add new objects onto the battlemap
+			added battle refresh command: you can now force the battlemap gui to be updated
+			added battle remove command: you can now remove objects from the battlemap with either the location or a selector
+			battle set command now has the 'xy' parameter so that both x and y of an object can be set at the same time
+		</new_and_mod>
+	</date_10.12.2020>
+	
+	<date_09.12.2020>
+		<bugfixes>
+			none
+		</bugfixes>
+		<new_and_mod>
+			new command battle stop with the outcome as parameter
+			added player and groundtiles parameters to battleInfo modifier
+			added battle set command: can control location, image and uid of the objects on the active battlemap
+			added battle active command: disables starting a new turn if set to false
+		</new_and_mod>
+	</date_09.12.2020>
+	
+	<date_08.12.2020>
+		<bugfixes>
+			in the CC, when all values were distributed, the available classes would no longer update their color for a second or two
+			trying to close file watcher in editor even when none was open which led to the frame being unable to close
+			mini player stats frame would not disappear if maximized by battle frame
+			loading an adventure with an empty variable would result in the adventure being unable to load
+			setting and getting variable objects when there is more than one now actually works; it treated all of them as one
+		</bugfixes>
+		<new_and_mod>
+			when creating a new adventure, the project icon uid is now automatically put into the project setting ('image')
+			set new 'gold' color to #f5ca0a
+			selectors can now also only contain a UID without any other parameters
+			player stats frame now minimizes into a square containing the project icon that maximizes again when mouse wheel clicked
+			in the editor, the textareas now fill the panels to the bottom
+			changed icons ('iconblue','iconyellow','icongreen','playerStartingPos')
+			you can now drag and drop files onto the battle map
+			using the new variable {currentbattle} and the modifier battleInfo() you can now get information on the current battle
+			removed several debug-println's
+			battle start command syntax has changed
+		</new_and_mod>
+	</date_08.12.2020>
+	
+	<date_07.12.2020>
+		<bugfixes>
+			creating a new adventure didn't reset images
+			parameters label in CC editor was too small
+			'if' inside of 'for each' did not skip body if condition was false
+			onw-word-commands were not displayed yellow in console
+			'execute' command would execute even without command parameters
+		</bugfixes>
+		<new_and_mod>
+			added (this) changelog file
+			you can now acess the button in the entity editor via shortcuts ctrl+[0-9]
+			you can now edit events in a text file, which automatically updates editor when saved
+			added clear console / chat command
+			added clear inventory command
+			you can now leave away 'expression' from the 'if expression' command
+			you can now leave away 'selector' from the 'if selector' command
+			added new command-keywords (yellow): clear,if,expression,return,break,continue
+			player input in console now begins with ' - '
+			pressing up arrow in console now only fetches player inputs
+			added return, break and continue commands
+			autocomplete feature, define terms in project settings (split with ',') that can be autocompleted. Use 'tab' to autocomplete as a player
+			permissions are now required before creating your character, since the creator now has the ability to execute code at launch &#38; at the beginning of the intro
+			intro frame now has a drag listener
+			you can now choose as an adventure creator wether the intro should be displayed ('showIntro')
+			the project image ('image') is now displayed under the adventure name in the intro frame
+		</new_and_mod>
+	</date_07.12.2020>
+</changelog>

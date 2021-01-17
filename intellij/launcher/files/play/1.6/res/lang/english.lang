@@ -1,0 +1,119 @@
+
+errorNoAdventuresFound:There are no adventures.<br>Create a new one with the <br>[[gold:Generator]] or download one from the web.
+errorChatNoNewLocation:[[red:Missing new location after 'go']]
+errorUnauthorizedAccessToVar:unauthorized access to internal variable
+
+popupChooseAdventure:Choose an [[gold:ADVENTURE]] to play:
+popupTalentRollFail:You [[red:failed]] the talent roll
+popupTalentRollSuccess:You [[green:completed]] the talent roll!
+popupItemClicked:[[aqua:{1}]]<br>What do you want to do with it?
+popupItemCanNotEquip:You cannot equip any more items
+popupRollEvaluatePart:Rolling {1}
+popupRollEvaluateResult:Result: {1}
+popupObjectShowHowTo:[[gray:how to control (click)]]
+popupObjectHowToTitle:You can use these click-conbinations<br>on the object frame:
+popupObjectHowToClose:- [[gray:mouse wheel click to close]]
+popupObjectHowToForeground:- [[gray:double click to stay in foreground]]
+popupObjectHowToMinimize:- [[gray:triple click to minimize<br>(click on minimized to switch values)]]
+popupObjectHowToOpenImage:- [[gray:click on image to maximize]]
+popupObjectNoVariables:[[gray:no values]]
+
+chCreationTitle:Character creation
+chCreationRoll:Roll 
+chCreationRollAll:all
+chCreationGoodAttributes:Attributes
+chCreationAvailableClasses:Available classes
+chCreationDone:Done!
+chCreationEnterName:This is the tale of:
+
+introAuthor:a story by 
+introPlayerName:This is the tale of {1}, the brave {2}.
+introStart:Start!
+introSkip:[[gray:Skip]]
+
+permissionRequestWeb:This adventure wants be able to make [[red:web requests]].
+permissionRequestFileRead:This adventure wants be able to [[red:read files from the 'advfiles'-folder]].
+permissionRequestFileWrite:This adventure wants be able to [[red:write files to the 'advfiles'-folder]].
+permissionRequestFileReadAnywhere:This adventure wants be able to [[red:read files from anywhere on your computer]].
+permissionRequestFileWriteAnywhere:This adventure wants be able to [[red:write files to anywhere on your computer]].
+permissionRequestFileOpen:This adventure wants be able to [[red:execute files<br>from the 'advfiles'-Folder]].
+permissionRequestAccept:Allow
+permissionRequestDeny:Deny
+permissionRequestRetry:The adventure cannot work without these permissions.<br>Are you sure you want to [[red:exit the adventure]]?
+permissionRequestRetryNotExit:[[green:Retry]]
+permissionRequestRetryExit:[[red:Exit adventure]]
+
+playerAttrMU:Courage
+playerAttrKL:Wisdom
+playerAttrIN:Intuition
+playerAttrCH:Charisma
+playerAttrFF:Dexterity
+playerAttrGE:Agility
+playerAttrKK:Strength
+playerAttr0:Courage
+playerAttr1:Wisdom
+playerAttr2:Intuition
+playerAttr3:Charisma
+playerAttr4:Dexterity
+playerAttr5:Agility
+playerAttr6:Strength
+playerAttrelf:Elf
+playerAttrwarrior:Warrior
+playerAttrmage:Mage
+playerAttrnovadi:Novadi
+playerAttrstray:Stray
+playerAttrthorwaler:Thorwaler
+playerAttrdwarf:Dwarf
+
+varNamesweight:Weight
+varNamesdamage:Damage
+varNamesrange:Range
+varNamesvalue:Value
+varNameshealth:HP
+varNameshands:Slot
+varNamesarmor:Armor
+
+objectNameCustomCommand:Custom command
+objectNameInventory:Inventory
+objectNameItem:Item
+objectNameBattleMap:Battle
+objectNameLocation:Location
+objectNameNPC:NPC
+objectNameEvent:Event
+objectNameColor:Color
+objectNameLootTable:Loot table
+
+playerStatsInventory:Inventory
+playerStatsStats:Stats
+playerStatsInsertValues:[[aqua:{1}]] HP<br>[[aqua:{2}]] gold<br>[[aqua:{3}]]
+playerStatsItemClickExamine:Examine
+playerStatsItemOpenItem:Item from your inventory
+playerStatsItemClickUse:Use
+playerStatsItemClickEquip:Equip
+playerStatsItemClickUnequip:Unequip
+playerStatsItemClickNothing:Nothing
+
+battleMapShowTurn:It's {1}'s turn!
+battleMapShowTurnYou:It's {1}'s turn! (you)
+battleMapCannotAttackTooFarAway:Enemy is too far away!
+battleMapCannotAttackViewObstructed:The view is obstructed!
+battleMapDamageEntity:Total damage: {1}
+battleMapFightOver:The battle is over!
+battleMapPlayerDefeated:You were defeated...
+battleMapPlayerWins:You have defeated all enemies!
+battleMapClose:[[red:Close]]
+battleMapCloseCheck:Are you sure you want to [[red:exit the adventure]]?<br>You will have to [[red:restart from the beginning]] if you want to try again later!
+battleMapCloseCheckClose:Exit
+battleMapCloseCheckNotClose:Continue
+
+loadAdventureFileEncr:[[red:This project is either an encrypted adventure or a corrupted file.<br>Please enter the password:]]
+loadAdventureFileEncrWrongPassword:[[red:Unable to unpack adventure!<br>This could be because the password was wrong or because the file is corrupted.]]
+
+mainFramePlayerInputDisabled:[[red:Input is currently disabled]]
+mainFramePlayerInputNoCommand:[[red:You cannot do that]]
+
+langSelectionText:Language selection:
+langInfoAuthorText:Author:
+langInfoVersionText:Version:
+langInfoAuthor:Yan W.
+langInfoVersion:1.0

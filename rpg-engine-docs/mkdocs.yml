@@ -1,0 +1,22 @@
+site_name: RPG Engine
+
+nav:
+    - Home: index.md
+    - Basics:
+        - Getting started: getting-started.md
+        - First adventure: first-adventure.md
+    - Topics:
+        - Player / Project settings: topics/player-project-settings.md
+        - Variables: topics/variables.md
+        - Events: topics/events.md
+        - Tags: topics/tags.md
+        - Selectors: topics/selectors.md
+        - Commands: topics/commands.md
+        - Custom commands: topics/custom-commands.md
+        - Items: topics/items.md
+        - Loot tables: topics/loot-tables.md
+        - Battle maps: topics/battle-maps.md
+        - Talents: topics/talents.md
+    - Other: other.md
+    - About: about.md
+    - Changelog: changelog.md
