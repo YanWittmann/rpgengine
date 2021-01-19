@@ -164,10 +164,14 @@ public class FileManager {
     }
 
     public static void deleteFilesInDirectory(String directory) {
-        File dir = new File(directory);
-        File[] listFiles = dir.listFiles();
-        for (File file : listFiles) {
-            file.delete();
+        try {
+            File dir = new File(directory);
+            File[] listFiles = dir.listFiles();
+            for (File file : listFiles) {
+                file.delete();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -410,6 +414,7 @@ public class FileManager {
     }
 
     public static void clearTmp() {
+        makeDirectory("res/tmp/");
         FileManager.deleteFilesInDirectory("res/tmp/");
     }
 }

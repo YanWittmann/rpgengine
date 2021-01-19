@@ -1,6 +1,6 @@
 public class Launcher {
-    private final String version = "2";
-    private Configuration playCFG, createCFG;
+    private final String version = "4";
+    //private Configuration playCFG, createCFG;
     private final GuiLauncher launcher;
     private boolean loadingScreenDone = false;
 
@@ -55,6 +55,7 @@ public class Launcher {
         String[] results = null;
         if (FileManager.connectedToInternet()) { //get online versions
             results = FileManager.getTextFromURL("http://yanwittmann.de/projects/rpgengine/" + which + "/versions.txt");
+            FileManager.makeDirectory("files/" + which);
             FileManager.writeToFile("files/" + which + "/versions.txt", results);
         } else if (FileManager.fileExists("files/" + which + "/versions.txt")) { //get offline versions
             results = FileManager.readFile("files/" + which + "/versions.txt");
@@ -141,18 +142,22 @@ public class Launcher {
     }
 
     private boolean installVersion(String version, String which) {
-        if (!FileManager.saveUrl("files/res/tmp/" + which + version, "http://yanwittmann.de/projects/rpgengine/" + which + "/" + version + ".zip"))
+        FileManager.makeDirectory("files/" + which);
+        FileManager.makeDirectory("files/res/tmp/");
+        if (!FileManager.saveUrl("files/res/tmp/" + which + version + ".zip", "http://yanwittmann.de/projects/rpgengine/" + which + "/" + version + ".zip"))
             return false;
         FileManager.makeDirectory("files/" + which + "/" + version);
-        if (!FileManager.unzip("files/res/tmp/" + which + version, "files/" + which + "/")) return false;
-        FileManager.delete("files/res/tmp/" + which + version);
+        if (!FileManager.unzip("files/res/tmp/" + which + version + ".zip", "files/" + which + "/"))
+            return false;
+        FileManager.delete("files/res/tmp/" + which + version + ".zip");
         return true;
     }
 
     public void manageAdventures() {
         int operation = StaticStuff.openPopup("What do you want to do?", new String[]{"Install adventure from file", "Install adventure from URL", "Uninstall adventure", "Open adventure list", "Nothing"});
         switch (operation) {
-            case 0: //Install adventure from file
+//Install adventure from file
+            case 0 -> {
                 String[] files = FileManager.windowsFilePicker();
                 for (String file : files) {
                     if (FileManager.copyFile(file, "files/adventures/" + FileManager.getFilename(file)))
@@ -160,9 +165,9 @@ public class Launcher {
                     else
                         notifyUser("Could not install " + FileManager.getFilename(file));
                 }
-                break;
-
-            case 1: //Install adventure from URL
+            }
+//Install adventure from URL
+            case 1 -> {
                 String url = StaticStuff.openPopup("<html>" + StaticStuff.prepareString("Enter a valid URL (with [[green:http://]] or [[green:https://]]):"), "");
                 if (url.contains("http://") || url.contains("https://")) ;
                 else if (url.equals("")) return;
@@ -174,9 +179,9 @@ public class Launcher {
                     notifyUser("Installed " + FileManager.getFilename(url).replace("%20", " "));
                 else
                     notifyUser("Could not install " + FileManager.getFilename(url).replace("%20", " "));
-                break;
-
-            case 2: //Uninstall adventure
+            }
+//Uninstall adventure
+            case 2 -> {
                 String[] adventures = StaticStuff.append(FileManager.getFilesWithEnding("files/adventures/", "adv"), "Cancel");
                 int index = StaticStuff.openPopup("Which adventure do you want to uninstall?", adventures);
                 if (index == 0) return;
@@ -184,11 +189,9 @@ public class Launcher {
                     notifyUser("Uninstalled " + adventures[index]);
                 else
                     notifyUser("Could not uninstall " + adventures[index]);
-                break;
-
-            case 3: //Open adventure list
-                StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/site/Adventures.html");
-                break;
+            }
+//Open adventure list
+            case 3 -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/site/Adventures.html");
         }
     }
 

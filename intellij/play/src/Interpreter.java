@@ -11,7 +11,7 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private final String extraFilePath = "../../";
-    private final String version = "1.8";
+    private final String version = "1.8.1";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg;

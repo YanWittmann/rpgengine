@@ -99,9 +99,8 @@ public class FileManager {
         return true;
     }
 
-    public static void makeDirectory(String dir) {
-        File file = new File(dir);
-        file.mkdirs();
+    public static boolean makeDirectory(String dir) {
+        return new File(dir).mkdirs();
     }
 
     public static String[] getFiles(String path) {
@@ -249,6 +248,7 @@ public class FileManager {
     private static final int BUFFER_SIZE = 4096;
 
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+        makeDirectory(filePath.replace(new File(filePath).getName(),""));
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;

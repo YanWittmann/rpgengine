@@ -1,3 +1,0 @@
-ifnot {value|{this}}.name() matches [0-9a-z]+ (
-  print {value|{this}}.name()
-)

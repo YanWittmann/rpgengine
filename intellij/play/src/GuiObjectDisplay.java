@@ -22,6 +22,9 @@ public class GuiObjectDisplay extends JFrame {
     private GuiObjectDisplay self = this;
     private Entity entity;
 
+    private boolean clickState = false;
+    private JPanel contentPane;
+
     public GuiObjectDisplay(Entity entity, String extraText) {
         if (entity == null) return;
         this.entity = entity;
@@ -35,12 +38,13 @@ public class GuiObjectDisplay extends JFrame {
                     imageActive = true;
                 }
 
-            JPanel contentPane = new JPanel(new BorderLayout()) {
+            contentPane = new JPanel(new BorderLayout()) {
                 public void paintComponent(Graphics g) {
                     g.setColor(StaticStuff.getColor("white_border"));
                     g.fillRoundRect(0, 0, x_size, y_size, 20, 20);
                     if (entity.type.equals("Color"))
                         g.setColor(StaticStuff.getColor(entity.name));
+                    else if (clickState) g.setColor(StaticStuff.getColor("gray"));
                     else g.setColor(StaticStuff.getColor("background"));
                     g.fillRoundRect(Interpreter.getScaledValue(3), Interpreter.getScaledValue(3), x_size - Interpreter.getScaledValue(6), y_size - Interpreter.getScaledValue(6), 20, 20);
                 }
@@ -145,11 +149,7 @@ public class GuiObjectDisplay extends JFrame {
             l_extraText.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent evt) {
                     if (evt.getClickCount() == 1) {
-                        new Thread() {
-                            public void run() {
-                                StaticStuff.openPopup(Interpreter.lang("popupObjectHowToTitle") + "<br>" + Interpreter.lang("popupObjectHowToClose") + "<br>" + Interpreter.lang("popupObjectHowToOpenImage") + "<br>" + Interpreter.lang("popupObjectHowToForeground") + "<br>" + Interpreter.lang("popupObjectHowToMinimize"));
-                            }
-                        }.start();
+                        new Thread(() -> StaticStuff.openPopup(Interpreter.lang("popupObjectHowToTitle") + "<br>" + Interpreter.lang("popupObjectHowToClose") + "<br>" + Interpreter.lang("popupObjectHowToOpenImage") + "<br>" + Interpreter.lang("popupObjectHowToForeground") + "<br>" + Interpreter.lang("popupObjectHowToMinimize"))).start();
                     }
                 }
             });
@@ -213,7 +213,7 @@ public class GuiObjectDisplay extends JFrame {
                     for (int currentOpacity = 100; currentOpacity > 0; currentOpacity -= 3) {
                         try {
                             Thread.sleep(2);
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                         setOpacity(currentOpacity * 0.01f);
                     }
@@ -227,13 +227,20 @@ public class GuiObjectDisplay extends JFrame {
                 if (me.getClickCount() == 2) { //double click
                     alwaysOnTop = !alwaysOnTop;
                     setAlwaysOnTop(alwaysOnTop);
-                } else if (me.getClickCount() == 3) { //triple click
+                    new Thread(() -> {
+                        clickState = true;
+                        new Thread(() -> contentPane.repaint()).start();
+                        Sleep.milliseconds(200);
+                        clickState = false;
+                        new Thread(() -> contentPane.repaint()).start();
+                    }).start();
+                } else if (me.getClickCount() == 3) { //triple clicktest
                     isMinimized = true;
                     minimized = new GuiObjectDisplayMinimized(entity);
                     for (int currentOpacity = 100; currentOpacity > 0; currentOpacity -= 3) {
                         try {
                             Thread.sleep(2);
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                         setOpacity(currentOpacity * 0.01f);
                     }
