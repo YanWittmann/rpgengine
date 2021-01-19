@@ -115,7 +115,7 @@ mainFramePlayerInputNoCommand:[[red:You cannot do that]]
 savestateEnterName:Enter a name for the [[gold:savestate]]
 savestateInvalidName:Enter a valid name for the [[gold:savestate]]
 savestateSavestateAvailable:There is a [[gold:savestate]] available for this adventure.
-savestateSavestatesAvailable:There are [[gold:savestate]] available for this adventure.
+savestateSavestatesAvailable:There are [[gold:savestates]] available for this adventure.
 savestateSelectSavestate:Which [[gold:savestate]] do you want to select?
 savestateStartNewGame:Start a new game
 savestateCreatedSuccess:Created [[gold:savestate]] [[green:{1}]]

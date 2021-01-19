@@ -148,7 +148,7 @@ public class Main {
         System.out.println("\nCreate and upload documentation\n");
         if (FileUtils.directoryExists("../../rpg-engine-docs/site")) {
             System.out.println("Deleting local documentation");
-            errorMessageIfFalse(FileUtils.deleteDirectory("../../rpg-engine-docs"), "Unable to delete current documentation");
+            errorMessageIfFalse(FileUtils.deleteDirectory("../../rpg-engine-docs/site"), "Unable to delete current documentation");
         }
 
         System.out.println("Creating local documentation");
