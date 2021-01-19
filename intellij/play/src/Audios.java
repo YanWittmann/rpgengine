@@ -37,10 +37,10 @@ public class Audios {
         this.namespace = namespace;
     }
 
-    public String generateSaveString() {
+    public String generateSaveString(String filePath) {
         for (int i = 0; i < uids.size(); i++) {
             try {
-                FileManager.writeFileFromByteArray(Manager.extraFilePath + "adventures/" + namespace + "/audio/" + uids.get(i) + ".wav", byteArrays.get(i));
+                FileManager.writeFileFromByteArray(filePath + uids.get(i) + ".wav", byteArrays.get(i));
             } catch (Exception e) {
                 StaticStuff.error("Audio '" + filename.get(i) + "' contains invalid data.\n" + e);
             }

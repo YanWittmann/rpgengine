@@ -88,6 +88,12 @@ public class PlayerSettings {
         }
     }
 
+    public String[] generateSaveString() {
+        String[] dest = new String[settings.toArray().length];
+        System.arraycopy(settings.toArray(), 0, dest, 0, settings.toArray().length);
+        return dest;
+    }
+
     /*
     0 elf
     1 warrior

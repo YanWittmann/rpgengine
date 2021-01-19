@@ -27,14 +27,14 @@ public class Item extends Entity {
     }
 
     public String generateSaveString() {
-        String str = "" + name + "\n" + description + "\n" + uid + "\n" + image;
+        StringBuilder str = new StringBuilder("" + name + "\n" + description + "\n" + uid + "\n" + image);
         for (int i = 0; i < eventName.size(); i++)
-            str = str + "\n++ev++" + eventName.get(i) + "---" + eventCode.get(i);
-        for (int i = 0; i < tags.size(); i++)
-            str = str + "\n++tag++" + tags.get(i);
-        for (int i = 0; i < localVarName.size(); i++)
-            str = str + "++variable++" + localVarUids.get(i) + "---" + localVarName.get(i) + "---" + localVarType.get(i) + "---" + localVarValue.get(i) + "\n";
-        return str;
+            str.append("\n++ev++").append(eventName.get(i)).append("---").append(eventCode.get(i));
+        for (String tag : tags) str.append("\n++tag++").append(tag);
+        for (int i = 0; i < localVarName.size(); i++) {
+            str.append("\n").append("++variable++").append(localVarUids.get(i)).append("---").append(localVarName.get(i)).append("---").append(localVarType.get(i)).append("---").append(localVarValue.get(i));
+        }
+        return str.toString();
     }
 
     public String generateInformation() {

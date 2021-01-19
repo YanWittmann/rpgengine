@@ -7,13 +7,13 @@ public abstract class Entity {
     String description;
     String image;
     String type;
-    ArrayList<String> eventName = new ArrayList<String>();
-    ArrayList<String> eventCode = new ArrayList<String>();
-    ArrayList<String> tags = new ArrayList<String>();
-    protected ArrayList<String> localVarUids = new ArrayList<String>();
-    protected ArrayList<String> localVarName = new ArrayList<String>();
-    protected ArrayList<String> localVarType = new ArrayList<String>();
-    protected ArrayList<String> localVarValue = new ArrayList<String>();
+    ArrayList<String> eventName = new ArrayList<>();
+    ArrayList<String> eventCode = new ArrayList<>();
+    ArrayList<String> tags = new ArrayList<>();
+    protected ArrayList<String> localVarUids = new ArrayList<>();
+    protected ArrayList<String> localVarName = new ArrayList<>();
+    protected ArrayList<String> localVarType = new ArrayList<>();
+    protected ArrayList<String> localVarValue = new ArrayList<>();
 
     public String generateEventEditorString(String str) {
         return str.replace(",,,", "\n");

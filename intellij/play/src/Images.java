@@ -36,6 +36,7 @@ public class Images extends JFrame {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             StaticStuff.error("Image '" + files[lastImage] + "' contains invalid data.<br>" + e);
         }
     }
@@ -45,17 +46,17 @@ public class Images extends JFrame {
     }
 
     public String generateMenuString() {
-        String str = uids.size() + " image(s):";
+        StringBuilder str = new StringBuilder(uids.size() + " image(s):");
         for (int i = 0; i < uids.size(); i++)
-            str = str + "\n" + filename.get(i) + "  " + uids.get(i);
-        return str;
+            str.append("\n").append(filename.get(i)).append("  ").append(uids.get(i));
+        return str.toString();
     }
 
     public void addImage(String name, String path) {
         if (name == null || path == null) return;
         if (name.equals("") || path.equals("")) return;
         try {
-            this.images.add(ImageIO.read(new File(path)));
+            images.add(ImageIO.read(new File(path)));
         } catch (Exception e) {
             StaticStuff.error("Unable to get image.");
         }
@@ -134,5 +135,19 @@ public class Images extends JFrame {
         String ret[] = new String[uids.size()];
         for (int i = 0; i < uids.size(); i++) ret[i] = uids.get(i);
         return ret;
+    }
+
+    public String generateSaveString(String filePath) {
+        for (int i = 0; i < uids.size(); i++) {
+            try {
+                ImageIO.write(images.get(i), "png", new File(filePath + uids.get(i) + ".png"));
+            } catch (Exception e) {
+                Popup.error(StaticStuff.projectName, "Image '" + filename.get(i) + "' contains invalid data.\n" + e);
+            }
+        }
+        String str = "";
+        for (int i = 0; i < uids.size(); i++)
+            str = str + "\n++image++" + uids.get(i) + "---" + filename.get(i);
+        return str;
     }
 }

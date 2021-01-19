@@ -44,9 +44,11 @@ public class FileManager {
                 bw.write(text[i]);
                 bw.newLine();
             }
-            bw.write(text[text.length - 1]);
+            if (text.length > 0)
+                bw.write(text[text.length - 1]);
             bw.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

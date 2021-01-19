@@ -63,4 +63,9 @@ public class Talent {
     private String prepareAttrString(String a) {
         return a.replace("MU", "courage").replace("KL", "wisdom").replace("IN", "intuition").replace("CH", "charisma").replace("FF", "dexterity").replace("GE", "agility").replace("KK", "strength");
     }
+
+
+    public String generateSaveString() {
+        return name + "\n" + uid + "\n" + attr1 + "\n" + attr2 + "\n" + attr3;
+    }
 } //courage, wisdom, intuition, charisma, dexterity, agility, strength

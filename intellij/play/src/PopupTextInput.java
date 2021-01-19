@@ -71,6 +71,10 @@ class PopupTextInput {
                 keyPressedEvent(evt);
             }
         });
+        SwingUtilities.invokeLater(() -> {
+            Sleep.milliseconds(100);
+            tf_input.requestFocus();
+        });
         p.add(tf_input, gbc);
 
         l_dummy = new JLabel("<html><font color=\"" + StaticStuff.colorToHex(StaticStuff.getColor("background")) + "\">-</font>");

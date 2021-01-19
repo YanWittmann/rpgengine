@@ -59,4 +59,10 @@ public class ProjectSettings {
             names[i] = settings.get(i).replaceAll(":.+", "").replace(":", "");
         return names;
     }
+
+    public String[] generateSaveString() {
+        String[] dest = new String[settings.toArray().length];
+        System.arraycopy(settings.toArray(), 0, dest, 0, settings.toArray().length);
+        return dest;
+    }
 }

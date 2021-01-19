@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,8 +11,8 @@ public class Interpreter {
     private PlayerSettings player;
     private ProjectSettings settings;
     private String filename = "";
-    private final String extraFilePath = "../../";
-    private final String version = "1.8.1";
+    private String extraFilePath = "../../";
+    private final String version = "1.9";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg;
@@ -47,6 +48,7 @@ public class Interpreter {
         loadingScreenDone = true;
         while (!mayOpenStartPopup) Sleep.milliseconds(300);
         filename = StaticStuff.openPopup(StaticStuff.prepareString(lang("popupChooseAdventure")), StaticStuff.replaceAllLines(files, StaticStuff.adventureFileEnding, ""), files[0]);
+        filename = letUserPickSavestateIfAvailable(filename);
         manager = new Manager(this, filename, extraFilePath);
         StaticStuff.prepareColors(manager.getAllColors(), manager.getAllColorNames(), manager.getAllColorUIDs());
         settings = Manager.project;
@@ -56,9 +58,10 @@ public class Interpreter {
         while (!checkForPermissions(settings.getValue("permissions")))
             if (StaticStuff.openPopup(lang("permissionRequestRetry"), new String[]{lang("permissionRequestRetryNotExit"), lang("permissionRequestRetryExit")}) == 1)
                 System.exit(400);
-        executeEventFromObject(manager.getGeneralEventCollection().getUID(), "launch", new String[]{});
+        if (!userPickedSavestate)
+            executeEventFromObject(manager.getGeneralEventCollection().getUID(), "launch", new String[]{});
         showIntro = Manager.project.getValue("showIntro").equals("true");
-        if (showIntro) create = new GuiCharacterCreation(this);
+        if (showIntro && !userPickedSavestate) create = new GuiCharacterCreation(this);
         else finishSetup();
     }
 
@@ -143,7 +146,7 @@ public class Interpreter {
         }
         playerStatus = new GuiPlayerStats(self, player, manager);
         activateLog();
-        if (showIntro) {
+        if (showIntro && !userPickedSavestate) {
             executeEventFromObject(manager.getGeneralEventCollection().getUID(), "intro", new String[]{});
             new GuiIntro(this, player, settings, version, Manager.getImage(settings.getValue("image")));
         } else openConsole();
@@ -154,7 +157,8 @@ public class Interpreter {
         StaticStuff.setCustomCommands(manager.getAllCCFirstWords());
         console.setVisible(true);
         playerStatus.open();
-        new Thread(() -> executeEventFromObject(manager.getGeneralEventCollection().getUID(), "introOver", new String[]{})).start();
+        if (!userPickedSavestate)
+            new Thread(() -> executeEventFromObject(manager.getGeneralEventCollection().getUID(), "introOver", new String[]{})).start();
     }
 
     private boolean permissionWeb = false, permissionFileRead = false, permissionFileWrite = false, permissionFileReadAnywhere = false, permissionFileWriteAnywhere = false, permissionFileOpen = false;
@@ -200,12 +204,13 @@ public class Interpreter {
     private boolean userInputAllowed = true;
 
     public void executePlayerCommand(String cmd) {
-        boolean found = false;
+        boolean found = cmd.equals("savegame");
+        if (found) createSavestate();
         if (userInputAllowed) {
             for (CustomCommand customCommand : customCommands) {
                 if (customCommand.matches(cmd)) {
                     found = true;
-                    String newArgs[] = customCommand.getArgs(cmd);
+                    String[] newArgs = customCommand.getArgs(cmd);
                     executeEventFromObject(customCommand.uid, "commandExecuted", newArgs);
                 }
             }
@@ -226,6 +231,45 @@ public class Interpreter {
         }
         if (self.settings.getValue("debugMode").equals("true"))
             self.executeEvent("", new String[]{cmd}, new String[]{});
+    }
+
+    private void createSavestate() {
+        String saveName = StaticStuff.openPopup(lang("savestateEnterName"), "");
+        while (saveName.equals("") || saveName.contains(".") || saveName.contains("/") || saveName.contains("-")) {
+            saveName = StaticStuff.openPopup(lang("savestateInvalidName"), "");
+        }
+        manager.createSavestate(saveName + "---");
+    }
+
+    private boolean userPickedSavestate = false;
+
+    private String letUserPickSavestateIfAvailable(String adventure) {
+        ArrayList<String> available = new ArrayList<>();
+        Collections.addAll(available, getSavestateFiles(adventure));
+        for (int i = available.size() - 1; i >= 0; i--) {
+            if (available.get(i).contains("---" + adventure + StaticStuff.adventureFileEnding))
+                available.set(i, available.get(i).replaceAll("(.+)---" + adventure + StaticStuff.adventureFileEnding, "$1"));
+            else available.remove(i);
+        }
+        if (available.size() > 0) {
+            available.add(lang("savestateStartNewGame"));
+            String picked = StaticStuff.openPopup((available.size() > 2 ? lang("savestateSavestatesAvailable") : lang("savestateSavestateAvailable")) + "<br>" + lang("savestateSelectSavestate"), available.toArray(new String[0]), "");
+            if (picked.equals(lang("savestateStartNewGame"))) {
+                return adventure;
+            } else {
+                picked = picked + "---" + adventure;
+                extraFilePath = Manager.SAVESTATES_DIRECTORY.replace("savestates/adventures/", "savestates/");
+                Manager.extraFilePath = extraFilePath;
+                userPickedSavestate = true;
+                return picked;
+            }
+        }
+        return adventure;
+    }
+
+    private String[] getSavestateFiles(String adventure) {
+        FileManager.makeDirectory(Manager.SAVESTATES_DIRECTORY);
+        return FileManager.getFiles(Manager.SAVESTATES_DIRECTORY);
     }
 
     private void playerWalk(String newLocation) {
@@ -668,6 +712,7 @@ public class Interpreter {
                 return;
             }
             Log.add("Opening file " + "res/advfiles/" + code);
+            FileManager.makeDirectory("res/advfiles/");
             FileManager.openFile("res/advfiles/" + code);
         } else { //open fileObject
             String[] objects = evaluateSelector(param);
@@ -1319,10 +1364,8 @@ public class Interpreter {
                 for (String modifier : modifiers) {
                     String modifierName = modifier.replaceAll("([a-zA-Z]+)\\([^\\)]*\\)", "$1");
                     String[] modifierParam = modifier.replaceAll("[a-zA-Z]+\\(([^\\)]*)\\)", "$1").split("\\|");
-                    //System.out.println(modifierName);
                     for (int j = 0; j < modifierParam.length; j++)
                         modifierParam[j] = modifierParam[j].replace("ESCAPEDSPLITTER", "|");
-                    //for(int j=0;j<modifierParam.length;j++) System.out.println(modifierParam[j]);
 
                     if (modifierName.equals("charAt")) {
                         int index = Integer.parseInt(modifierParam[0]);
@@ -1791,6 +1834,7 @@ public class Interpreter {
             interpreter.prepareArgs(args);
             interpreter.setup();
         } catch (Exception e) {
+            e.printStackTrace();
             Popup.error("An error occurred", "Unable to launch player:\n" + e);
         }
     }

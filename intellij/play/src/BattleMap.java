@@ -52,22 +52,17 @@ public class BattleMap extends Entity {
     }
 
     public String generateSaveString() {
-        String str = "" + name + "\n" + description + "\n" + uid + "\n" + size + "\n" + groundTileUID + "\n" + playerPos;
+        StringBuilder str = new StringBuilder("" + name + "\n" + description + "\n" + uid + "\n" + size + "\n" + groundTileUID + "\n" + playerPos);
         for (int i = 0; i < eventName.size(); i++)
-            str = str + "\n++ev++" + eventName.get(i) + "---" + eventCode.get(i);
-        for (int i = 0; i < tags.size(); i++)
-            str = str + "\n++tag++" + tags.get(i);
+            str.append("\n++ev++").append(eventName.get(i)).append("---").append(eventCode.get(i));
+        for (String tag : tags) str.append("\n++tag++").append(tag);
         for (int i = 0; i < localVarName.size(); i++)
-            str = str + "\n++variable++" + localVarUids.get(i) + "---" + localVarName.get(i) + "---" + localVarType.get(i) + "---" + localVarValue.get(i);
-        for (int i = 0; i < extraGroundTiles.size(); i++)
-            str = str + "\n++extraGroundTile++" + extraGroundTiles.get(i);
-        for (int i = 0; i < obstacles.size(); i++)
-            str = str + "\n++obstacles++" + obstacles.get(i);
-        for (int i = 0; i < npcs.size(); i++)
-            str = str + "\n++npc++" + npcs.get(i);
-        for (int i = 0; i < items.size(); i++)
-            str = str + "\n++item++" + items.get(i);
-        return str;
+            str.append("\n++variable++").append(localVarUids.get(i)).append("---").append(localVarName.get(i)).append("---").append(localVarType.get(i)).append("---").append(localVarValue.get(i));
+        for (String extraGroundTile : extraGroundTiles) str.append("\n++extraGroundTile++").append(extraGroundTile);
+        for (String obstacle : obstacles) str.append("\n++obstacles++").append(obstacle);
+        for (String npc : npcs) str.append("\n++npc++").append(npc);
+        for (String item : items) str.append("\n++item++").append(item);
+        return str.toString();
     }
 
     private GuiBattleMap gui;

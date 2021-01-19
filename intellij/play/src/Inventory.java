@@ -36,16 +36,15 @@ public class Inventory extends Entity {
     }
 
     public String generateSaveString() {
-        String str = "" + name + "\n" + description + "\n" + uid;
+        StringBuilder str = new StringBuilder("" + name + "\n" + description + "\n" + uid);
         for (int i = 0; i < eventName.size(); i++)
-            str = str + "\n++ev++" + eventName.get(i) + "---" + eventCode.get(i);
-        for (int i = 0; i < tags.size(); i++)
-            str = str + "\n++tag++" + tags.get(i);
+            str.append("\n++ev++").append(eventName.get(i)).append("---").append(eventCode.get(i));
+        for (String tag : tags) str.append("\n++tag++").append(tag);
         for (int i = 0; i < localVarName.size(); i++)
-            str = str + "++variable++" + localVarUids.get(i) + "---" + localVarName.get(i) + "---" + localVarType.get(i) + "---" + localVarValue.get(i) + "\n";
+            str.append("\n").append("++variable++").append(localVarUids.get(i)).append("---").append(localVarName.get(i)).append("---").append(localVarType.get(i)).append("---").append(localVarValue.get(i));
         for (int i = 0; i < items.size(); i++)
-            str = str + "\n++item++" + items.get(i) + "---" + itemAmount.get(i);
-        return str;
+            str.append("\n++item++").append(items.get(i)).append("---").append(itemAmount.get(i));
+        return str.toString();
     }
 
     public void setItem(String uid, int amount) {

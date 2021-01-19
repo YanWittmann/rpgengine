@@ -692,76 +692,77 @@ public class Manager {
     }
 
     public static String getLocalVariableByUID(String varUID) {
-        for (int i = 0; i < npcs.size(); i++)
-            if (npcs.get(i).localVarUids.contains(varUID))
-                return npcs.get(i).localVarValue.get(npcs.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).localVarUids.contains(varUID))
-                return inventories.get(i).localVarValue.get(inventories.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).localVarUids.contains(varUID))
-                return locations.get(i).localVarValue.get(locations.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).localVarUids.contains(varUID))
-                return items.get(i).localVarValue.get(items.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).localVarUids.contains(varUID))
-                return inventories.get(i).localVarValue.get(inventories.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).localVarUids.contains(varUID))
-                return battleMaps.get(i).localVarValue.get(battleMaps.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < events.size(); i++)
-            if (events.get(i).localVarUids.contains(varUID))
-                return events.get(i).localVarValue.get(events.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).localVarUids.contains(varUID))
-                return lootTable.get(i).localVarValue.get(lootTable.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).localVarUids.contains(varUID))
-                return customCommands.get(i).localVarValue.get(customCommands.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < colors.size(); i++)
-            if (colors.get(i).localVarUids.contains(varUID))
-                return colors.get(i).localVarValue.get(colors.get(i).localVarUids.indexOf(varUID));
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).localVarUids.contains(varUID))
-                return fileObjects.get(i).localVarValue.get(fileObjects.get(i).localVarUids.indexOf(varUID));
+        for (NPC npc : npcs)
+            if (npc.localVarUids.contains(varUID))
+                return npc.localVarValue.get(npc.localVarUids.indexOf(varUID));
+        for (Inventory inventory : inventories)
+            if (inventory.localVarUids.contains(varUID))
+                return inventory.localVarValue.get(inventory.localVarUids.indexOf(varUID));
+        for (Location location : locations)
+            if (location.localVarUids.contains(varUID))
+                return location.localVarValue.get(location.localVarUids.indexOf(varUID));
+        for (Item item : items)
+            if (item.localVarUids.contains(varUID))
+                return item.localVarValue.get(item.localVarUids.indexOf(varUID));
+        for (Inventory inventory : inventories)
+            if (inventory.localVarUids.contains(varUID))
+                return inventory.localVarValue.get(inventory.localVarUids.indexOf(varUID));
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.localVarUids.contains(varUID))
+                return battleMap.localVarValue.get(battleMap.localVarUids.indexOf(varUID));
+        for (Event event : events)
+            if (event.localVarUids.contains(varUID))
+                return event.localVarValue.get(event.localVarUids.indexOf(varUID));
+        for (LootTable table : lootTable)
+            if (table.localVarUids.contains(varUID))
+                return table.localVarValue.get(table.localVarUids.indexOf(varUID));
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.localVarUids.contains(varUID))
+                return customCommand.localVarValue.get(customCommand.localVarUids.indexOf(varUID));
+        for (ColorObject color : colors)
+            if (color.localVarUids.contains(varUID))
+                return color.localVarValue.get(color.localVarUids.indexOf(varUID));
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.localVarUids.contains(varUID))
+                return fileObject.localVarValue.get(fileObject.localVarUids.indexOf(varUID));
         return "";
     }
 
     public static String getLocalVariableByName(String uid, String varName) {
-        for (int i = 0; i < npcs.size(); i++)
-            if (npcs.get(i).uid.equals(uid)) if (npcs.get(i).localVarName.contains(varName))
-                return npcs.get(i).localVarValue.get(npcs.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) if (inventories.get(i).localVarName.contains(varName))
-                return inventories.get(i).localVarValue.get(inventories.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid)) if (locations.get(i).localVarName.contains(varName))
-                return locations.get(i).localVarValue.get(locations.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).uid.equals(uid)) if (items.get(i).localVarName.contains(varName))
-                return items.get(i).localVarValue.get(items.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) if (inventories.get(i).localVarName.contains(varName))
-                return inventories.get(i).localVarValue.get(inventories.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid)) if (battleMaps.get(i).localVarName.contains(varName))
-                return battleMaps.get(i).localVarValue.get(battleMaps.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < events.size(); i++)
-            if (events.get(i).uid.equals(uid)) if (events.get(i).localVarName.contains(varName))
-                return events.get(i).localVarValue.get(events.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(uid)) if (lootTable.get(i).localVarName.contains(varName))
-                return lootTable.get(i).localVarValue.get(lootTable.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid)) if (customCommands.get(i).localVarName.contains(varName))
-                return customCommands.get(i).localVarValue.get(customCommands.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < colors.size(); i++)
-            if (colors.get(i).uid.equals(uid)) if (colors.get(i).localVarName.contains(varName))
-                return colors.get(i).localVarValue.get(colors.get(i).localVarName.indexOf(varName));
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) if (fileObjects.get(i).localVarName.contains(varName))
-                return fileObjects.get(i).localVarValue.get(fileObjects.get(i).localVarName.indexOf(varName));
+        for (NPC npc : npcs)
+            if (npc.uid.equals(uid)) if (npc.localVarName.contains(varName))
+                return npc.localVarValue.get(npc.localVarName.indexOf(varName));
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid)) if (inventory.localVarName.contains(varName))
+                return inventory.localVarValue.get(inventory.localVarName.indexOf(varName));
+        for (Location location : locations)
+            if (location.uid.equals(uid)) if (location.localVarName.contains(varName))
+                return location.localVarValue.get(location.localVarName.indexOf(varName));
+        for (Item item : items)
+            if (item.uid.equals(uid))
+                if (item.localVarName.contains(varName))
+                    return item.localVarValue.get(item.localVarName.indexOf(varName));
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid)) if (inventory.localVarName.contains(varName))
+                return inventory.localVarValue.get(inventory.localVarName.indexOf(varName));
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.uid.equals(uid)) if (battleMap.localVarName.contains(varName))
+                return battleMap.localVarValue.get(battleMap.localVarName.indexOf(varName));
+        for (Event event : events)
+            if (event.uid.equals(uid)) if (event.localVarName.contains(varName))
+                return event.localVarValue.get(event.localVarName.indexOf(varName));
+        for (LootTable table : lootTable)
+            if (table.uid.equals(uid)) if (table.localVarName.contains(varName))
+                return table.localVarValue.get(table.localVarName.indexOf(varName));
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.uid.equals(uid)) if (customCommand.localVarName.contains(varName))
+                return customCommand.localVarValue.get(customCommand.localVarName.indexOf(varName));
+        for (ColorObject color : colors)
+            if (color.uid.equals(uid)) if (color.localVarName.contains(varName))
+                return color.localVarValue.get(color.localVarName.indexOf(varName));
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.uid.equals(uid)) if (fileObject.localVarName.contains(varName))
+                return fileObject.localVarValue.get(fileObject.localVarName.indexOf(varName));
         return "";
     }
 
@@ -1175,42 +1176,41 @@ public class Manager {
     }
 
     public static Entity getEntity(String uid) {
-        for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) return npcs.get(i);
-        for (int i = 0; i < inventories.size(); i++) if (inventories.get(i).uid.equals(uid)) return inventories.get(i);
-        for (int i = 0; i < locations.size(); i++) if (locations.get(i).uid.equals(uid)) return locations.get(i);
-        for (int i = 0; i < items.size(); i++) if (items.get(i).uid.equals(uid)) return items.get(i);
-        for (int i = 0; i < inventories.size(); i++) if (inventories.get(i).uid.equals(uid)) return inventories.get(i);
-        for (int i = 0; i < battleMaps.size(); i++) if (battleMaps.get(i).uid.equals(uid)) return battleMaps.get(i);
-        for (int i = 0; i < events.size(); i++) if (events.get(i).uid.equals(uid)) return events.get(i);
-        for (int i = 0; i < lootTable.size(); i++) if (lootTable.get(i).uid.equals(uid)) return lootTable.get(i);
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid)) return customCommands.get(i);
-        for (int i = 0; i < colors.size(); i++) if (colors.get(i).uid.equals(uid)) return colors.get(i);
-        for (int i = 0; i < fileObjects.size(); i++) if (fileObjects.get(i).uid.equals(uid)) return fileObjects.get(i);
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return npc;
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return inventory;
+        for (Location location : locations) if (location.uid.equals(uid)) return location;
+        for (Item item : items) if (item.uid.equals(uid)) return item;
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return inventory;
+        for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return battleMap;
+        for (Event event : events) if (event.uid.equals(uid)) return event;
+        for (LootTable table : lootTable) if (table.uid.equals(uid)) return table;
+        for (CustomCommand customCommand : customCommands) if (customCommand.uid.equals(uid)) return customCommand;
+        for (ColorObject color : colors) if (color.uid.equals(uid)) return color;
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return fileObject;
         return null;
     }
 
     public ArrayList<Color> getAllColors() {
-        ArrayList<Color> c = new ArrayList<Color>();
+        ArrayList<Color> c = new ArrayList<>();
         for (ColorObject co : colors) c.add(co.color);
         return c;
     }
 
     public ArrayList<String> getAllColorNames() {
-        ArrayList<String> c = new ArrayList<String>();
+        ArrayList<String> c = new ArrayList<>();
         for (ColorObject co : colors) c.add(co.name);
         return c;
     }
 
     public ArrayList<String> getAllColorUIDs() {
-        ArrayList<String> c = new ArrayList<String>();
+        ArrayList<String> c = new ArrayList<>();
         for (ColorObject co : colors) c.add(co.uid);
         return c;
     }
 
     public static Color getColorByName(String name) {
         for (ColorObject co : colors) if (co.name.equals(name)) return co.color;
-        return new Color(0, 0, 0);
+        return new Color(238, 0, 255);
     }
 
     public void endBattle() {
@@ -1222,11 +1222,73 @@ public class Manager {
     }
 
     public void clearInventory(String uid) {
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) inventories.get(i).clearItems();
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) inventory.clearItems();
     }
 
     public Event getGeneralEventCollection() {
         return generalEventCollection;
+    }
+
+    public final static String SAVESTATES_DIRECTORY = "../../adventures/savestates/adventures/";
+
+    public void createSavestate(String extraName) {
+        String localFilename = extraName + filename;
+        localFilename = localFilename.replaceAll("([^-]+---)[^-]+---(.+)", "$1$2");
+        try {
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename);
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/project");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/locations");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/npcs");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/inventories");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/itemtypes");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/battlemaps");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/audio");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/images");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/variables");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/talents");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/events");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/lootTable");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/customCommands");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/colors");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/fileObjects");
+            FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/project/player" + StaticStuff.dataFileEnding, player.generateSaveString());
+            FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/project/settings" + StaticStuff.dataFileEnding, project.generateSaveString());
+            for (Location location : locations)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/locations/" + location.uid + "" + StaticStuff.dataFileEnding, location.generateSaveString());
+            for (NPC npc : npcs)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/npcs/" + npc.uid + "" + StaticStuff.dataFileEnding, npc.generateSaveString());
+            for (Item item : items)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/itemtypes/" + item.uid + "" + StaticStuff.dataFileEnding, item.generateSaveString());
+            for (Inventory inventory : inventories)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/inventories/" + inventory.uid + "" + StaticStuff.dataFileEnding, inventory.generateSaveString());
+            for (BattleMap battleMap : battleMaps)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/battlemaps/" + battleMap.uid + "" + StaticStuff.dataFileEnding, battleMap.generateSaveString());
+            for (Talent talent : talents)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/talents/" + talent.uid + "" + StaticStuff.dataFileEnding, talent.generateSaveString());
+            for (Event event : events)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/events/" + event.uid + "" + StaticStuff.dataFileEnding, event.generateSaveString());
+            for (LootTable table : lootTable)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/lootTable/" + table.uid + "" + StaticStuff.dataFileEnding, table.generateSaveString());
+            for (CustomCommand customCommand : customCommands)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/customCommands/" + customCommand.uid + "" + StaticStuff.dataFileEnding, customCommand.generateSaveString());
+            for (ColorObject color : colors)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/colors/" + color.uid + "" + StaticStuff.dataFileEnding, color.generateSaveString());
+            for (FileObject fileObject : fileObjects) {
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/fileObjects/" + fileObject.uid + "" + StaticStuff.dataFileEnding, fileObject.generateSaveString());
+                FileManager.writeFileFromByteArray(SAVESTATES_DIRECTORY + localFilename + "/fileObjects/" + fileObject.uid + ".file", fileObject.getByteArray());
+            }
+            FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/variables/vars" + StaticStuff.dataFileEnding, variables.generateSaveString());
+            FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/images/imagelist" + StaticStuff.dataFileEnding, images.generateSaveString(SAVESTATES_DIRECTORY + localFilename + "/images/"));
+            FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/audio/audiolist" + StaticStuff.dataFileEnding, audios.generateSaveString(SAVESTATES_DIRECTORY + localFilename + "/audio/"));
+            FileManager.zipDirectory(SAVESTATES_DIRECTORY + localFilename, SAVESTATES_DIRECTORY + localFilename + "" + StaticStuff.adventureFileEnding);
+            FileManager.deleteDirectoryRecursively(SAVESTATES_DIRECTORY + localFilename);
+            if (!project.getValue("password").equals("") && project.getValue("requirePasswordToPlay").equals("true")) {
+                CryptoUtils.encrypt(CryptoUtils.prepareKey(project.getValue("password")), SAVESTATES_DIRECTORY + localFilename + "" + StaticStuff.adventureFileEnding, SAVESTATES_DIRECTORY + localFilename + "" + StaticStuff.adventureFileEnding);
+            }
+            StaticStuff.openPopup(Interpreter.lang("savestateCreatedSuccess", extraName.replace("---", "")));
+        } catch (Exception e) {
+            e.printStackTrace();
+            StaticStuff.error(Interpreter.lang("savestateCreatedFailed", extraName.replace("---", "")));
+        }
     }
 }

@@ -45,6 +45,12 @@ public class ColorObject extends Entity {
     }
 
     public String generateSaveString() {
-        return "";
+        StringBuilder str = new StringBuilder("" + name + "\n" + description + "\n" + uid + "\n" + color.getRed() + "\n" + color.getGreen() + "\n" + color.getBlue() + "\n");
+        for (int i = 0; i < eventName.size(); i++)
+            str.append("\n++ev++").append(eventName.get(i)).append("---").append(eventCode.get(i));
+        for (String tag : tags) str.append("\n++tag++").append(tag);
+        for (int i = 0; i < localVarName.size(); i++)
+            str.append("\n").append("\n++variable++").append(localVarUids.get(i)).append("---").append(localVarName.get(i)).append("---").append(localVarType.get(i)).append("---").append(localVarValue.get(i));
+        return str.toString();
     }
 }

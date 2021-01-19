@@ -1,0 +1,116 @@
+
+if {value|{this}}.variable(whichPath) == entrance (
+	if {newLocation} == north (
+		player input false
+		{value|{this}}.variable(whichPath) == examinePath
+		print You slowly walk along the path, the forest becoming [[gray:darker]] and [[black:darker]]. The path in front of you splits in two paths.
+		sleep 6 s
+		print Unsure of where to go, you decide to '[[gold:examine path]]'. Try also typing only '[[gold:ex]]' and pressing [[gold:tab]] to autocomplete.
+		player input true
+		return
+	) else (
+		print Try typing '[[gold:go north]]'!
+		return
+	)
+)
+
+
+if {value|{this}}.variable(whichPath) == examinePath (
+	if {value|{this}}.variable(paperFound) == true (
+		if {newLocation} == north (
+			player input false
+			{value|{this}}.variable(whichPath) == optPath1
+			print You decide to walk north.
+			sleep 2 s
+			print After a short moment, you arrive at a [[gold:small resting place]] with a campfire that seems to be inactive for quite some time.
+			if {value|{this}}.variable(bowPickedUp) == false (
+				print There is a [[gold:bow]] and a few arrows next to the campfire! Pick them up using '[[gold:pick up bow]]' or '[[gold:take bow]]'.
+			)
+			player input true
+			return
+		)
+		if {newLocation} == east (
+			{value|{this}}.variable(whichPath) == optPath2
+			print You decide to walk east. You arrive at another crossing, with a path to the [[gold:south]], [[gold:west]] and [[gold:east]], where you just came from. There is nothing special otherwise.
+			return
+		)
+		if {newLocation} == south (
+			print You don't feel like [[gold:walking back]] to your home.
+			return
+		)
+		print You can't walk [[aqua:{newLocation}]] here.
+	) else (
+		print Try typing '[[gold:examine path]]'!
+		return
+	)
+)
+
+
+if {value|{this}}.variable(whichPath) == optPath1 (
+	if {newLocation} == south (
+		{value|{this}}.variable(whichPath) == optPath2
+		print You decide to walk south. You arrive at another crossing, with a path to the [[gold:south]], [[gold:west]] (where you just came from) and [[gold:east]]. There is nothing special otherwise.
+		return
+	)
+	if {newLocation} == west (
+		{value|{this}}.variable(whichPath) == examinePath
+		print You decide to walk west. You are back at the spot where you found the [[gold:map]].
+		return
+	)
+	print You can't walk [[aqua:{newLocation}]] here.
+)
+
+
+if {value|{this}}.variable(whichPath) == optPath2 (
+	if {newLocation} == north (
+			player input false
+			{value|{this}}.variable(whichPath) == optPath1
+			print You decide to walk north.
+			sleep 1 s
+			print After a short moment, you arrive at a [[gold:small resting place]] with a campfire that seems to be inactive for quite some time.
+			if {value|{this}}.variable(bowPickedUp) == false (
+				print There is a [[gold:bow]] and a few arrows next to the campfire! Pick them up using '[[gold:pick up bow]]' or '[[gold:take bow]]'.
+			)
+			player input true
+			return
+		)
+	if {newLocation} == west (
+		{value|{this}}.variable(whichPath) == examinePath
+		print You decide to walk west. You are back at the spot where you found the [[gold:map]].
+		return
+	)
+	if {newLocation} == east (
+		{value|{this}}.variable(whichPath) == beforeClearing
+		player input false
+		print You decide to walk east. In the distance, you can see that the light gets brighter, as if you were approaching a clearing.
+		sleep 6 s
+		print You check on your map and it says '[[gold:Clearing]]'
+		sleep 4 s
+		print Something tells you that you should [[gold:examine the path]] again.
+		player input true
+		return
+	)
+	print You can't walk [[aqua:{newLocation}]] here.
+)
+
+
+if {value|{this}}.variable(whichPath) == beforeClearing (
+	if {newLocation} == south (
+		if {value|{this}}.variable(swordPickedUp) == true (
+			player input false
+			print You slowly approach the [[gold:clearing]].
+			sleep 1 s
+			player input true
+			goto #name:Clearing in the forest#
+			return
+		) else (
+			print Try typing '[[gold:examine path]]'!
+		)
+	)
+	if {newLocation} == west (
+		{value|{this}}.variable(whichPath) == optPath2
+		print You decide to walk west. You are back at the spot where you found the [[gold:map]].
+		return
+	)
+	print You can't walk [[aqua:{newLocation}]] here.
+)

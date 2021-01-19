@@ -2,7 +2,7 @@
 ___
 
 
-## 19.01.2021 - RELEASE `1.8.1`
+## 19.01.2021 - RELEASE `1.8.1` & `1.9`
 #### Bugfixes:
 
  * the launcher did not extract files from new downloaded versions correctly making them unuseable
@@ -11,6 +11,8 @@ ___
 #### New / Modification:
 
  * finished automatic uploader, i can now create all files and upload them with one button press (which is really cool)
+ * text input popup now automatically requests focus upon opening so that the user doesn't have to click into the text field
+ * new command `savegame`: you can now create a savestate that you can later reload by opening that adventure and selecting the savestate
 
 #### Other:
 
