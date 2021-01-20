@@ -16,7 +16,7 @@ public class GuiActionEditor extends JFrame {
     private Entity entity;
     private int event;
     private String eventName;
-    private boolean isActionEditorOpenDirectlyInExternalEditor = Manager.isActionEditorOpenDirectlyInExternalEditor();
+    private final boolean isActionEditorOpenDirectlyInExternalEditor = Manager.isActionEditorOpenDirectlyInExternalEditor();
 
     public GuiActionEditor(Entity entity, int event) {
         int size_x = 1000;

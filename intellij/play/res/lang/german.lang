@@ -121,6 +121,9 @@ savestateStartNewGame:Ein neues Abenteuer beginnen
 savestateCreatedSuccess:[[gold:Speicherstand]] [[green:{1}]] erstellt
 savestateCreatedFailed:red:Konnte [[gold:Speicherstand]] [[red:{1}]] nicht erstellen
 
+mainFrameActionHover1:[[green:Speicherstand erstellen]]
+mainFrameActionHover2:Befehle anzeigen
+
 langSelectionText:Sprachauswahl:
 langInfoAuthorText:Autor:
 langInfoVersionText:Version:

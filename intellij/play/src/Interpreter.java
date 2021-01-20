@@ -6,13 +6,13 @@ import java.util.regex.Pattern;
 
 public class Interpreter {
     private static Interpreter self;
-    private GuiTextarea console;
+    private GuiMainConsole console;
     private Manager manager;
     private PlayerSettings player;
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.9";
+    private final String version = "1.9.1";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg;
@@ -74,7 +74,7 @@ public class Interpreter {
             loadingScreenDone = false;
             loading.dispose();
         }).start();
-        console = new GuiTextarea(this);
+        console = new GuiMainConsole(this);
         customCommands = manager.getAllCC();
         Sleep.milliseconds(200);
         loadingScreenDone = true;
@@ -193,7 +193,7 @@ public class Interpreter {
 
     public void print(String str) {
         String[] toPrint = str.split("LINEBREAK");
-        for (String s : toPrint) GuiTextarea.appendToOutput(s);
+        for (String s : toPrint) GuiMainConsole.appendToOutput(s);
     }
 
     public void activateLog() {
@@ -233,7 +233,7 @@ public class Interpreter {
             self.executeEvent("", new String[]{cmd}, new String[]{});
     }
 
-    private void createSavestate() {
+    public void createSavestate() {
         String saveName = StaticStuff.openPopup(lang("savestateEnterName"), "");
         while (saveName.equals("") || saveName.contains(".") || saveName.contains("/") || saveName.contains("-")) {
             saveName = StaticStuff.openPopup(lang("savestateInvalidName"), "");
@@ -1706,6 +1706,10 @@ public class Interpreter {
 
     public void addAutoCompleteWords(String words) {
         console.addAutoCompleteWords(words.split(","));
+    }
+
+    public void showPossiblePlayerCommands() {
+        executeEventFromObject(manager.getGeneralEventCollection().getUID(), "showAvailableCommands", new String[]{});
     }
 
     public static String lang(String textName) {

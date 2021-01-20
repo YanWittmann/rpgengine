@@ -9,19 +9,21 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiTextarea extends JFrame {
+public class GuiMainConsole extends JFrame {
     private JMenuBar menuBar;
     private JTextField ta_input;
     private JTextArea ta_main;
+    private JLabel[] l_iconActions;
     private static ArrayList<JLabel> l_mainLabels = new ArrayList<>();
     private static ArrayList<String> textBuffer = new ArrayList<String>();
     public static String waitForUserInputLastString = "";
     private Interpreter interpreter;
     private int pX, pY;
+    private int heightFactor = Interpreter.getScaledValue(49);
     private static JPanel contentPane = new JPanel(null);
-    private static GuiTextarea self;
+    private static GuiMainConsole self;
 
-    public GuiTextarea(Interpreter interpreter) {
+    public GuiMainConsole(Interpreter interpreter) {
         this.self = this;
         this.interpreter = interpreter;
         this.setTitle(StaticStuff.projectName);
@@ -32,7 +34,7 @@ public class GuiTextarea extends JFrame {
         setIconImage(new ImageIcon("res/img/iconyellow.png").getImage());
 
         ta_input = new JTextField();
-        ta_input.setBounds(4, 732, 1352, 35);
+        ta_input.setBounds(4, 732, 1314, 35);
         ta_input.setBackground(new Color(255, 255, 255));
         ta_input.setForeground(new Color(0, 0, 0));
         ta_input.setEnabled(true);
@@ -46,23 +48,46 @@ public class GuiTextarea extends JFrame {
                 keyPressedEvent(evt);
             }
         });
-
         contentPane.add(ta_input);
 
-        int heightFactor = Interpreter.getScaledValue(49);
+        l_iconActions = new JLabel[3];
+        for (int i = 0; i < l_iconActions.length; i++) {
+            l_iconActions[i] = new JLabel();
+            l_iconActions[i].setBounds(1317, 732, 35, 35);
+            l_iconActions[i].setBackground(new Color(100, 100, 100));
+            l_iconActions[i].setForeground(new Color(100, 100, 100));
+            l_iconActions[i].setEnabled(true);
+            l_iconActions[i].setText("");
+            ImageIcon img = new ImageIcon("res/img/consoleIcon" + i + ".png");
+            l_iconActions[i].setIcon(PopupImage.getScaledImage(img, Interpreter.getScaledValue(35), Interpreter.getScaledValue(35)));
+            l_iconActions[i].setVisible(i == 0);
+            final int ii = i;
+            l_iconActions[i].addMouseListener(new MouseListener() {
+                public void mouseReleased(MouseEvent e) {
+                    clickActionIcon(ii);
+                }
+
+                public void mousePressed(MouseEvent e) {
+                }
+
+                public void mouseExited(MouseEvent e) {
+                }
+
+                public void mouseEntered(MouseEvent e) {
+                    if (ii != 0 && !actionMenuAnimationIsRunning)
+                        new GuiHoverText("<html>" + StaticStuff.prepareString(Interpreter.lang("mainFrameActionHover" + ii)));
+                }
+
+                public void mouseClicked(MouseEvent e) {
+                }
+            });
+            contentPane.add(l_iconActions[i]);
+        }
+
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                int width = e.getComponent().getWidth();
-                int height = e.getComponent().getHeight();
-                ta_input.setBounds(4, height - 78 + (35 - Interpreter.getScaledValue(35)), width - 24, Interpreter.getScaledValue(35));
-                //l_main.setBounds(4,-10+((height-78)%heightFactor) + (35 - Interpreter.getScaledValue(35)),15000,height-78);
-                int currentAmountLines = (int) ((height - 78 - ((height - 78) % heightFactor)) / heightFactor);
-
-                setAmountMainLabels(currentAmountLines + 3);
-                distributeMainLabels(height - 78 + (35 - Interpreter.getScaledValue(35)));
-
-                updateOutput();
+                resizeEvent(false);
             }
 
             @Override
@@ -73,11 +98,7 @@ public class GuiTextarea extends JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                new Thread() {
-                    public void run() {
-                        closeOperation();
-                    }
-                }.start();
+                new Thread(() -> closeOperation()).start();
             }
         });
 
@@ -90,7 +111,30 @@ public class GuiTextarea extends JFrame {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.pack();
+
+        resizeEvent(true);
     }
+
+    private void resizeEvent(boolean init) {
+        int width = getWidth();
+        int height = getHeight();
+        int iconsActionSize = Interpreter.getScaledValue(35);
+
+        ta_input.setBounds(4, height - 78 + (35 - iconsActionSize), width - 24 - 10 - iconsActionSize, iconsActionSize);
+
+        if(!init) {
+            int currentAmountLines = (height - 78 - ((height - 78) % heightFactor)) / heightFactor;
+            setAmountMainLabels(currentAmountLines + 3);
+            distributeMainLabels(height - 78 + (35 - Interpreter.getScaledValue(35)));
+            updateOutput();
+        }
+
+        for (int i = 0; i < l_iconActions.length; i++) {
+            l_iconActions[i].setBounds(width - 22 - iconsActionSize, height - 78 + (35 - iconsActionSize) - (i * (iconsActionSize + 10)), iconsActionSize, iconsActionSize);
+        }
+    }
+
+    private boolean dragActive = false;
 
     private void addDragListener(Component c) {
         c.addMouseListener(new MouseAdapter() {
@@ -117,7 +161,76 @@ public class GuiTextarea extends JFrame {
         });
     }
 
-    private boolean dragActive = false;
+    private boolean actionMenuIsOpen = false;
+    private boolean actionMenuAnimationIsRunning = false;
+
+    private void clickActionIcon(int id) {
+        Log.add("Clicked action icon with ID " + id);
+        if (actionMenuAnimationIsRunning) {
+            Log.add("Animation is running, click again later!");
+            return;
+        }
+        if (id == 0) { //open/close
+            if (actionMenuIsOpen) { //close menu
+                Log.add("Closing action menu");
+                new Thread(() -> { //closing animation
+
+                    actionMenuAnimationIsRunning = true;
+                    boolean isNotVisible = true;
+                    int width = getWidth();
+                    int height = getHeight();
+                    int iconsActionSize = Interpreter.getScaledValue(35);
+                    int x = width - 22 - iconsActionSize;
+                    int startY = height - 78 + (35 - iconsActionSize) - (iconsActionSize + 10) - ((l_iconActions.length - 1) * (iconsActionSize + 10));
+
+                    for (int j = 0; isNotVisible; j++) {
+                        for (int i = 1; i < l_iconActions.length; i++) {
+                            l_iconActions[i].setLocation(x, startY + (int) (j * 1.2) + (i * (iconsActionSize + 10)));
+                        }
+                        isNotVisible = (height > l_iconActions[l_iconActions.length - 1].getY());
+                        Sleep.milliseconds(1);
+                    }
+
+                    for (int i = 0; i < l_iconActions.length; i++)
+                        l_iconActions[i].setVisible(i == 0);
+
+                    actionMenuIsOpen = !actionMenuIsOpen;
+                    actionMenuAnimationIsRunning = false;
+                }).start();
+            } else { //open menu
+                Log.add("Opening action menu");
+                new Thread(() -> { //opening animation
+
+                    actionMenuAnimationIsRunning = true;
+                    for (JLabel l_iconAction : l_iconActions) l_iconAction.setVisible(true);
+
+                    boolean isNotVisible = true;
+                    int width = getWidth();
+                    int height = getHeight();
+                    int iconsActionSize = Interpreter.getScaledValue(35);
+                    int x = width - 22 - iconsActionSize;
+                    int destY = height - 78 + (35 - iconsActionSize) - (iconsActionSize + 10);
+
+                    for (int j = 0; isNotVisible; j++) {
+                        for (int i = 1; i < l_iconActions.length; i++) {
+                            l_iconActions[i].setLocation(x, l_iconActions[0].getY() + Interpreter.getScaledValue(40) - (int) (j * 0.8) + (i * (iconsActionSize + 10)));
+                        }
+                        isNotVisible = (destY < l_iconActions[l_iconActions.length - 1].getY());
+                        Sleep.milliseconds(1);
+                    }
+
+                    actionMenuIsOpen = !actionMenuIsOpen;
+                    actionMenuAnimationIsRunning = false;
+                }).start();
+            }
+        } else if (id == 1) {
+            new Thread(() -> interpreter.createSavestate()).start();
+            clickActionIcon(0);
+        } else if (id == 2) {
+            new Thread(() -> interpreter.showPossiblePlayerCommands()).start();
+            clickActionIcon(0);
+        }
+    }
 
     private static void setAmountMainLabels(int amount) {
         if (l_mainLabels.size() >= amount) return;
@@ -133,22 +246,18 @@ public class GuiTextarea extends JFrame {
             l_mainLabels.get(counter).setHorizontalAlignment(JLabel.LEFT);
             l_mainLabels.get(counter).setVerticalAlignment(JLabel.TOP);
             l_mainLabels.get(counter).setVisible(true);
-            l_mainLabels.get(counter).addMouseWheelListener(new MouseWheelListener() {
-                public void mouseWheelMoved(MouseWheelEvent evt) {
-                    scroll(evt);
-                }
-            });
+            l_mainLabels.get(counter).addMouseWheelListener(GuiMainConsole::scroll);
             contentPane.add(l_mainLabels.get(counter));
             self.addDragListener(l_mainLabels.get(counter));
             counter++;
         } while (l_mainLabels.size() < amount);
     }
 
-    private static int changeMainLabelHeightPerStep = Interpreter.getScaledValue(49);
+    private static final int changeMainLabelHeightPerStep = Interpreter.getScaledValue(49);
 
     private static void distributeMainLabels(int height) {
-        for (int i = 0; i < l_mainLabels.size(); i++) {
-            l_mainLabels.get(i).setBounds(4, -1000, 0, 0);
+        for (JLabel l_mainLabel : l_mainLabels) {
+            l_mainLabel.setBounds(4, -1000, 0, 0);
         }
         for (int i = 0; height > 0; i++) {
             height -= changeMainLabelHeightPerStep;
@@ -175,13 +284,11 @@ public class GuiTextarea extends JFrame {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     List<File> droppedFiles = (List<File>)
                             evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    new Thread() {
-                        public void run() {
-                            for (File file : droppedFiles) {
-                                dropFile(file.getAbsolutePath());
-                            }
+                    new Thread(() -> {
+                        for (File file : droppedFiles) {
+                            dropFile(file.getAbsolutePath());
                         }
-                    }.start();
+                    }).start();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -282,7 +389,7 @@ public class GuiTextarea extends JFrame {
     }
 
     public void playerAppend(String text) {
-        if (GuiTextarea.waitForUserInputLastString.equals("waitingForInput")) {
+        if (GuiMainConsole.waitForUserInputLastString.equals("waitingForInput")) {
             Log.add("Player entered value for {input|line}: " + text);
             waitForUserInputLastString = StaticStuff.removePrepareString(text);
             addToTextArea(" - " + StaticStuff.prepareStringForPlayer(text));
@@ -372,11 +479,7 @@ public class GuiTextarea extends JFrame {
     }
 
     private void executePlayerCommand(String cmd) {
-        new Thread() {
-            public void run() {
-                interpreter.executePlayerCommand(cmd);
-            }
-        }.start();
+        new Thread(() -> interpreter.executePlayerCommand(cmd)).start();
     }
 
     public void clearChat() {

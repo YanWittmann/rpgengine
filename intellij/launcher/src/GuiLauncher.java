@@ -22,8 +22,10 @@ public class GuiLauncher extends JFrame {
     private Launcher launcher;
     private int xSize = 1310, ySize = 753;
     private boolean ready = false, isSelectedPlay = false, isSelectedCreate = false, isSelectedOther[], isVisiblePlay = false, isVisibleCreate = false, isVisibleOther[];
+    private static GuiLauncher self;
 
     public GuiLauncher(Launcher launcher) {
+        self = this;
         this.launcher = launcher;
         this.setTitle("RPG Engine - Launcher");
         this.setSize(xSize, ySize);
@@ -51,12 +53,10 @@ public class GuiLauncher extends JFrame {
         l_close.setFont(StaticStuff.getPixelatedFont());
         l_close.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
-                new Thread() {
-                    public void run() {
-                        if (buttonsAcitve)
-                            System.exit(0);
-                    }
-                }.start();
+                new Thread(() -> {
+                    if (buttonsAcitve)
+                        System.exit(0);
+                }).start();
             }
         });
 
@@ -66,6 +66,11 @@ public class GuiLauncher extends JFrame {
         l_title.setForeground(new Color(255, 255, 255));
         l_title.setEnabled(true);
         l_title.setFont(StaticStuff.getPixelatedFont().deriveFont(30f));
+        l_title.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                new Thread(launcher::toggleFastMode).start();
+            }
+        });
 
         l_createTitle = new JLabel("<html>" + StaticStuff.prepareString("[[gold:Create]]"), SwingConstants.CENTER);
         l_createTitle.setBounds(0, 175, 437, 60);
@@ -282,9 +287,22 @@ public class GuiLauncher extends JFrame {
         addListener(this);
     }
 
-    public void showMe() {
-        setVisible(true);
-        openAnimation();
+    public void showMe(boolean fast) {
+        if (fast) {
+            openAnimation(fast);
+            setVisible(true);
+        }
+        java.awt.EventQueue.invokeLater(() -> {
+            self.toFront();
+            self.repaint();
+            setAlwaysOnTop(true);
+            Sleep.milliseconds(100);
+            setAlwaysOnTop(false);
+        });
+        if (!fast) {
+            setVisible(true);
+            openAnimation(fast);
+        }
     }
 
     int pX, pY;
@@ -297,7 +315,7 @@ public class GuiLauncher extends JFrame {
                     for (int currentOpacity = 100; currentOpacity > 0; currentOpacity -= 3) {
                         try {
                             Thread.sleep(2);
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                         setOpacity(currentOpacity * 0.01f);
                     }
@@ -325,12 +343,11 @@ public class GuiLauncher extends JFrame {
         });
     }
 
-    private void openAnimation() {
+    private void openAnimation(boolean fast) {
         l_title.setVisible(false);
         l_close.setVisible(false);
         l_manageTitle.setVisible(false);
-        for (int i = 0; i < l_manageButtons.length; i++)
-            l_manageButtons[i].setVisible(false);
+        for (JLabel lManageButton : l_manageButtons) lManageButton.setVisible(false);
         l_createTitle.setVisible(false);
         l_createDesc.setVisible(false);
         l_createStart.setVisible(false);
@@ -340,8 +357,8 @@ public class GuiLauncher extends JFrame {
         cb_versionsPlay.setVisible(false);
         cb_versionsCreate.setVisible(false);
 
-        new Thread() {
-            public void run() {
+        new Thread(() -> {
+            if (!fast) {
                 for (int i = 0; i < 10; i++) {
                     l_title.setVisible(true);
                     Sleep.milliseconds(StaticStuff.randomNumber(50, 100));
@@ -349,12 +366,12 @@ public class GuiLauncher extends JFrame {
                     Sleep.milliseconds(StaticStuff.randomNumber(50, 100));
                 }
                 Sleep.milliseconds(100);
-                l_title.setVisible(true);
             }
-        }.start();
+            l_title.setVisible(true);
+        }).start();
 
-        new Thread() {
-            public void run() {
+        new Thread(() -> {
+            if (!fast) {
                 Sleep.milliseconds(800);
                 for (int i = 0; i < 4; i++) {
                     l_createTitle.setVisible(true);
@@ -372,16 +389,16 @@ public class GuiLauncher extends JFrame {
                     isVisibleCreate = true;
                 }
                 Sleep.milliseconds(100);
-                l_createTitle.setVisible(true);
-                l_createDesc.setVisible(true);
-                l_createStart.setVisible(true);
-                isVisibleCreate = true;
-                cb_versionsCreate.setVisible(true);
             }
-        }.start();
+            l_createTitle.setVisible(true);
+            l_createDesc.setVisible(true);
+            l_createStart.setVisible(true);
+            isVisibleCreate = true;
+            cb_versionsCreate.setVisible(true);
+        }).start();
 
-        new Thread() {
-            public void run() {
+        new Thread(() -> {
+            if (!fast) {
                 Sleep.milliseconds(1000);
                 for (int i = 0; i < 3; i++) {
                     l_playTitle.setVisible(true);
@@ -399,48 +416,48 @@ public class GuiLauncher extends JFrame {
                     isVisiblePlay = false;
                 }
                 Sleep.milliseconds(100);
-                l_playTitle.setVisible(true);
-                l_playDesc.setVisible(true);
-                l_playStart.setVisible(true);
-                isVisiblePlay = true;
-                cb_versionsPlay.setVisible(true);
             }
-        }.start();
+            l_playTitle.setVisible(true);
+            l_playDesc.setVisible(true);
+            l_playStart.setVisible(true);
+            isVisiblePlay = true;
+            cb_versionsPlay.setVisible(true);
+        }).start();
 
-        new Thread() {
-            public void run() {
+        new Thread(() -> {
+            if (!fast) {
                 Sleep.milliseconds(1200);
                 for (int i = 0; i < 2; i++) {
                     l_manageTitle.setVisible(true);
                     Sleep.milliseconds(StaticStuff.randomNumber(20, 50));
-                    for (int j = 0; j < l_manageButtons.length; j++) {
-                        l_manageButtons[j].setVisible(true);
+                    for (JLabel l_manageButton : l_manageButtons) {
+                        l_manageButton.setVisible(true);
                         isVisibleOther[i] = true;
                         Sleep.milliseconds(StaticStuff.randomNumber(20, 50));
                     }
                     l_manageTitle.setVisible(false);
                     Sleep.milliseconds(StaticStuff.randomNumber(20, 50));
-                    for (int j = 0; j < l_manageButtons.length; j++) {
-                        l_manageButtons[j].setVisible(false);
+                    for (JLabel l_manageButton : l_manageButtons) {
+                        l_manageButton.setVisible(false);
                         isVisibleOther[i] = false;
                         Sleep.milliseconds(StaticStuff.randomNumber(20, 50));
                     }
                 }
                 Sleep.milliseconds(100);
-                l_manageTitle.setVisible(true);
-                for (int i = 0; i < l_manageButtons.length; i++) {
-                    l_manageButtons[i].setVisible(true);
-                    isVisibleOther[i] = true;
-                    Sleep.milliseconds(StaticStuff.randomNumber(20, 50));
-                }
-                Sleep.milliseconds(100);
-                l_close.setVisible(true);
-                ready = true;
             }
-        }.start();
+            l_manageTitle.setVisible(true);
+            for (int i = 0; i < l_manageButtons.length; i++) {
+                l_manageButtons[i].setVisible(true);
+                isVisibleOther[i] = true;
+                Sleep.milliseconds(StaticStuff.randomNumber(20, 50));
+            }
+            Sleep.milliseconds(100);
+            l_close.setVisible(true);
+            ready = true;
+        }).start();
     }
 
-    private String minusText[] = new String[]{
+    private final String[] minusText = new String[]{
             StaticStuff.prepareString("[[gray:sbo]]"),
             StaticStuff.prepareString("[[aqua:sbo]]"),
             StaticStuff.prepareString("[[gray:sbc]]"),

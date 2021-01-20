@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Manager {
-    public static String pathExtension = "../../", filename = "", version = "1.9";
+    public static String pathExtension = "../../", filename = "", version = "1.9.1";
     public static ArrayList<Location> locations = new ArrayList<>();
     public static ArrayList<NPC> npcs = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();
@@ -920,6 +920,7 @@ public class Manager {
         events.get(0).addEvent("audioStart");
         events.get(0).addEvent("audioStop");
         events.get(0).addEvent("audioEnd");
+        events.get(0).addEvent("showAvailableCommands");
     }
 
     private void generateInventories() {
@@ -951,7 +952,14 @@ public class Manager {
     }
 
     public static boolean isActionEditorOpenDirectlyInExternalEditor() {
-        return projectSettings.getValue("actionEditorOpenDirectlyInExternalEditor").equals("true");
+        myself.cfg.refresh();
+        return myself.cfg.get("actionEditorOpenDirectlyInExternalEditor").equals("true");
+        //return projectSettings.getValue("actionEditorOpenDirectlyInExternalEditor").equals("true");
+    }
+
+    public static void toggleActionEditor() {
+        myself.cfg.refresh();
+        myself.cfg.set("actionEditorOpenDirectlyInExternalEditor", !myself.cfg.get("actionEditorOpenDirectlyInExternalEditor").equals("true") + "");
     }
 
     public void setMainCfgSetting(String name, String value) {

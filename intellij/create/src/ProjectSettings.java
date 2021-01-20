@@ -38,7 +38,6 @@ public class ProjectSettings extends Frame {
         addIfNotContain("debugModeForceable", "false");
         addIfNotContain("password", "");
         addIfNotContain("requirePasswordToPlay", "false");
-        addIfNotContain("actionEditorOpenDirectlyInExternalEditor", "false");
     }
 
     private void addIfNotContain(String option, String value) {

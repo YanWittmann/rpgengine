@@ -1,14 +1,17 @@
 public class Launcher {
-    private final String version = "4";
-    //private Configuration playCFG, createCFG;
+    private final String version = "5";
+    private Configuration mainCFG;
     private final GuiLauncher launcher;
     private boolean loadingScreenDone = false;
 
     public Launcher() {
+        mainCFG = new Configuration("files/res/txt/main.cfg");
         new Thread(() -> {
             GuiLoading loading = new GuiLoading();
             loading.setVisible(true);
-            Sleep.milliseconds(4500);
+            if (!mainCFG.get("fastsetup").equals("true"))
+                Sleep.milliseconds(4500);
+            else Sleep.milliseconds(400);
             loading.setVisible(false);
             loadingScreenDone = true;
         }).start();
@@ -26,8 +29,9 @@ public class Launcher {
                 notifyUser("Synced local version list with online version list");
             launcher.setAvailableVersions(prepareVersionStringsForComboBox(playVersions, "play"), "play");
             launcher.setAvailableVersions(prepareVersionStringsForComboBox(createVersions, "create"), "create");
-            while (!loadingScreenDone) Sleep.milliseconds(300);
-            launcher.showMe();
+            if (!mainCFG.get("fastsetup").equals("true"))
+                while (!loadingScreenDone) Sleep.milliseconds(300);
+            launcher.showMe(mainCFG.get("fastsetup").equals("true"));
         }).start();
     }
 
@@ -197,6 +201,13 @@ public class Launcher {
 
     private void notifyUser(String text) {
         new GuiNotification(text);
+    }
+
+    public void toggleFastMode() {
+        mainCFG.set("fastsetup", !mainCFG.get("fastsetup").equals("true") + "");
+        if(mainCFG.get("fastsetup").equals("true"))
+            notifyUser("The launcher will now start up in fast mode");
+        else notifyUser("The launcher will now start up in slow mode");
     }
 
     public static void main(String[] args) {

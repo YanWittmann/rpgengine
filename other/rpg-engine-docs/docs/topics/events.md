@@ -6,38 +6,39 @@ Every object can have events. Events are containers for code that can be execute
 ## Predefined events 
 When creating an object, there can be predefined events. A list of all of them can be found here:  
 
-| Object Type         | Event Name      | Parameters                     | Description                                                                                  |
-|---------------------|-----------------|--------------------------------|----------------------------------------------------------------------------------------------|
-| **location**        | examine         | name                           | when player uses 'examine' command. Compare {name} to check if entity should be examined     |
-| **location**        | entry           | comeFromLocation, gotoLocation | when location is entered via goto                                                            |
-| **location**        | exit            | comeFromLocation, gotoLocation | when leaving location via goto                                                               |
-| **location**        | walk            | newLocation                    | executed when using walk command. Check here where to go next based on {newLocation}         |
-| **npc**             | talkTo          | name                           | every NPC at location of player calls their talkTo event when player uses                    |
-| **npc**             | examine         | name                           | when player uses 'examine' command. Compare {name} to check if entity                        |
-| **item**            | use             | - - -                          | when player selects 'use' in inventory                                                       |
-| **item**            | pickup          | amount, inventory              | when item goes into inventory                                                                |
-| **item**            | drop            | amount, inventory              | when item leaves inventory                                                                   |
-| **item**            | examine         | name                           | when player uses 'examine' command. Compare {name} to check if entity should be examined     |
-| **inventory**       | pickup          | amount, item                   | when item goes into inventory                                                                |
-| **inventory**       | drop            | amount, item                   | when item leaves into inventory                                                              |
-| **battleMap**       | start           | - - -                          | when battlemap is opened and intro is done                                                   |
-| **battleMap**       | end             | outcome                        | when either of the events 'fail' or 'win' take place                                         |
-| **battleMap**       | walkOnTile      | x, y, entity                   | when entity walks on a tile; {entity} = npc's uid / 'player'                                 |
-| **battleMap**       | damage          | attacker, victim, damage, item | when entity attacks entity; {attacker,victim} = npc's uid / 'player'                         |
-| **battleMap**       | dies            | entity                         | when an entity reaches 0 HP (npc's uid / 'player')                                           |
-| **battleMap**       | walkOnItem      | x, y, entity, item             | when entity walks on item                                                                    |
-| **battleMap**       | rightClick      | x, y                           | when player right clicks on tile                                                             |
-| **lootTable**       | dropLoot        | - - -                          | when loot table is dropped into an inventory; may only contain a loot table, not actual code |
-| **lootTable**       | dropLootCode    | inventory                      | when loot table is dropped into an inventory                                                 |
-| **eventCollection** |                 |                                |                                                                                              |
-|  _--> General_      | launch          | - - -                          | when adventure is selected                                                                   |
-|  _--> General_      | intro           | - - -                          | when character creaction is done and intro launches                                          |
-|  _--> General_      | introOver       | - - -                          | when intro is over and adventure starts                                                      |
-|  _--> General_      | exit            | - - -                          | when adventure is stopped                                                                    |
-|  _--> General_      | audioStart      | uid                            | when audio starts playing                                                                    |
-|  _--> General_      | audioStop       | uid                            | when audio stops playing via 'audio stop'                                                    |
-|  _--> General_      | audioEnd        | uid                            | when audio stops playing in any way                                                          |
-| **customCommands**  | commandExecuted | ...                            | when customCommand is executed; parameters depend on customCommand                           |  
+| Object Type         | Event Name            | Parameters                     | Description                                                                                  |
+|---------------------|-----------------------|--------------------------------|----------------------------------------------------------------------------------------------|
+| **location**        | examine               | name                           | when player uses 'examine' command. Compare {name} to check if entity should be examined     |
+| **location**        | entry                 | comeFromLocation, gotoLocation | when location is entered via goto                                                            |
+| **location**        | exit                  | comeFromLocation, gotoLocation | when leaving location via goto                                                               |
+| **location**        | walk                  | newLocation                    | executed when using walk command. Check here where to go next based on {newLocation}         |
+| **npc**             | talkTo                | name                           | every NPC at location of player calls their talkTo event when player uses                    |
+| **npc**             | examine               | name                           | when player uses 'examine' command. Compare {name} to check if entity                        |
+| **item**            | use                   | - - -                          | when player selects 'use' in inventory                                                       |
+| **item**            | pickup                | amount, inventory              | when item goes into inventory                                                                |
+| **item**            | drop                  | amount, inventory              | when item leaves inventory                                                                   |
+| **item**            | examine               | name                           | when player uses 'examine' command. Compare {name} to check if entity should be examined     |
+| **inventory**       | pickup                | amount, item                   | when item goes into inventory                                                                |
+| **inventory**       | drop                  | amount, item                   | when item leaves into inventory                                                              |
+| **battleMap**       | start                 | - - -                          | when battlemap is opened and intro is done                                                   |
+| **battleMap**       | end                   | outcome                        | when either of the events 'fail' or 'win' take place                                         |
+| **battleMap**       | walkOnTile            | x, y, entity                   | when entity walks on a tile; {entity} = npc's uid / 'player'                                 |
+| **battleMap**       | damage                | attacker, victim, damage, item | when entity attacks entity; {attacker,victim} = npc's uid / 'player'                         |
+| **battleMap**       | dies                  | entity                         | when an entity reaches 0 HP (npc's uid / 'player')                                           |
+| **battleMap**       | walkOnItem            | x, y, entity, item             | when entity walks on item                                                                    |
+| **battleMap**       | rightClick            | x, y                           | when player right clicks on tile                                                             |
+| **lootTable**       | dropLoot              | - - -                          | when loot table is dropped into an inventory; may only contain a loot table, not actual code |
+| **lootTable**       | dropLootCode          | inventory                      | when loot table is dropped into an inventory                                                 |
+| **eventCollection** |                       |                                |                                                                                              |
+|  _--> General_      | launch                | - - -                          | when adventure is selected                                                                   |
+|  _--> General_      | intro                 | - - -                          | when character creaction is done and intro launches                                          |
+|  _--> General_      | introOver             | - - -                          | when intro is over and adventure starts                                                      |
+|  _--> General_      | exit                  | - - -                          | when adventure is stopped                                                                    |
+|  _--> General_      | audioStart            | uid                            | when audio starts playing                                                                    |
+|  _--> General_      | audioStop             | uid                            | when audio stops playing via 'audio stop'                                                    |
+|  _--> General_      | audioEnd              | uid                            | when audio stops playing in any way                                                          |
+|  _--> General_      | showAvailableCommands |                                | when player clicks `Show commands` on main frame                                             |
+| **customCommands**  | commandExecuted       | ...                            | when customCommand is executed; parameters depend on customCommand                           |  
 
 ## Editing an event
 An event can be opened and edited via the object frame. The editor looks like this:  

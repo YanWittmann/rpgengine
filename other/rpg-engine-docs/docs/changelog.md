@@ -1,6 +1,18 @@
 # Changelog
 ___
 
+## 20.01.2020 - RELEASE `1.9.1`
+#### Bugfixes:
+
+ * creadits text in creator would not set position scaled correctly if it bounced up and down automatically every 30 - 120 seconds
+
+#### New / Modification:
+
+ * new `general` `eventCollection` event: `showAvailableCommands`: gets executed when player clicks on new `Show commands` button in player
+ * you can now save the game via a 'drop up' (?) menu at the bootom right of the main player frame
+ * in the launcher, you can now click on the title `RPG Engine` to toggle between fast and slow setup mode
+ * moved `actionEditorOpenDirectlyInExternalEditor` from `Project settings` to `menu bar > Other > Toggle open actions directly in editor`
+
 
 ## 19.01.2021 - RELEASE `1.8.1` & `1.9`
 #### Bugfixes:

@@ -44,7 +44,7 @@ class PopupImage {
         w.setAlwaysOnTop(true);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         JPanel p = new JPanel(new BorderLayout()) {
@@ -118,7 +118,7 @@ class PopupImage {
     }
 
     //https://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon; Thanks to trolologuy!
-    private ImageIcon getScaledImage(ImageIcon srcImg, int w, int h) {
+    public static ImageIcon getScaledImage(ImageIcon srcImg, int w, int h) {
         Image image = srcImg.getImage();
         Image newimg = image.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
         return new ImageIcon(newimg);

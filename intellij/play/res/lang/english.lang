@@ -121,6 +121,9 @@ savestateStartNewGame:Start a new game
 savestateCreatedSuccess:Created [[gold:savestate]] [[green:{1}]]
 savestateCreatedFailed:Could not create [[gold:savestate]] [[red:{1}]]
 
+mainFrameActionHover1:[[green:Create savestate]]
+mainFrameActionHover2:Show commands
+
 langSelectionText:Language selection:
 langInfoAuthorText:Author:
 langInfoVersionText:Version:

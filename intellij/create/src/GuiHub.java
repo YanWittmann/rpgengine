@@ -490,17 +490,23 @@ public class GuiHub extends JFrame {
         new Thread(() -> {
             while (true) {
                 Sleep.seconds(StaticStuff.randomNumber(30, 120));
-                l_credits.setBounds(20, 845, creditsWidth, 29);
+
+                l_credits.setBounds(creditsHoverPosX, creditsHoverPosY, creditsWidth, 29);
                 l_credits.setForeground(StaticStuff.getRandomSaturatedColorForCreditsHover());
+
                 Sleep.milliseconds(StaticStuff.randomNumber(600, 2000));
-                l_credits.setBounds(20, 848, creditsWidth, 26);
+
+                l_credits.setBounds(creditsUpPosX, creditsUpPosY, creditsWidth, 26);
                 l_credits.setForeground(StaticStuff.getColor("text_color"));
 
                 Sleep.milliseconds(StaticStuff.randomNumber(200, 1000));
-                l_credits.setBounds(20, 845, creditsWidth, 29);
+
+                l_credits.setBounds(creditsHoverPosX, creditsHoverPosY, creditsWidth, 29);
                 l_credits.setForeground(StaticStuff.getRandomSaturatedColorForCreditsHover());
+
                 Sleep.milliseconds(StaticStuff.randomNumber(600, 2000));
-                l_credits.setBounds(20, 848, creditsWidth, 26);
+
+                l_credits.setBounds(creditsUpPosX, creditsUpPosY, creditsWidth, 26);
                 l_credits.setForeground(StaticStuff.getColor("text_color"));
             }
         }).start();
@@ -819,6 +825,7 @@ public class GuiHub extends JFrame {
         JMenuItem delete = new JMenuItem("Delete   ");
 
         JMenuItem selectStylesheet = new JMenuItem("Set stylesheet   ");
+        JMenuItem toggleActionEditor = new JMenuItem("Toggle open actions directly in editor   ");
         JMenuItem shortcuts = new JMenuItem("Shortcuts   ");
         JMenuItem documentation = new JMenuItem("Documentation   ");
         JMenuItem website = new JMenuItem("Website   ");
@@ -845,6 +852,8 @@ public class GuiHub extends JFrame {
 
         selectStylesheet.addActionListener(evt -> selectStylesheet());
 
+        toggleActionEditor.addActionListener(evt -> toggleActionEditor());
+
         project.addActionListener(evt -> projectSettings());
 
         player.addActionListener(evt -> playerSettings());
@@ -864,6 +873,7 @@ public class GuiHub extends JFrame {
         menuBar.add(properties);
 
         help.add(selectStylesheet);
+        help.add(toggleActionEditor);
         help.add(shortcuts);
         help.add(documentation);
         help.add(website);
@@ -879,6 +889,10 @@ public class GuiHub extends JFrame {
         if (result == 0) save();
         FileManager.openFile("create.jar");
         System.exit(0);
+    }
+
+    private void toggleActionEditor() {
+        manager.toggleActionEditor();
     }
 
     private boolean refactorUIDwarningShow = true;

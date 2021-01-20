@@ -44,7 +44,7 @@ public class Audio {
                 while (true) {
                     Sleep.milliseconds(200);
                     if (print) {
-                        GuiTextarea.appendToOutput("Playing: [[aqua:" + uid + "]]");
+                        GuiMainConsole.appendToOutput("Playing: [[aqua:" + uid + "]]");
                         Sleep.milliseconds(200);
                         print = false;
                     }

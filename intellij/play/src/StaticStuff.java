@@ -251,14 +251,14 @@ public class StaticStuff {
 
     public static String waitForLineInput() {
         Log.add("Waiting for line input...");
-        GuiTextarea.waitForUserInputLastString = "waitingForInput";
-        while (GuiTextarea.waitForUserInputLastString.equals("waitingForInput")) Sleep.milliseconds(100);
+        GuiMainConsole.waitForUserInputLastString = "waitingForInput";
+        while (GuiMainConsole.waitForUserInputLastString.equals("waitingForInput")) Sleep.milliseconds(100);
         try {
-            lastInput = GuiTextarea.waitForUserInputLastString;
+            lastInput = GuiMainConsole.waitForUserInputLastString;
         } catch (Exception e) {
         }
         Log.add("Result: " + lastInput);
-        return GuiTextarea.waitForUserInputLastString;
+        return GuiMainConsole.waitForUserInputLastString;
     }
 
     public static void error(String text) {
