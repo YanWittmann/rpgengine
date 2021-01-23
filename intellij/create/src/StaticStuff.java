@@ -30,15 +30,14 @@ public class StaticStuff {
         if (uid.equals("")) return false;
         if (uid.matches("[\\da-z]{16}")) return true;
         if (!uid.matches("[0-9a-z]{16}") && !(uid.length() == 16)) return false;
-        if (!uid.matches("[\\da-z]{16}")) return false;
-        return true;
+        return uid.matches("[\\da-z]{16}");
     }
 
     public static String autoDetectUID(String inputText) {
         String clip = "", uid = "";
         try {
             clip = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         if (clip.matches("[0-9a-z]{16}") && clip.length() == 16)
             uid = Popup.input(inputText + "\nThis UID has been automatically detected:", clip);
@@ -52,7 +51,7 @@ public class StaticStuff {
         String clip = "";
         try {
             clip = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         copyString(clipboardBefore);
         return clip;
@@ -78,7 +77,7 @@ public class StaticStuff {
             rob.keyRelease(KeyEvent.VK_CONTROL);
             rob.keyRelease(KeyEvent.VK_C);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -87,6 +86,25 @@ public class StaticStuff {
         StringSelection selection = new StringSelection(text);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);
+    }
+
+    public static String getWordAtIndex(String str, int index) {
+        if (index == -1 || index > str.length()) return "";
+        int minIndex = index;
+        while (true) {
+            minIndex--;
+            if (minIndex <= -1) break;
+            if (str.charAt(minIndex) == ' ' || str.charAt(minIndex) == '\n') break;
+        }
+        minIndex++;
+        int maxIndex = index;
+        while (true) {
+            maxIndex++;
+            if (maxIndex >= str.length()) break;
+            if (str.charAt(maxIndex) == ' ' || str.charAt(maxIndex) == '\n') break;
+        }
+
+        return str.substring(minIndex, maxIndex);
     }
 
     public static int countOccurrences(String text, String find) {
@@ -130,7 +148,7 @@ public class StaticStuff {
     public static String makeWithSpace(String input) {
         StringBuilder output = new StringBuilder(input.length());
         for (int i = 0; i < input.length(); i++) {
-            output.append(input.charAt(i) + " ");
+            output.append(input.charAt(i)).append(" ");
         }
         return output.toString();
     }
@@ -141,7 +159,7 @@ public class StaticStuff {
 
     public static String generateRandomMessageFromFile(String filename) {
         try {
-            String input[] = FileManager.readFile(filename);
+            String[] input = FileManager.readFile(filename);
             return input[randomNumber(0, input.length - 1)];
         } catch (Exception e) {
             return "File does not exist: " + filename;
@@ -152,7 +170,7 @@ public class StaticStuff {
         String user = "Me";
         try {
             user = System.getProperty("user.name");
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return user;
     }
@@ -173,8 +191,7 @@ public class StaticStuff {
         if (path.matches(".+\\.m4a")) return false;
         if (path.matches(".+\\.mp3")) return false;
         if (path.matches(".+\\.mp4")) return false;
-        if (path.matches(".+\\.wav")) return true;
-        return false;
+        return path.matches(".+\\.wav");
     }
 
     public static String replaceLast(String text, String regex, String replacement) {
@@ -182,8 +199,8 @@ public class StaticStuff {
     }
 
     public static String[] appendArray(String[] arr, String app) {
-        String ret[] = new String[arr.length + 1];
-        for (int i = 0; i < arr.length; i++) ret[i] = arr[i];
+        String[] ret = new String[arr.length + 1];
+        System.arraycopy(arr, 0, ret, 0, arr.length);
         ret[arr.length] = app;
         return ret;
     }
@@ -220,7 +237,7 @@ public class StaticStuff {
     }
 
     private static String colorScheme = "dark";
-    private static HashMap<String, Color> colors = new HashMap<>();
+    private static final HashMap<String, Color> colors = new HashMap<>();
 
     public static void setColorScheme(String pColorScheme) {
         colorScheme = pColorScheme;
@@ -283,7 +300,6 @@ public class StaticStuff {
             } else {
                 Popup.error("Stylesheet", "Stylesheet does not exist: " + colorScheme);
                 toggleColorScheme();
-                return;
             }
         }
     }
@@ -296,9 +312,9 @@ public class StaticStuff {
     public static Color getRandomSaturatedColorForCreditsHover() {
         //check if clipboard contains color
         String clipboard = getClipboard();
-        if(clipboard.matches("#?[\\da-f]{6}")) {
+        if (clipboard.matches("#?[\\da-f]{6}")) {
             return hex2Rgb(clipboard);
-        } else if(clipboard.matches("\\d{1,3}[, ]{1,2}\\d{1,3}[, ]{1,2}\\d{1,3}")) {
+        } else if (clipboard.matches("\\d{1,3}[, ]{1,2}\\d{1,3}[, ]{1,2}\\d{1,3}")) {
             String[] split = clipboard.split("[, ]{1,2}");
             return new Color(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
         }
@@ -321,14 +337,14 @@ public class StaticStuff {
     }
 
     public static Color hex2Rgb(String colorStr) {
-        colorStr = colorStr.replace("#","");
+        colorStr = colorStr.replace("#", "");
         return new Color(
-                Integer.valueOf( colorStr.substring( 0, 2 ), 16 ),
-                Integer.valueOf( colorStr.substring( 2, 4 ), 16 ),
-                Integer.valueOf( colorStr.substring( 4, 6 ), 16 ) );
+                Integer.valueOf(colorStr.substring(0, 2), 16),
+                Integer.valueOf(colorStr.substring(2, 4), 16),
+                Integer.valueOf(colorStr.substring(4, 6), 16));
     }
 
-    private static Font baseFont = new Font("sansserif", 0, 12);
+    private static final Font baseFont = new Font("sansserif", 0, 12);
 
     public static Font getBaseFont() {
         return baseFont;

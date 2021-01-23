@@ -12,7 +12,7 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.9.1";
+    private final String version = "1.10";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg;
@@ -128,6 +128,7 @@ public class Interpreter {
                 player.setValue("dmgNoWeapon", "1W3 - 1");
             }
             player.setupTalents(settings.getValue("language"));
+            System.out.println(player.getValue("name"));
             if (player.getValue("name").length() == 0) {
                 String name;
                 do name = StaticStuff.openPopup(lang("chCreationEnterName"), "");
@@ -138,6 +139,7 @@ public class Interpreter {
             player.setValue("class", "elf");
             player.setValue("speed", 3);
             player.setValue("health", 20 + Integer.parseInt(player.getValue("health")));
+            player.addIfNotContain("maxHealth", player.getValue("health"));
             player.setValue("dmgNoWeapon", "1W3 - 1");
             player.setupTalents(settings.getValue("language"));
             if (player.getValue("name").length() == 0)

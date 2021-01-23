@@ -1,6 +1,28 @@
 # Changelog
 ___
 
+## 23.01.2020 - RELEASE `1.10`
+#### Bugfixes:
+
+ * player name would be stuck at string `Yan` when not changed via the player settings or set to `name:` in player settings
+ * intro frame would still wait for project icon to appear when skipped
+ * player max health would be set wrong (to `80`) when editing adventure after removing `maxHealth` value
+ * launcher will now no longer install a corrupt version if `install` is clicked multiple times
+ * fixed a bug in the intro adventure (you will need to reinstall the engine to get the new adventure file)
+
+#### New / Modification:
+
+ * made editing/deleting/cloning objects easier: you don't need to mark the uid any more, placing the curser inside it is enough. also, if you select a string that _contains_ a uid, it will filter out the uid.
+ * your clipboard will now no longer be flooded with uids when using shortcuts to edit/delete/clone objects
+ * optimized creator main frame setup code
+ * updated `consoleIcon1.png` (save icon) to be black & white
+ * player stats frame will now appear `10 pixels` away from taskbar and not at fixed location (`150, 10`) which is something i wanted to do a long time ago
+ * loading animation is now not contained inside of creator or player, they now use the gif from the launcher; this drastically reduces the file size again
+ * in the character creation, you can now simply hover over rolled values to slect them
+ * you can now escape `[` and `]` in formatted strings by using `\[` and `\]`
+ * changed action editor string `Detected event modification: [EVENT]` to `Event saved: [EVENT]`
+
+
 ## 20.01.2020 - RELEASE `1.9.1`
 #### Bugfixes:
 
@@ -68,6 +90,7 @@ ___
 #### Other:
 
  * this release is mainly to test if everything still works as with bluej or if there are things that need to be fixed (and yes, there were a lot of things that needed to be fixed)
+ * had to remove release `1.8` due to a bug that might have corrupted adventure files
 
 
 ## 16.01.2021 - RELEASE `1.7`

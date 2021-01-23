@@ -6,9 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
 public class GuiLoading extends JFrame {
-    private JMenuBar menuBar;
-    private JLabel l_animation;
-    private int ee = 0;
     private int pX, pY;
 
     public GuiLoading() {
@@ -21,7 +18,7 @@ public class GuiLoading extends JFrame {
         contentPane.setBackground(new Color(255, 255, 255));
         setIconImage(new ImageIcon("res/img/iconyellow.png").getImage());
 
-        l_animation = new JLabel();
+        JLabel l_animation = new JLabel();
         l_animation.setBounds(0, 0, 498, 290);
         l_animation.setBackground(new Color(214, 217, 223));
         l_animation.setForeground(new Color(0, 0, 0));
@@ -53,9 +50,15 @@ public class GuiLoading extends JFrame {
         this.pack();
         this.setVisible(false);
 
+        String[] fileOrder = new String[]{"res/img/specialloading.gif", "../../res/img/loading.gif", "res/img/loading.gif"};
         try {
-            ImageIcon ii;
-            ii = new ImageIcon("res/img/loading.gif");
+            ImageIcon ii = null;
+            for (String file : fileOrder)
+                if (FileManager.fileExists(file)) {
+                    ii = new ImageIcon(file);
+                    break;
+                }
+            if (ii == null) return;
             l_animation.setIcon(ii);
             l_animation.setBounds(0, 0, ii.getIconWidth(), ii.getIconHeight());
             this.setSize(ii.getIconWidth(), ii.getIconHeight());

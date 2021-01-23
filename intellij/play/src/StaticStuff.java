@@ -29,6 +29,7 @@ public class StaticStuff {
             evaluateMathExpression("");
             commandYellow.add("set");
             commandYellow.add("print");
+            commandYellow.add("printwait");
             commandYellow.add("go");
             commandYellow.add("execute");
             commandYellow.add("selector");
@@ -50,12 +51,12 @@ public class StaticStuff {
             commandYellow.add("return");
             commandYellow.add("break");
             commandYellow.add("continue");
-            String files[] = FileManager.getFilesWithEnding("res/txt/basecolors/", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            String[] files = FileManager.getFilesWithEnding("res/txt/basecolors/", StaticStuff.dataFileEndingNoDot);
+            for (String file : files) {
                 try {
-                    baseColors.add(new ColorObject(FileManager.readFile("res/txt/basecolors/" + files[i])));
+                    baseColors.add(new ColorObject(FileManager.readFile("res/txt/basecolors/" + file)));
                 } catch (Exception e) {
-                    error("Color '" + files[i] + "' contains invalid data.\nDSA Engine will exit:\n" + e);
+                    error("Color '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e);
                     System.exit(109);
                 }
             }
@@ -93,7 +94,7 @@ public class StaticStuff {
         return pixelFont;
     }
 
-    private static HashMap<Float, Font> fonts = new HashMap<>();
+    private static final HashMap<Float, Font> fonts = new HashMap<>();
 
     public static Font getPixelatedFont(float size) {
         if (fonts.containsKey(size)) return fonts.get(size);
@@ -121,8 +122,8 @@ public class StaticStuff {
 
     public static int getLongestLineWidth(String[] lines, Font font) {
         int longest = 0, current;
-        for (int i = 0; i < lines.length; i++) {
-            current = getTextWidthWithFontRemoveFormatting(lines[i], font);
+        for (String line : lines) {
+            current = getTextWidthWithFontRemoveFormatting(line, font);
             if (current > longest) longest = current;
         }
         return longest;
@@ -130,8 +131,7 @@ public class StaticStuff {
 
     public static int getLongestLineLength(String[] lines) {
         int longest = 0;
-        for (int i = 0; i < lines.length; i++)
-            if (lines[i].length() > longest) longest = removeTextFormatting(lines[i]).length();
+        for (String line : lines) if (line.length() > longest) longest = removeTextFormatting(line).length();
         return longest;
     }
 
@@ -152,15 +152,11 @@ public class StaticStuff {
     public static int openPopup(String text, String[] options) {
         Log.add("Open popup buttons '" + text + "'");
         popButtons = new PopupButtons(text, options);
-        new Thread() {
-            public void run() {
-                popButtons.createComponents();
-            }
-        }.start();
+        new Thread(() -> popButtons.createComponents()).start();
         while (popButtons.selected == -1) Sleep.milliseconds(100);
         try {
             lastInput = popButtons.selected + "";
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         Log.add("Result: " + lastInput);
         return popButtons.selected;
@@ -171,11 +167,7 @@ public class StaticStuff {
     public static void openPopup(String text) {
         Log.add("Open popup text '" + text + "'");
         popText = new PopupText(text);
-        new Thread() {
-            public void run() {
-                popText.createComponents();
-            }
-        }.start();
+        new Thread(() -> popText.createComponents()).start();
         while (popText.selected == -1) Sleep.milliseconds(100);
     }
 
@@ -184,15 +176,11 @@ public class StaticStuff {
     public static String openPopup(String text, String pretext) {
         Log.add("Open popup text input '" + text + "'");
         popTextInput = new PopupTextInput(text, pretext);
-        new Thread() {
-            public void run() {
-                popTextInput.createComponents();
-            }
-        }.start();
+        new Thread(() -> popTextInput.createComponents()).start();
         while (popTextInput.selected == -1) Sleep.milliseconds(100);
         try {
             lastInput = popTextInput.result;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         Log.add("Result: " + lastInput);
         return popTextInput.result;
@@ -200,18 +188,14 @@ public class StaticStuff {
 
     static PopupDropDown popDropDown;
 
-    public static String openPopup(String text, String options[], String preselected) {
+    public static String openPopup(String text, String[] options, String preselected) {
         Log.add("Open popup text input '" + text + "'");
         popDropDown = new PopupDropDown(text, options, preselected);
-        new Thread() {
-            public void run() {
-                popDropDown.createComponents();
-            }
-        }.start();
+        new Thread(() -> popDropDown.createComponents()).start();
         while (popDropDown.selected == -1) Sleep.milliseconds(100);
         try {
             lastInput = popDropDown.result;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return popDropDown.result;
     }
@@ -222,22 +206,14 @@ public class StaticStuff {
         Log.add("Open popup text input '" + text + "'");
         if (sides == 6 || sides == 20) {
             popDice = new PopupDice(text, sides, duration, autoRoll, sides);
-            new Thread() {
-                public void run() {
-                    popDice.createComponents();
-                }
-            }.start();
+            new Thread(() -> popDice.createComponents()).start();
             while (popDice.selected == -1) Sleep.milliseconds(100);
             Sleep.milliseconds(1500);
             Log.add("Result: " + popDice.selected);
             return popDice.selected;
         } else if (sides < 20) {
             popDice = new PopupDice(text, 6, duration, autoRoll, sides);
-            new Thread() {
-                public void run() {
-                    popDice.createComponents();
-                }
-            }.start();
+            new Thread(() -> popDice.createComponents()).start();
             while (popDice.selected == -1) Sleep.milliseconds(100);
             Sleep.milliseconds(1500);
             Log.add("Result: " + popDice.selected);
@@ -255,7 +231,7 @@ public class StaticStuff {
         while (GuiMainConsole.waitForUserInputLastString.equals("waitingForInput")) Sleep.milliseconds(100);
         try {
             lastInput = GuiMainConsole.waitForUserInputLastString;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         Log.add("Result: " + lastInput);
         return GuiMainConsole.waitForUserInputLastString;
@@ -267,9 +243,9 @@ public class StaticStuff {
     }
 
     public static ArrayList<ColorObject> baseColors = new ArrayList<ColorObject>();
-    private static ArrayList<Color> colors = new ArrayList<Color>();
-    private static ArrayList<String> colorNames = new ArrayList<String>();
-    private static ArrayList<String> colorUIDs = new ArrayList<String>();
+    private static final ArrayList<Color> colors = new ArrayList<Color>();
+    private static final ArrayList<String> colorNames = new ArrayList<String>();
+    private static final ArrayList<String> colorUIDs = new ArrayList<String>();
 
     public static void prepareColors(ArrayList<Color> color, ArrayList<String> name, ArrayList<String> uid) {
         colors.clear();
@@ -284,11 +260,11 @@ public class StaticStuff {
         if (Manager.ready)
             try {
                 return Manager.getColorByName(name);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         try {
             for (ColorObject co : baseColors) if (co.name.equals(name)) return co.color;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return new Color(191, 59, 178);
     }
@@ -299,6 +275,7 @@ public class StaticStuff {
 
     public static String prepareString(String s) {
         s = "[[def_text_color_main:" + s.replace("ESCAPEDCURVEDBRACKETSOPEN", "{").replace("ESCAPEDCURVEDBRACKETSCLOSED", "}") + "]]";
+        s = s.replace("\\[", "ESCAPEDSQUAREBRACKETSOPEN").replace("\\]", "ESCAPEDSQUAREBRACKETSCLOSE");
         for (int i = 0; i < colors.size(); i++)
             s = s.replace("[[" + colorNames.get(i) + ":", "<font color=\"" + colorToHex(colors.get(i)) + "\">");
         for (int i = 0; i < colors.size(); i++)
@@ -308,10 +285,11 @@ public class StaticStuff {
                 .replace("novadi", Interpreter.lang("playerAttrnovadi")).replace("stray", Interpreter.lang("playerAttrstray")).replace("thorwaler", Interpreter.lang("playerAttrthorwaler"))
                 .replace("dwarf", Interpreter.lang("playerAttrdwarf")).replace("courage", Interpreter.lang("playerAttrMU")).replace("wisdom", Interpreter.lang("playerAttrKL"))
                 .replace("intuition", Interpreter.lang("playerAttrIN")).replace("charisma", Interpreter.lang("playerAttrCH")).replace("dexterity", Interpreter.lang("playerAttrFF"))
-                .replace("agility", Interpreter.lang("playerAttrGE")).replace("strength", Interpreter.lang("playerAttrKK"));
+                .replace("agility", Interpreter.lang("playerAttrGE")).replace("strength", Interpreter.lang("playerAttrKK"))
+                .replace("ESCAPEDSQUAREBRACKETSOPEN", "[").replace("ESCAPEDSQUAREBRACKETSCLOSE", "]");
     }
 
-    private static ArrayList<String> commandYellow = new ArrayList<String>();
+    private static final ArrayList<String> commandYellow = new ArrayList<>();
     private static ArrayList<String> customCommandYellow = null;
 
     public static String prepareStringForPlayer(String s) {
@@ -320,17 +298,13 @@ public class StaticStuff {
                 .replaceAll("(-?[0-9]+\\.?(?:[0-9]+)?)", "[[dark-green:$1]]").replaceAll("'([^\\']+)'", "[[aqua:'$1']]").replaceAll("(_[a-zA-Z]+)", "[[yellow:$1]]")
                 .replace("ä", "ae").replace("Ä", "AE").replace("ö", "oe").replace("Ö", "OE").replace("ü", "ue").replace("Ü", "UE");
         if (s.contains(" "))
-            for (int i = 0; i < commandYellow.size(); i++)
-                s = s.replaceAll(commandYellow.get(i) + " (.+)", "[[yellow:" + commandYellow.get(i) + "]] $1");
+            for (String value : commandYellow) s = s.replaceAll(value + " (.+)", "[[yellow:" + value + "]] $1");
         else
-            for (int i = 0; i < commandYellow.size(); i++)
-                s = s.replaceAll(commandYellow.get(i), "[[yellow:" + commandYellow.get(i) + "]]");
+            for (String value : commandYellow) s = s.replaceAll(value, "[[yellow:" + value + "]]");
         if (s.contains(" ") && customCommandYellow != null)
-            for (int i = 0; i < customCommandYellow.size(); i++)
-                s = s.replaceAll(customCommandYellow.get(i) + " (.+)", "[[yellow:" + customCommandYellow.get(i) + "]] $1");
+            for (String value : customCommandYellow) s = s.replaceAll(value + " (.+)", "[[yellow:" + value + "]] $1");
         else if (customCommandYellow != null)
-            for (int i = 0; i < customCommandYellow.size(); i++)
-                s = s.replaceAll(customCommandYellow.get(i), "[[yellow:" + customCommandYellow.get(i) + "]]");
+            for (String value : customCommandYellow) s = s.replaceAll(value, "[[yellow:" + value + "]]");
         s = s.replace("dark-green", "dark_green");
         return prepareString(s);
     }
@@ -353,23 +327,22 @@ public class StaticStuff {
     }
 
     public static String prepareStringWithLineLength(String text, int length) {
-        String parts[] = text.split("<br>");
-        text = "";
+        String[] parts = text.split("<br>");
+        StringBuilder textBuilder = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
             if (parts[i].length() > length)
-                parts[i] = parts[i].substring(0, length) + "<br>" + parts[i].substring(length, parts[i].length());
-            if (i != parts.length) text += parts[i] + "<br>";
-            else text += parts[i];
+                parts[i] = parts[i].substring(0, length) + "<br>" + parts[i].substring(length);
+            textBuilder.append(parts[i]).append("<br>");
         }
+        text = textBuilder.toString();
         if (prepareStringWithLineLengthRecheckCheck(text, length)) return prepareStringWithLineLength(text, length);
         return text;
     }
 
     public static boolean prepareStringWithLineLengthRecheckCheck(String text, int length) {
-        String parts[] = text.split("<br>");
-        text = "";
-        for (int i = 0; i < parts.length; i++) {
-            if (parts[i].length() > length) return true;
+        String[] parts = text.split("<br>");
+        for (String part : parts) {
+            if (part.length() > length) return true;
         }
         return false;
     }
@@ -399,8 +372,7 @@ public class StaticStuff {
         if (uid.equals("")) return false;
         if (uid.contains("#")) return false;
         if (!uid.matches("[\\da-z]{16}")) return false;
-        if (!uid.matches("[0-9a-z]{16}") && !(uid.length() == 16)) return false;
-        return true;
+        return uid.matches("[0-9a-z]{16}") || uid.length() == 16;
     }
 
     public static int evaluateMathExpression(String expr) {
@@ -483,7 +455,7 @@ public class StaticStuff {
     public static int estimatedRollValue(String roll) {
         int all = 0;
         for (int i = 0; i < 20; i++) all += evaluateRoll(roll, false, false);
-        return (int) (all / 20);
+        return all / 20;
     }
 
     public static long time() {

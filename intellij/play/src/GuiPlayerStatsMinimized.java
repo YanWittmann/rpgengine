@@ -73,7 +73,7 @@ public class GuiPlayerStatsMinimized extends JFrame {
                     for (int currentOpacity = 100; currentOpacity > 0; currentOpacity -= 3) {
                         try {
                             Thread.sleep(2);
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                         setOpacity(currentOpacity * 0.01f);
                     }

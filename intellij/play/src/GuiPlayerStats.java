@@ -2,6 +2,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Objects;
 
 public class GuiPlayerStats extends JFrame {
     private static JLabel l_attr[];
@@ -80,7 +81,7 @@ public class GuiPlayerStats extends JFrame {
         l_statsHeader.setForeground(new Color(255, 255, 255));
         l_statsHeader.setEnabled(true);
         l_statsHeader.setFont(StaticStuff.getPixelatedFont());
-        l_statsHeader.setText("<html>" + StaticStuff.prepareString(interpreter.lang("playerStatsStats")));
+        l_statsHeader.setText("<html>" + StaticStuff.prepareString(Interpreter.lang("playerStatsStats")));
         l_statsHeader.setVisible(false);
 
         l_stats = new JLabel();
@@ -89,7 +90,7 @@ public class GuiPlayerStats extends JFrame {
         l_stats.setForeground(new Color(255, 255, 255));
         l_stats.setEnabled(true);
         l_stats.setFont(StaticStuff.getPixelatedFont(10f));
-        l_stats.setText("<html>" + interpreter.lang("playerStatsInsertValues", player.getValue("health"), player.getValue("gold"), manager.getName(player.getValue("location"))));
+        l_stats.setText("<html>" + Interpreter.lang("playerStatsInsertValues", player.getValue("health"), player.getValue("gold"), Manager.getName(player.getValue("location"))));
         l_stats.setVisible(false);
 
         l_inventoryHeader = new JLabel();
@@ -98,7 +99,7 @@ public class GuiPlayerStats extends JFrame {
         l_inventoryHeader.setForeground(new Color(255, 255, 255));
         l_inventoryHeader.setEnabled(true);
         l_inventoryHeader.setFont(StaticStuff.getPixelatedFont());
-        l_inventoryHeader.setText("<html>" + StaticStuff.prepareString(interpreter.lang("playerStatsInventory")));
+        l_inventoryHeader.setText("<html>" + StaticStuff.prepareString(Interpreter.lang("playerStatsInventory")));
         l_inventoryHeader.setVisible(false);
 
         int invSlotsApart = Interpreter.getScaledValue(26);
@@ -144,13 +145,13 @@ public class GuiPlayerStats extends JFrame {
 
         l_img = new JLabel[7];
         l_attr = new JLabel[7];
-        setupAttribute(0, 50, 582, interpreter.lang("playerAttrMU"), "courage.png", contentPane);
-        setupAttribute(1, 122, 582, interpreter.lang("playerAttrKL"), "wisdom.png", contentPane);
-        setupAttribute(2, 194, 582, interpreter.lang("playerAttrIN"), "intuition.png", contentPane);
-        setupAttribute(3, 266, 582, interpreter.lang("playerAttrCH"), "charisma.png", contentPane);
-        setupAttribute(4, 86, 662, interpreter.lang("playerAttrFF"), "dexterity.png", contentPane);
-        setupAttribute(5, 158, 662, interpreter.lang("playerAttrGE"), "agility.png", contentPane);
-        setupAttribute(6, 230, 662, interpreter.lang("playerAttrKK"), "strength.png", contentPane);
+        setupAttribute(0, 50, 582, Interpreter.lang("playerAttrMU"), "courage.png", contentPane);
+        setupAttribute(1, 122, 582, Interpreter.lang("playerAttrKL"), "wisdom.png", contentPane);
+        setupAttribute(2, 194, 582, Interpreter.lang("playerAttrIN"), "intuition.png", contentPane);
+        setupAttribute(3, 266, 582, Interpreter.lang("playerAttrCH"), "charisma.png", contentPane);
+        setupAttribute(4, 86, 662, Interpreter.lang("playerAttrFF"), "dexterity.png", contentPane);
+        setupAttribute(5, 158, 662, Interpreter.lang("playerAttrGE"), "agility.png", contentPane);
+        setupAttribute(6, 230, 662, Interpreter.lang("playerAttrKK"), "strength.png", contentPane);
 
         contentPane.add(l_playerClass);
         addListener(l_playerClass);
@@ -177,11 +178,22 @@ public class GuiPlayerStats extends JFrame {
         this.add(contentPane);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setLocationRelativeTo(null);
-        setLocation(150, 10);
+
+        //get save bounds
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        Rectangle bounds = gd.getDefaultConfiguration().getBounds();
+        Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gd.getDefaultConfiguration());
+        Rectangle safeBounds = new Rectangle(bounds);
+        safeBounds.x += insets.left;
+        safeBounds.y += insets.top;
+        safeBounds.width -= (insets.left + insets.right);
+        safeBounds.height -= (insets.top + insets.bottom);
+
+        setLocation(safeBounds.x + 10, safeBounds.y + 10);
         this.pack();
         this.setVisible(false);
 
-        playerInventory = (Inventory) manager.getEntity(player.getValue("inventory"));
+        playerInventory = (Inventory) Manager.getEntity(player.getValue("inventory"));
     }
 
     private void setupAttribute(int id, int x, int y, String name, String filename, JPanel contentPane) {
@@ -194,7 +206,7 @@ public class GuiPlayerStats extends JFrame {
         l_img[id].setForeground(new Color(255, 255, 255));
         l_img[id].setEnabled(true);
         l_img[id].setFont(StaticStuff.getPixelatedFont());
-        l_img[id].setIcon(getScaledImage(new ImageIcon(Images.readImageFromFile("res/img/" + filename)), Interpreter.getScaledValue(36), Interpreter.getScaledValue(36)));
+        l_img[id].setIcon(getScaledImage(new ImageIcon(Objects.requireNonNull(Images.readImageFromFile("res/img/" + filename))), Interpreter.getScaledValue(36), Interpreter.getScaledValue(36)));
         l_img[id].setVisible(false);
         l_img[id].addMouseListener(new MouseListener() {
             GuiHoverText popup;
@@ -242,7 +254,7 @@ public class GuiPlayerStats extends JFrame {
     private int pX, pY;
     private boolean dragActive = false;
     private GuiPlayerStatsMinimized mini = null;
-    private GuiPlayerStats self = this;
+    private final GuiPlayerStats self = this;
 
     private void addListener(Component c) {
         c.addMouseListener(new MouseAdapter() {
@@ -251,13 +263,13 @@ public class GuiPlayerStats extends JFrame {
                     for (int currentOpacity = 100; currentOpacity > 0; currentOpacity -= 3) {
                         try {
                             Thread.sleep(2);
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                         setOpacity(currentOpacity * 0.01f);
                     }
                     setVisible(false);
                     if (mini == null)
-                        mini = new GuiPlayerStatsMinimized(player, self, manager.getImage(manager.project.getValue("image")));
+                        mini = new GuiPlayerStatsMinimized(player, self, Manager.getImage(Manager.project.getValue("image")));
                     mini.open(getX(), getY());
                 }
                 dragActive = true;
@@ -310,14 +322,14 @@ public class GuiPlayerStats extends JFrame {
         l_attr[6].setText("<html>" + StaticStuff.prepareString(player.getValue("strength")));
         l_playername.setText("<html>" + StaticStuff.prepareString("[[gold:" + player.getValue("name") + "]]"));
         l_playerClass.setText("<html>" + StaticStuff.prepareString("[[gray:" + player.getValue("class") + "]]"));
-        l_stats.setText("<html>" + StaticStuff.prepareString(interpreter.lang("playerStatsInsertValues", player.getValue("health") + " [[white:/]] " + player.getValue("maxHealth"), player.getValue("gold"), manager.getName(player.getValue("location")))));
+        l_stats.setText("<html>" + StaticStuff.prepareString(Interpreter.lang("playerStatsInsertValues", player.getValue("health") + " [[white:/]] " + player.getValue("maxHealth"), player.getValue("gold"), manager.getName(player.getValue("location")))));
         inventoryItems = playerInventory.getItemsAsStringArray();
         inventoryItemsUIDs = playerInventory.getItemUIDsAsStringArray();
         if (!(inventoryItems.length > scrollIndex + 2)) scrollIndex = Math.max(0, inventoryItems.length - 2);
         if (manager.isPlayerInventoryOverloaded())
-            l_inventoryHeader.setText("<html>" + StaticStuff.prepareString(interpreter.lang("playerStatsInventory") + " ([[red:" + playerInventory.getInventoryWeight() + "]] / " + player.getValue("maxLoad") + ")"));
+            l_inventoryHeader.setText("<html>" + StaticStuff.prepareString(Interpreter.lang("playerStatsInventory") + " ([[red:" + playerInventory.getInventoryWeight() + "]] / " + player.getValue("maxLoad") + ")"));
         else
-            l_inventoryHeader.setText(interpreter.lang("playerStatsInventory") + " (" + playerInventory.getInventoryWeight() + " / " + player.getValue("maxLoad") + ")");
+            l_inventoryHeader.setText(Interpreter.lang("playerStatsInventory") + " (" + playerInventory.getInventoryWeight() + " / " + player.getValue("maxLoad") + ")");
         updateInventory();
     }
 
@@ -369,56 +381,50 @@ public class GuiPlayerStats extends JFrame {
         p_status.setVisible(false);
         p_inventory.setVisible(false);
 
-        new Thread() {
-            public void run() {
-                String toDisplay = "<html>" + StaticStuff.prepareString("[[gold:" + player.getValue("name") + "]]");
-                l_playername.setText("");
-                l_playername.setVisible(true);
-                for (int i = 1; i < toDisplay.length(); i++) {
-                    if (toDisplay.charAt(i) == '<' || toDisplay.charAt(i - 1) == '<') {
-                        while (toDisplay.charAt(i) != '>' && i < toDisplay.length()) i++;
-                        i++;
-                    }
-                    Sleep.milliseconds(StaticStuff.randomNumber(50, 150));
-                    l_playername.setText(toDisplay.substring(0, i));
+        new Thread(() -> {
+            String toDisplay = "<html>" + StaticStuff.prepareString("[[gold:" + player.getValue("name") + "]]");
+            l_playername.setText("");
+            l_playername.setVisible(true);
+            for (int i = 1; i < toDisplay.length(); i++) {
+                if (toDisplay.charAt(i) == '<' || toDisplay.charAt(i - 1) == '<') {
+                    while (toDisplay.charAt(i) != '>') i++;
+                    i++;
                 }
-                l_playername.setText(toDisplay);
-                l_playerClass.setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(50, 150));
+                l_playername.setText(toDisplay.substring(0, i));
             }
-        }.start();
+            l_playername.setText(toDisplay);
+            l_playerClass.setVisible(true);
+        }).start();
 
-        new Thread() {
-            public void run() {
-                for (int i = 0; i < 4; i++) {
-                    l_statsHeader.setVisible(false);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                    p_status.setVisible(false);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                    l_statsHeader.setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                    p_status.setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                }
-                Sleep.milliseconds(100);
-                l_stats.setVisible(true);
+        new Thread(() -> {
+            for (int i = 0; i < 4; i++) {
+                l_statsHeader.setVisible(false);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+                p_status.setVisible(false);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+                l_statsHeader.setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+                p_status.setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
             }
-        }.start();
+            Sleep.milliseconds(100);
+            l_stats.setVisible(true);
+        }).start();
 
-        new Thread() {
-            public void run() {
-                Sleep.milliseconds(300);
-                for (int i = 0; i < 4; i++) {
-                    l_inventoryHeader.setVisible(false);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                    p_inventory.setVisible(false);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                    l_inventoryHeader.setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                    p_inventory.setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                }
+        new Thread(() -> {
+            Sleep.milliseconds(300);
+            for (int i = 0; i < 4; i++) {
+                l_inventoryHeader.setVisible(false);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+                p_inventory.setVisible(false);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+                l_inventoryHeader.setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+                p_inventory.setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
             }
-        }.start();
+        }).start();
 
         new Thread() {
             public void run() {

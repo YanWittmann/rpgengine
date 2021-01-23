@@ -26,7 +26,6 @@ public class PlayerSettings extends Frame {
     private void addAllRequired() {
         addIfNotContain("gold", "100");
         addIfNotContain("health", "0");
-        addIfNotContain("maxHealth", "80");
         addIfNotContain("location", "");
         addIfNotContain("inventory", "");
         addIfNotContain("battleMapImage", "");

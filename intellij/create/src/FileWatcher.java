@@ -6,7 +6,7 @@ import java.util.TimerTask;
 
 public abstract class FileWatcher extends TimerTask {
     private long timeStamp;
-    private File file;
+    private final File file;
 
     public FileWatcher(File file) {
         this.file = file;

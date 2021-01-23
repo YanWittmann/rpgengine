@@ -7,24 +7,17 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
 public class GuiIntro extends JFrame {
-    private JMenuBar menuBar;
-    private JLabel l_adventureTitle;
-    private JLabel l_author;
-    private JLabel l_creditsAndInfo;
-    private JLabel l_restText;
-    private JLabel l_start;
-    private JLabel l_projectIcon;
-    private PlayerSettings player;
-    private ProjectSettings project;
-    private Interpreter interpreter;
+    private final JLabel l_adventureTitle;
+    private final JLabel l_author;
+    private final JLabel l_creditsAndInfo;
+    private final JLabel l_restText;
+    private final JLabel l_start;
+    private final JLabel l_projectIcon;
     private boolean exit = false;
     public static boolean skipIntro = false;
-    private int x_size = Interpreter.getScaledValue(1400), y_size = Interpreter.getScaledValue(790);
+    private final int x_size = Interpreter.getScaledValue(1400), y_size = Interpreter.getScaledValue(790);
 
     public GuiIntro(Interpreter interpreter, PlayerSettings player, ProjectSettings project, String version, BufferedImage image) {
-        this.player = player;
-        this.project = project;
-        this.interpreter = interpreter;
         this.setTitle(StaticStuff.projectName + " - Intro");
         this.setSize(x_size, y_size);
 
@@ -109,90 +102,88 @@ public class GuiIntro extends JFrame {
         this.pack();
         this.setVisible(true);
 
-        new Thread() {
-            public void run() {
-                Sleep.millisecondsIntro(2000);
-                String toDisplay = l_adventureTitle.getText();
-                l_adventureTitle.setText("");
-                l_adventureTitle.setVisible(true);
-                for (int i = 1; i < toDisplay.length(); i++) {
-                    if (toDisplay.charAt(i) == '<' || toDisplay.charAt(i - 1) == '<') {
-                        while (toDisplay.charAt(i) != '>' && i < toDisplay.length()) i++;
-                        i++;
-                    }
-                    Sleep.millisecondsIntro(StaticStuff.randomNumber(20, 300));
-                    l_adventureTitle.setText(toDisplay.substring(0, i));
+        new Thread(() -> {
+            Sleep.millisecondsIntro(2000);
+            String toDisplay = l_adventureTitle.getText();
+            l_adventureTitle.setText("");
+            l_adventureTitle.setVisible(true);
+            for (int i = 1; i < toDisplay.length(); i++) {
+                if (toDisplay.charAt(i) == '<' || toDisplay.charAt(i - 1) == '<') {
+                    while (toDisplay.charAt(i) != '>') i++;
+                    i++;
                 }
-                Sleep.millisecondsIntro(2000);
-                for (int i = l_adventureTitle.getY(); i > Interpreter.getScaledValue(47); i -= 10) {
-                    Sleep.millisecondsIntro(StaticStuff.randomNumber(10, 60));
-                    l_adventureTitle.setBounds(Interpreter.getScaledValue(StaticStuff.randomNumber(-10, 10)), Interpreter.getScaledValue(i + StaticStuff.randomNumber(-10, 10)), x_size, Interpreter.getScaledValue(60));
-                }
-                l_adventureTitle.setBounds(0, Interpreter.getScaledValue(47), x_size, Interpreter.getScaledValue(60));
-                Sleep.millisecondsIntro(1000);
-                l_projectIcon.setVisible(false);
-                for (int i = 0; i < 7; i++) {
-                    l_projectIcon.setVisible((i % 2) == 0);
-                    try {
-                        Thread.sleep(30 + (20 * i));
-                    } catch (Exception e) {
-                    }
-                }
-                l_projectIcon.setVisible(true);
-                Sleep.millisecondsIntro(500);
-                toDisplay = l_author.getText();
-                l_author.setText("");
-                l_author.setVisible(true);
-                for (int i = 1; i < toDisplay.length(); i++) {
-                    if (toDisplay.charAt(i) == '<' || toDisplay.charAt(i - 1) == '<') {
-                        while (toDisplay.charAt(i) != '>' && i < toDisplay.length()) i++;
-                        i++;
-                    }
-                    Sleep.millisecondsIntro(StaticStuff.randomNumber(0, 140));
-                    l_author.setText(toDisplay.substring(0, i));
-                }
-                Sleep.millisecondsIntro(1000);
-                toDisplay = l_restText.getText();
-                l_restText.setText("");
-                l_restText.setVisible(true);
+                Sleep.millisecondsIntro(StaticStuff.randomNumber(20, 300));
+                l_adventureTitle.setText(toDisplay.substring(0, i));
+            }
+            Sleep.millisecondsIntro(2000);
+            for (int i = l_adventureTitle.getY(); i > Interpreter.getScaledValue(47); i -= 10) {
+                Sleep.millisecondsIntro(StaticStuff.randomNumber(10, 60));
+                l_adventureTitle.setBounds(Interpreter.getScaledValue(StaticStuff.randomNumber(-10, 10)), Interpreter.getScaledValue(i + StaticStuff.randomNumber(-10, 10)), x_size, Interpreter.getScaledValue(60));
+            }
+            l_adventureTitle.setBounds(0, Interpreter.getScaledValue(47), x_size, Interpreter.getScaledValue(60));
+            Sleep.millisecondsIntro(1000);
+            l_projectIcon.setVisible(false);
+            for (int i = 0; i < 7; i++) {
+                l_projectIcon.setVisible((i % 2) == 0);
                 try {
-                    for (int i = 1; i < toDisplay.length(); i++) {
-                        if (toDisplay.charAt(i) == '<' || toDisplay.charAt(i - 1) == '<') {
-                            while (toDisplay.charAt(i) != '>' && i < toDisplay.length()) i++;
-                            i++;
-                        }
-                        Sleep.millisecondsIntro(StaticStuff.randomNumber(100, 300));
-                        l_restText.setText(toDisplay.substring(0, i));
-                        while (toDisplay.charAt(i) != '<' && toDisplay.charAt(i + 1) != 'b' && i < toDisplay.length())
-                            i++;
-                    }
-                } catch (Exception e) {
-                }
-                l_restText.setText(toDisplay);
-                Sleep.millisecondsIntro(4000);
-                l_start.setVisible(true);
-                Sleep.millisecondsIntro(200);
-                l_creditsAndInfo.setVisible(true);
-                l_creditsAndInfo.setText("made with the " + StaticStuff.projectName + " by Yan Wittmann (v. " + version + ")");
-                skipIntro = true;
-                Sleep.milliseconds(1000);
-                int amountMinus = 0;
-                while (!exit) {
-                    Sleep.milliseconds(150);
-                    l_start.setText("<html>" + StaticStuff.prepareString("[[aqua:" + makeFancyMinusText(Interpreter.lang("introStart"), amountMinus) + "]]"));
-                    amountMinus = (amountMinus + 1) % 4;
-                    Sleep.milliseconds(150);
-                    l_start.setText("<html>" + StaticStuff.prepareString("[[aqua:" + makeFancyMinusText(Interpreter.lang("introStart"), amountMinus) + "]]"));
-                    amountMinus = (amountMinus + 1) % 4;
-                    Sleep.milliseconds(150);
-                    l_start.setText("<html>" + StaticStuff.prepareString("[[gray:" + makeFancyMinusText(Interpreter.lang("introStart"), amountMinus) + "]]"));
-                    amountMinus = (amountMinus + 1) % 4;
-                    Sleep.milliseconds(150);
-                    l_start.setText("<html>" + StaticStuff.prepareString("[[gray:" + makeFancyMinusText(Interpreter.lang("introStart"), amountMinus) + "]]"));
-                    amountMinus = (amountMinus + 1) % 4;
+                    Sleep.millisecondsIntro(30 + (20 * i));
+                } catch (Exception ignored) {
                 }
             }
-        }.start();
+            l_projectIcon.setVisible(true);
+            Sleep.millisecondsIntro(500);
+            toDisplay = l_author.getText();
+            l_author.setText("");
+            l_author.setVisible(true);
+            for (int i = 1; i < toDisplay.length(); i++) {
+                if (toDisplay.charAt(i) == '<' || toDisplay.charAt(i - 1) == '<') {
+                    while (toDisplay.charAt(i) != '>') i++;
+                    i++;
+                }
+                Sleep.millisecondsIntro(StaticStuff.randomNumber(0, 140));
+                l_author.setText(toDisplay.substring(0, i));
+            }
+            Sleep.millisecondsIntro(1000);
+            toDisplay = l_restText.getText();
+            l_restText.setText("");
+            l_restText.setVisible(true);
+            try {
+                for (int i = 1; i < toDisplay.length(); i++) {
+                    if (toDisplay.charAt(i) == '<' || toDisplay.charAt(i - 1) == '<') {
+                        while (toDisplay.charAt(i) != '>' && i < toDisplay.length()) i++;
+                        i++;
+                    }
+                    Sleep.millisecondsIntro(StaticStuff.randomNumber(100, 300));
+                    l_restText.setText(toDisplay.substring(0, i));
+                    while (toDisplay.charAt(i) != '<' && toDisplay.charAt(i + 1) != 'b' && i < toDisplay.length())
+                        i++;
+                }
+            } catch (Exception e) {
+            }
+            l_restText.setText(toDisplay);
+            Sleep.millisecondsIntro(4000);
+            l_start.setVisible(true);
+            Sleep.millisecondsIntro(200);
+            l_creditsAndInfo.setVisible(true);
+            l_creditsAndInfo.setText("made with the " + StaticStuff.projectName + " by Yan Wittmann (v. " + version + ")");
+            skipIntro = true;
+            Sleep.milliseconds(1000);
+            int amountMinus = 0;
+            while (!exit) {
+                Sleep.milliseconds(150);
+                l_start.setText("<html>" + StaticStuff.prepareString("[[aqua:" + makeFancyMinusText(Interpreter.lang("introStart"), amountMinus) + "]]"));
+                amountMinus = (amountMinus + 1) % 4;
+                Sleep.milliseconds(150);
+                l_start.setText("<html>" + StaticStuff.prepareString("[[aqua:" + makeFancyMinusText(Interpreter.lang("introStart"), amountMinus) + "]]"));
+                amountMinus = (amountMinus + 1) % 4;
+                Sleep.milliseconds(150);
+                l_start.setText("<html>" + StaticStuff.prepareString("[[gray:" + makeFancyMinusText(Interpreter.lang("introStart"), amountMinus) + "]]"));
+                amountMinus = (amountMinus + 1) % 4;
+                Sleep.milliseconds(150);
+                l_start.setText("<html>" + StaticStuff.prepareString("[[gray:" + makeFancyMinusText(Interpreter.lang("introStart"), amountMinus) + "]]"));
+                amountMinus = (amountMinus + 1) % 4;
+            }
+        }).start();
         addListener(this);
     }
 

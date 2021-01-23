@@ -6,13 +6,12 @@ public class PlayerSettings {
 
     public PlayerSettings(String[] fileInput) {
         settings.clear();
-        for (int i = 0; i < fileInput.length; i++)
-            if (fileInput[i].contains(":")) settings.add(fileInput[i]);
+        for (String s : fileInput) if (s.contains(":")) settings.add(s);
         addAllRequired();
     }
 
     private void addAllRequired() {
-        addIfNotContain("name", "Yan");
+        addIfNotContain("name", "");
         addIfNotContain("battleMapImage", "");
         addIfNotContain("location", "");
         addIfNotContain("gold", "100");
@@ -23,15 +22,13 @@ public class PlayerSettings {
     }
 
     public boolean addIfNotContain(String option, String value) {
-        for (int i = 0; i < settings.size(); i++)
-            if (settings.get(i).contains(option + ":")) return true;
+        for (String setting : settings) if (setting.contains(option + ":")) return true;
         settings.add(option + ":" + value);
         return false;
     }
 
     public String getValue(String name) {
-        for (int i = 0; i < settings.size(); i++)
-            if (settings.get(i).contains(name + ":")) return settings.get(i).replaceAll(".+:", "");
+        for (String setting : settings) if (setting.contains(name + ":")) return setting.replaceAll(".+:", "");
         return "";
     }
 
@@ -59,16 +56,16 @@ public class PlayerSettings {
     }
 
     public static String[] getNames() {
-        String names[] = new String[settings.size()];
+        String[] names = new String[settings.size()];
         for (int i = 0; i < names.length; i++) names[i] = settings.get(i).replaceAll(":.+", "").replace(":", "");
         return names;
     }
 
     public void setupTalents(String language) {
-        String input[] = FileManager.readFile("res/txt/talentData/" + getValue("class") + language + "" + StaticStuff.dataFileEnding);
-        String currentTalent[];
-        for (int i = 0; i < input.length; i++) {
-            currentTalent = input[i].split(";");
+        String[] input = FileManager.readFile("res/txt/talentData/" + getValue("class") + language + "" + StaticStuff.dataFileEnding);
+        String[] currentTalent;
+        for (String s : input) {
+            currentTalent = s.split(";");
             setValue(currentTalent[0], currentTalent[1]);
         }
     }

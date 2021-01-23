@@ -6,21 +6,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
 public class GuiCharacterCreation extends JFrame {
-    private JMenuBar menuBar;
-    private JPanel p_attributes;
-    private JLabel l_availableClasses;
-    private JLabel l_availableClassesList[] = new JLabel[7];
-    private JLabel l_diceRoll[] = new JLabel[7];
+    private final JPanel p_attributes;
+    private final JLabel l_availableClasses;
+    private final JLabel[] l_availableClassesList = new JLabel[7];
+    private final JLabel[] l_diceRoll = new JLabel[7];
     private JLabel l_diceRollAll;
-    private JLabel l_done;
-    private JLabel l_goodAttributes;
-    private JLabel l_goodAttributesList[] = new JLabel[7];
-    private JLabel l_title;
-    private Interpreter interpreter;
-    private int x_size = Interpreter.getScaledValue(1365), y_size = Interpreter.getScaledValue(700);
+    private final JLabel l_done;
+    private final JLabel l_goodAttributes;
+    private final JLabel[] l_goodAttributesList = new JLabel[7];
+    private final JLabel l_title;
+    private final int x_size = Interpreter.getScaledValue(1365);
+    private int y_size = Interpreter.getScaledValue(700);
 
     public GuiCharacterCreation(Interpreter interpreter) {
-        this.interpreter = interpreter;
         this.setTitle(StaticStuff.projectName + " - " + lang("chCreationTitle"));
         this.setSize(x_size, y_size);
         setUndecorated(false);
@@ -38,19 +36,17 @@ public class GuiCharacterCreation extends JFrame {
         l_title.setEnabled(true);
         l_title.setFont(StaticStuff.getPixelatedFont());
         l_title.setVisible(true);
-        new Thread() {
-            public void run() {
-                Sleep.milliseconds(3000);
-                l_title.setText(lang("chCreationTitle"));
-            }
-        }.start();
+        new Thread(() -> {
+            Sleep.milliseconds(3000);
+            l_title.setText(lang("chCreationTitle"));
+        }).start();
 
         p_attributes = new JPanel(null);
         p_attributes.setBounds(0, 0, x_size, Interpreter.getScaledValue(700));
         p_attributes.setBackground(StaticStuff.getColor("background"));
         p_attributes.setForeground(StaticStuff.getColor("background"));
         p_attributes.setEnabled(true);
-        p_attributes.setFont(new Font("sansserif", 0, 12));
+        p_attributes.setFont(new Font("sansserif", Font.PLAIN, 12));
         p_attributes.setVisible(true);
 
         for (int i = 0; i < 8; i++) {
@@ -69,12 +65,10 @@ public class GuiCharacterCreation extends JFrame {
                 });
                 p_attributes.add(l_diceRollAll);
                 final int ii = i;
-                new Thread() {
-                    public void run() {
-                        Sleep.milliseconds(1000 + 100 * ii + StaticStuff.randomNumber(0, 130));
-                        l_diceRollAll.setVisible(true);
-                    }
-                }.start();
+                new Thread(() -> {
+                    Sleep.milliseconds(1000 + 100 * ii + StaticStuff.randomNumber(0, 130));
+                    l_diceRollAll.setVisible(true);
+                }).start();
             } else {
                 l_diceRoll[i] = new JLabel("<html>" + StaticStuff.prepareString("[[black:" + lang("chCreationRoll") + (i + 1) + "]]"), SwingConstants.CENTER);
                 l_diceRoll[i].setBounds(Interpreter.getScaledValue((167 * i) + 130), Interpreter.getScaledValue(120), Interpreter.getScaledValue(120), Interpreter.getScaledValue(35));
@@ -88,16 +82,21 @@ public class GuiCharacterCreation extends JFrame {
                     public void mouseClicked(MouseEvent evt) {
                         clickRoll(ii);
                     }
+
+                    public void mouseEntered(MouseEvent e) {
+                        if(attributesRollAmount == 7) clickRoll(ii);
+                    }
+
+                    public void mouseExited(MouseEvent e) {
+                    }
                 });
                 p_attributes.add(l_diceRoll[i]);
                 rollResults[i] = -1;
                 rollPlaced[i] = -1;
-                new Thread() {
-                    public void run() {
-                        Sleep.milliseconds(1000 + 100 * ii + StaticStuff.randomNumber(0, 130));
-                        l_diceRoll[ii].setText("<html>" + StaticStuff.prepareString(lang("chCreationRoll") + "[[purple:" + (ii + 1) + "]]"));
-                    }
-                }.start();
+                new Thread(() -> {
+                    Sleep.milliseconds(1000 + 100 * ii + StaticStuff.randomNumber(0, 130));
+                    l_diceRoll[ii].setText("<html>" + StaticStuff.prepareString(lang("chCreationRoll") + "[[purple:" + (ii + 1) + "]]"));
+                }).start();
             }
         }
 
@@ -134,7 +133,7 @@ public class GuiCharacterCreation extends JFrame {
         l_availableClasses.setFont(StaticStuff.getPixelatedFont());
         l_availableClasses.setVisible(true);
 
-        String classDataInput[] = FileManager.readFile("res/txt/classes" + Interpreter.getLanguage() + "" + StaticStuff.dataFileEnding);
+        String[] classDataInput = FileManager.readFile("res/txt/classes" + Interpreter.getLanguage() + "" + StaticStuff.dataFileEnding);
         classData = new String[7][];
         for (int i = 0; i < 7; i++) classData[i] = classDataInput[i].split(";;;");
         classDataNames = new String[7];
@@ -154,11 +153,7 @@ public class GuiCharacterCreation extends JFrame {
             final int ii = i;
             l_availableClassesList[i].addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent evt) {
-                    new Thread() {
-                        public void run() {
-                            clickClass(ii);
-                        }
-                    }.start();
+                    new Thread(() -> clickClass(ii)).start();
                 }
 
                 public void mouseEntered(MouseEvent e) {
@@ -186,11 +181,7 @@ public class GuiCharacterCreation extends JFrame {
             public void mouseClicked(MouseEvent evt) {
                 doneDisplay = true;
                 dispose();
-                new Thread() {
-                    public void run() {
-                        interpreter.finishSetup();
-                    }
-                }.start();
+                new Thread(interpreter::finishSetup).start();
             }
         });
 
@@ -234,10 +225,11 @@ public class GuiCharacterCreation extends JFrame {
 
     private void clickClass(int id) {
         if (!canSelectClass || !classAvailable[id]) {
-            String temp = classDataCond[id][0].replaceAll("[0-9]", ""), condString = classDataCond[id][0].replaceAll("[A-Za-z]+", lang("playerAttr" + temp) + ": ");
+            String temp = classDataCond[id][0].replaceAll("[0-9]", "");
+            StringBuilder condString = new StringBuilder(classDataCond[id][0].replaceAll("[A-Za-z]+", lang("playerAttr" + temp) + ": "));
             for (int i = 1; i < classDataCond[id].length; i++) {
                 temp = classDataCond[id][i].replaceAll("[0-9]", "");
-                condString += "<br>" + classDataCond[id][i].replaceAll("[A-Za-z]+", lang("playerAttr" + temp) + ": ");
+                condString.append("<br>").append(classDataCond[id][i].replaceAll("[A-Za-z]+", lang("playerAttr" + temp) + ": "));
             }
             StaticStuff.openPopup(StaticStuff.prepareString("[[yellow:" + classDataNames[id] + "]]") + "<br>" + condString);
         } else {
@@ -259,39 +251,39 @@ public class GuiCharacterCreation extends JFrame {
                     l_done.setText("<html>" + StaticStuff.prepareString("[[gray:" + lang("chCreationDone") + "]]"));
                 }
                 Sleep.milliseconds(500);
-                new Thread() {
-                    public void run() {
-                        int amountMinus = 0;
-                        while (doneDisplay) {
-                            Sleep.milliseconds(150);
-                            l_done.setText("<html>" + StaticStuff.prepareString("[[aqua:" + makeFancyMinusText(lang("chCreationDone"), amountMinus) + "]]"));
-                            amountMinus = (amountMinus + 1) % 4;
-                            Sleep.milliseconds(150);
-                            l_done.setText("<html>" + StaticStuff.prepareString("[[aqua:" + makeFancyMinusText(lang("chCreationDone"), amountMinus) + "]]"));
-                            amountMinus = (amountMinus + 1) % 4;
-                            Sleep.milliseconds(150);
-                            l_done.setText("<html>" + StaticStuff.prepareString("[[gray:" + makeFancyMinusText(lang("chCreationDone"), amountMinus) + "]]"));
-                            amountMinus = (amountMinus + 1) % 4;
-                            Sleep.milliseconds(150);
-                            l_done.setText("<html>" + StaticStuff.prepareString("[[gray:" + makeFancyMinusText(lang("chCreationDone"), amountMinus) + "]]"));
-                            amountMinus = (amountMinus + 1) % 4;
-                        }
-                        exit = true;
+                new Thread(() -> {
+                    int amountMinus = 0;
+                    while (doneDisplay) {
+                        Sleep.milliseconds(150);
+                        l_done.setText("<html>" + StaticStuff.prepareString("[[aqua:" + makeFancyMinusText(lang("chCreationDone"), amountMinus) + "]]"));
+                        amountMinus = (amountMinus + 1) % 4;
+                        Sleep.milliseconds(150);
+                        l_done.setText("<html>" + StaticStuff.prepareString("[[aqua:" + makeFancyMinusText(lang("chCreationDone"), amountMinus) + "]]"));
+                        amountMinus = (amountMinus + 1) % 4;
+                        Sleep.milliseconds(150);
+                        l_done.setText("<html>" + StaticStuff.prepareString("[[gray:" + makeFancyMinusText(lang("chCreationDone"), amountMinus) + "]]"));
+                        amountMinus = (amountMinus + 1) % 4;
+                        Sleep.milliseconds(150);
+                        l_done.setText("<html>" + StaticStuff.prepareString("[[gray:" + makeFancyMinusText(lang("chCreationDone"), amountMinus) + "]]"));
+                        amountMinus = (amountMinus + 1) % 4;
                     }
-                }.start();
+                    exit = true;
+                }).start();
             }
         }
     }
 
     public static String makeFancyMinusText(String text, int amount) {
-        for (int i = 0; i < amount; i++) text = "[[black:- ]]" + text + "[[black: -]]";
+        StringBuilder textBuilder = new StringBuilder(text);
+        for (int i = 0; i < amount; i++) textBuilder = new StringBuilder("[[black:- ]]" + textBuilder + "[[black: -]]");
+        text = textBuilder.toString();
         text = "- " + text + " -";
         return text;
     }
 
     private boolean checkIfMinRequirements() {
         l_diceRollAll.setVisible(false);
-        int numbersAmount[] = new int[]{0, 0, 0, 0, 0, 0, 0};
+        int[] numbersAmount = new int[]{0, 0, 0, 0, 0, 0, 0};
         for (int i = 0; i < 7; i++) {
             numbersAmount[rollResults[i] - 7]++;
             l_diceRoll[i].setText("<html>" + StaticStuff.prepareString("[[aqua:" + rollResults[i] + "]]"));
@@ -330,214 +322,205 @@ public class GuiCharacterCreation extends JFrame {
     }
 
     int attributeClicked = -1, attributesSetAmount = 0, attributesRollAmount = 0, selectedClassID = -1;
-    int rollResults[] = new int[7];
-    int rollPlaced[] = new int[7];
-    int rollAttributeValue[] = new int[7];
-    String classData[][];
-    String classDataNames[], classDataCond[][];
-    boolean rolling = false, newAttributeClicked = false, classAvailable[] = new boolean[7], rollAll = false;
+    int[] rollResults = new int[7];
+    int[] rollPlaced = new int[7];
+    int[] rollAttributeValue = new int[7];
+    String[][] classData;
+    String[] classDataNames;
+    String[][] classDataCond;
+    boolean rolling = false;
+    boolean newAttributeClicked = false;
+    boolean[] classAvailable = new boolean[7];
+    boolean rollAll = false;
 
     private void clickRoll(int id) {
         if (!rolling || rollAll)
             if (rollResults[id] == -1) {
-                new Thread() {
-                    public void run() {
-                        rolling = true;
-                        if (!rollAll)
-                            rollResults[id] = StaticStuff.rollDice(lang("chCreationRoll") + (id + 1), 6, 10, rollAll) + 7;
-                        else rollResults[id] = StaticStuff.randomNumber(1, 6) + 7;
-                        //rollResults[id] = Integer.parseInt(StaticStuff.openPopup("Roll value:", ""));
-                        if (!rollAll) new GuiHoverText((rollResults[id] - 7) + " + 7 = " + rollResults[id]);
+                new Thread(() -> {
+                    rolling = true;
+                    if (!rollAll)
+                        rollResults[id] = StaticStuff.rollDice(lang("chCreationRoll") + (id + 1), 6, 10, rollAll) + 7;
+                    else rollResults[id] = StaticStuff.randomNumber(1, 6) + 7;
+                    //rollResults[id] = Integer.parseInt(StaticStuff.openPopup("Roll value:", ""));
+                    if (!rollAll) new GuiHoverText((rollResults[id] - 7) + " + 7 = " + rollResults[id]);
+                    l_diceRoll[id].setText("<html>" + StaticStuff.prepareString("[[yellow:" + rollResults[id] + "]]"));
+                    rolling = false;
+                    attributesRollAmount++;
+                    if (attributesRollAmount == 7) {
+                        while (!checkIfMinRequirements()) ;
+                        for (int i = 20; i < 35; i++) {
+                            l_goodAttributes.setText("<html>" + StaticStuff.prepareString("[[black:" + lang("chCreationGoodAttributes") + "]]"));
+                            Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
+                            l_goodAttributes.setText("<html>" + StaticStuff.prepareString("[[aqua:" + lang("chCreationGoodAttributes") + "]]"));
+                            Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
+                        }
+                        Sleep.milliseconds(200);
+                        for (int i = 0; i < 7; i++) {
+                            l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[white:" + lang("playerAttr" + i) + "]]"));
+                            Sleep.milliseconds(40);
+                        }
+                        for (int i = 0; i < 7; i++) {
+                            l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + lang("playerAttr" + i) + "]]"));
+                            Sleep.milliseconds(40);
+                        }
+                        for (int i = 0; i < 7; i++) {
+                            l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[white:" + lang("playerAttr" + i) + "]]"));
+                            Sleep.milliseconds(50);
+                        }
+                        for (int i = 0; i < 7; i++) {
+                            l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + lang("playerAttr" + i) + "]]"));
+                            Sleep.milliseconds(60);
+                        }
+                        for (int i = 0; i < 7; i++) {
+                            l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[white:" + lang("playerAttr" + i) + "]]"));
+                            Sleep.milliseconds(100);
+                        }
+                        new Thread(() -> {
+                            while (!exit) {
+                                try {
+                                    Sleep.milliseconds(StaticStuff.randomNumber(1000, 5000));
+                                    int chosen = StaticStuff.randomNumber(1, 8); //1;2;3-5;6-8
+                                    if (chosen == 1 && canSelectClass) {
+                                        for (int i = 0; i < 7; i++) {
+                                            l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + classDataNames[i] + "]]"));
+                                            Sleep.milliseconds(60);
+                                        }
+                                        for (int i = 0; i < 7; i++) {
+                                            if (classAvailable[i])
+                                                l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + classDataNames[i] + "]]"));
+                                            else
+                                                l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[gray:" + classDataNames[i] + "]]"));
+                                            Sleep.milliseconds(100);
+                                        }
+                                        Sleep.milliseconds(100);
+                                        if (selectedClassID != -1)
+                                            l_availableClassesList[selectedClassID].setText("<html>" + StaticStuff.prepareString("[[green:" + classDataNames[selectedClassID] + "]]"));
+                                    } else if (chosen == 2) {
+                                        for (int i = 0; i < 7; i++) {
+                                            l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + lang("playerAttr" + i) + "]]"));
+                                            Sleep.milliseconds(60);
+                                        }
+                                        for (int i = 0; i < 7; i++) {
+                                            l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[white:" + lang("playerAttr" + i) + "]]"));
+                                            Sleep.milliseconds(100);
+                                        }
+                                    } else if (chosen > 2 && chosen < 6 && canSelectClass) {
+                                        for (int i = 20; i < 30; i++) {
+                                            l_availableClasses.setText("<html>" + StaticStuff.prepareString("[[gray:" + lang("chCreationAvailableClasses") + "]]"));
+                                            Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
+                                            l_availableClasses.setText("<html>" + StaticStuff.prepareString("[[aqua:" + lang("chCreationAvailableClasses") + "]]"));
+                                            Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
+                                        }
+                                    } else if (chosen > 6 && chosen < 9) {
+                                        for (int i = 20; i < 30; i++) {
+                                            l_goodAttributes.setText("<html>" + StaticStuff.prepareString("[[black:" + lang("chCreationGoodAttributes") + "]]"));
+                                            Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
+                                            l_goodAttributes.setText("<html>" + StaticStuff.prepareString("[[aqua:" + lang("chCreationGoodAttributes") + "]]"));
+                                            Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
+                                        }
+                                    }
+                                } catch (Exception ignored) {
+                                }
+                            }
+                            exit = true;
+                        }).start();
+                    }
+                }).start();
+            } else if (rollPlaced[id] == -1) {
+                new Thread(() -> {
+                    newAttributeClicked = true;
+                    for (int i = 0; i < 7; i++)
+                        if (rollResults[i] != -1)
+                            l_diceRoll[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + rollResults[i] + "]]"));
+                    l_diceRoll[id].setText("<html>" + StaticStuff.prepareString("[[yellow:\\[ ]][[aqua:" + rollResults[id] + "]][[yellow: \\]]]"));
+                    Sleep.milliseconds(200);
+                    attributeClicked = -1;
+                    newAttributeClicked = false;
+                    while (attributeClicked == -1 && !newAttributeClicked) Sleep.milliseconds(200);
+                    if (newAttributeClicked) return;
+                    boolean taken = false;
+                    for (int i = 0; i < 7; i++)
+                        if (attributeClicked == rollPlaced[i]) {
+                            taken = true;
+                            break;
+                        }
+                    if (!taken) {
+                        rollPlaced[id] = attributeClicked;
+                        rollAttributeValue[attributeClicked] = rollResults[id];
+                        int origPosX = l_diceRoll[id].getX(), origPosY = l_diceRoll[id].getY();
+                        int destPosX = l_goodAttributesList[attributeClicked].getX() + Interpreter.getScaledValue(350), destPosY = l_goodAttributesList[attributeClicked].getY();
+                        float diffX = destPosX - origPosX, diffY = destPosY - origPosY;
+                        for (int i = 0; i < 50; i++) {
+                            l_diceRoll[id].setBounds((int) (origPosX + ((diffX / 50) * i)), (int) (origPosY + ((diffY / 50) * i)), Interpreter.getScaledValue(120), Interpreter.getScaledValue(35));
+                            Sleep.milliseconds(10);
+                        }
+                        l_diceRoll[id].setBounds(destPosX, destPosY, Interpreter.getScaledValue(120), Interpreter.getScaledValue(35));
                         l_diceRoll[id].setText("<html>" + StaticStuff.prepareString("[[yellow:" + rollResults[id] + "]]"));
-                        rolling = false;
-                        attributesRollAmount++;
-                        if (attributesRollAmount == 7) {
-                            while (!checkIfMinRequirements()) ;
+                        attributesSetAmount++;
+                        if (attributesSetAmount == 7) {
+                            for (int i = 0; i < 7; i++) //reset color of available classes
+                                l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + classDataNames[i] + "]]"));
+                            Sleep.milliseconds(800); //fancy animation for the classes
                             for (int i = 20; i < 35; i++) {
-                                l_goodAttributes.setText("<html>" + StaticStuff.prepareString("[[black:" + lang("chCreationGoodAttributes") + "]]"));
+                                l_availableClasses.setText("<html>" + StaticStuff.prepareString("[[gray:" + lang("chCreationAvailableClasses") + "]]"));
                                 Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
-                                l_goodAttributes.setText("<html>" + StaticStuff.prepareString("[[aqua:" + lang("chCreationGoodAttributes") + "]]"));
+                                l_availableClasses.setText("<html>" + StaticStuff.prepareString("[[aqua:" + lang("chCreationAvailableClasses") + "]]"));
                                 Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
                             }
                             Sleep.milliseconds(200);
+                            checkClassesAvailable(false);
                             for (int i = 0; i < 7; i++) {
-                                l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[white:" + lang("playerAttr" + i) + "]]"));
+                                if (classAvailable[i])
+                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + classDataNames[i] + "]]"));
+                                else
+                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[gray:" + classDataNames[i] + "]]"));
                                 Sleep.milliseconds(40);
                             }
                             for (int i = 0; i < 7; i++) {
-                                l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + lang("playerAttr" + i) + "]]"));
+                                l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + classDataNames[i] + "]]"));
                                 Sleep.milliseconds(40);
                             }
                             for (int i = 0; i < 7; i++) {
-                                l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[white:" + lang("playerAttr" + i) + "]]"));
+                                if (classAvailable[i])
+                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + classDataNames[i] + "]]"));
+                                else
+                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[gray:" + classDataNames[i] + "]]"));
                                 Sleep.milliseconds(50);
                             }
                             for (int i = 0; i < 7; i++) {
-                                l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + lang("playerAttr" + i) + "]]"));
+                                l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + classDataNames[i] + "]]"));
                                 Sleep.milliseconds(60);
                             }
                             for (int i = 0; i < 7; i++) {
-                                l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[white:" + lang("playerAttr" + i) + "]]"));
+                                if (classAvailable[i])
+                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + classDataNames[i] + "]]"));
+                                else
+                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[gray:" + classDataNames[i] + "]]"));
                                 Sleep.milliseconds(100);
                             }
-                            new Thread() {
-                                public void run() {
-                                    while (!exit) {
-                                        try {
-                                            Sleep.milliseconds(StaticStuff.randomNumber(1000, 5000));
-                                            int chosen = StaticStuff.randomNumber(1, 8); //1;2;3-5;6-8
-                                            if (chosen == 1 && canSelectClass) {
-                                                for (int i = 0; i < 7; i++) {
-                                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + classDataNames[i] + "]]"));
-                                                    Sleep.milliseconds(60);
-                                                }
-                                                for (int i = 0; i < 7; i++) {
-                                                    if (classAvailable[i])
-                                                        l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + classDataNames[i] + "]]"));
-                                                    else
-                                                        l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[gray:" + classDataNames[i] + "]]"));
-                                                    Sleep.milliseconds(100);
-                                                }
-                                                Sleep.milliseconds(100);
-                                                if (selectedClassID != -1)
-                                                    l_availableClassesList[selectedClassID].setText("<html>" + StaticStuff.prepareString("[[green:" + classDataNames[selectedClassID] + "]]"));
-                                            } else if (chosen == 2) {
-                                                for (int i = 0; i < 7; i++) {
-                                                    l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + lang("playerAttr" + i) + "]]"));
-                                                    Sleep.milliseconds(60);
-                                                }
-                                                for (int i = 0; i < 7; i++) {
-                                                    l_goodAttributesList[i].setText("<html>" + StaticStuff.prepareString("[[white:" + lang("playerAttr" + i) + "]]"));
-                                                    Sleep.milliseconds(100);
-                                                }
-                                            } else if (chosen > 2 && chosen < 6 && canSelectClass) {
-                                                for (int i = 20; i < 30; i++) {
-                                                    l_availableClasses.setText("<html>" + StaticStuff.prepareString("[[gray:" + lang("chCreationAvailableClasses") + "]]"));
-                                                    Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
-                                                    l_availableClasses.setText("<html>" + StaticStuff.prepareString("[[aqua:" + lang("chCreationAvailableClasses") + "]]"));
-                                                    Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
-                                                }
-                                            } else if (chosen > 6 && chosen < 9) {
-                                                for (int i = 20; i < 30; i++) {
-                                                    l_goodAttributes.setText("<html>" + StaticStuff.prepareString("[[black:" + lang("chCreationGoodAttributes") + "]]"));
-                                                    Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
-                                                    l_goodAttributes.setText("<html>" + StaticStuff.prepareString("[[aqua:" + lang("chCreationGoodAttributes") + "]]"));
-                                                    Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
-                                                }
-                                            }
-                                        } catch (Exception e) {
-                                        }
-                                    }
-                                    exit = true;
-                                }
-                            }.start();
+                            Sleep.milliseconds(300);
+                            for (int i = 0; i < 100; i++) {
+                                p_attributes.setBounds(0, i * -1, x_size, Interpreter.getScaledValue(700));
+                                setSize(Interpreter.getScaledValue(1381), Interpreter.getScaledValue(739 - (i / 2)));
+                                Sleep.milliseconds(20);
+                            }
+                            canSelectClass = true;
                         }
                     }
-                }.start();
-            } else if (rollPlaced[id] == -1) {
-                new Thread() {
-                    public void run() {
-                        newAttributeClicked = true;
-                        for (int i = 0; i < 7; i++)
-                            if (rollResults[i] != -1)
-                                l_diceRoll[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + rollResults[i] + "]]"));
-                        l_diceRoll[id].setText("<html>" + StaticStuff.prepareString("[[aqua:" + rollResults[id] + "]]"));
-                        Sleep.milliseconds(200);
-                        attributeClicked = -1;
-                        newAttributeClicked = false;
-                        while (attributeClicked == -1 && !newAttributeClicked) Sleep.milliseconds(200);
-                        if (newAttributeClicked) return;
-                        boolean taken = false;
-                        for (int i = 0; i < 7; i++) if (attributeClicked == rollPlaced[i]) taken = true;
-                        if (!taken) {
-                            rollPlaced[id] = attributeClicked;
-                            rollAttributeValue[attributeClicked] = rollResults[id];
-                            int origPosX = l_diceRoll[id].getX(), origPosY = l_diceRoll[id].getY();
-                            int destPosX = l_goodAttributesList[attributeClicked].getX() + Interpreter.getScaledValue(350), destPosY = l_goodAttributesList[attributeClicked].getY();
-                            float diffX = destPosX - origPosX, diffY = destPosY - origPosY;
-                            for (int i = 0; i < 50; i++) {
-                                l_diceRoll[id].setBounds((int) (origPosX + ((diffX / 50) * i)), (int) (origPosY + ((diffY / 50) * i)), Interpreter.getScaledValue(120), Interpreter.getScaledValue(35));
-                                Sleep.milliseconds(10);
-                            }
-                            l_diceRoll[id].setBounds(destPosX, destPosY, Interpreter.getScaledValue(120), Interpreter.getScaledValue(35));
-                            l_diceRoll[id].setText("<html>" + StaticStuff.prepareString("[[yellow:" + rollResults[id] + "]]"));
-                            attributesSetAmount++;
-                            if (attributesSetAmount == 7) {
-                                for (int i = 0; i < 7; i++) //reset color of available classes
-                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + classDataNames[i] + "]]"));
-                                Sleep.milliseconds(800); //fancy animation for the classes
-                                for (int i = 20; i < 35; i++) {
-                                    l_availableClasses.setText("<html>" + StaticStuff.prepareString("[[gray:" + lang("chCreationAvailableClasses") + "]]"));
-                                    Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
-                                    l_availableClasses.setText("<html>" + StaticStuff.prepareString("[[aqua:" + lang("chCreationAvailableClasses") + "]]"));
-                                    Sleep.milliseconds(StaticStuff.randomNumber(1, 4) * i);
-                                }
-                                Sleep.milliseconds(200);
-                                checkClassesAvailable(false);
-                                for (int i = 0; i < 7; i++) {
-                                    if (classAvailable[i])
-                                        l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + classDataNames[i] + "]]"));
-                                    else
-                                        l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[gray:" + classDataNames[i] + "]]"));
-                                    Sleep.milliseconds(40);
-                                }
-                                for (int i = 0; i < 7; i++) {
-                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + classDataNames[i] + "]]"));
-                                    Sleep.milliseconds(40);
-                                }
-                                for (int i = 0; i < 7; i++) {
-                                    if (classAvailable[i])
-                                        l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + classDataNames[i] + "]]"));
-                                    else
-                                        l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[gray:" + classDataNames[i] + "]]"));
-                                    Sleep.milliseconds(50);
-                                }
-                                for (int i = 0; i < 7; i++) {
-                                    l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[black:" + classDataNames[i] + "]]"));
-                                    Sleep.milliseconds(60);
-                                }
-                                for (int i = 0; i < 7; i++) {
-                                    if (classAvailable[i])
-                                        l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[yellow:" + classDataNames[i] + "]]"));
-                                    else
-                                        l_availableClassesList[i].setText("<html>" + StaticStuff.prepareString("[[gray:" + classDataNames[i] + "]]"));
-                                    Sleep.milliseconds(100);
-                                }
-                                Sleep.milliseconds(300);
-                                for (int i = 0; i < 100; i++) {
-                                    p_attributes.setBounds(0, i * -1, x_size, Interpreter.getScaledValue(700));
-                                    setSize(Interpreter.getScaledValue(1381), Interpreter.getScaledValue(739 - (i / 2)));
-                                    Sleep.milliseconds(20);
-                                }
-                                canSelectClass = true;
-                            }
-                        }
-                    }
-                }.start();
+                }).start();
             }
     }
 
     private void clickRollAll() {
-        new Thread() {
-            public void run() {
-                l_diceRollAll.setVisible(false);
-                rollAll = true;
-                Sleep.milliseconds(400);
-                clickRoll(0);
+        new Thread(() -> {
+            l_diceRollAll.setVisible(false);
+            rollAll = true;
+            Sleep.milliseconds(400);
+            for(int i=0;i<7;i++) {
+                clickRoll(i);
                 Sleep.milliseconds(50);
-                clickRoll(1);
-                Sleep.milliseconds(50);
-                clickRoll(2);
-                Sleep.milliseconds(50);
-                clickRoll(3);
-                Sleep.milliseconds(50);
-                clickRoll(4);
-                Sleep.milliseconds(50);
-                clickRoll(5);
-                Sleep.milliseconds(50);
-                clickRoll(6);
             }
-        }.start();
+        }).start();
     }
 
     private void checkClassesAvailable(boolean updateDisplay) {

@@ -1,8 +1,8 @@
 public class Launcher {
-    private final String version = "5";
-    private Configuration mainCFG;
+    private final String version = "6";
+    private final Configuration mainCFG;
     private final GuiLauncher launcher;
-    private boolean loadingScreenDone = false;
+    private boolean loadingScreenDone = false, isDownloadingNewVersion = false;
 
     public Launcher() {
         mainCFG = new Configuration("files/res/txt/main.cfg");
@@ -26,7 +26,7 @@ public class Launcher {
                 System.exit(0);
             }
             if (FileManager.connectedToInternet())
-                notifyUser("Synced local version list with online version list");
+                notifyUser("Version list updated");
             launcher.setAvailableVersions(prepareVersionStringsForComboBox(playVersions, "play"), "play");
             launcher.setAvailableVersions(prepareVersionStringsForComboBox(createVersions, "create"), "create");
             if (!mainCFG.get("fastsetup").equals("true"))
@@ -106,7 +106,7 @@ public class Launcher {
             if (argument.replaceAll("([^:]+):(.+)", "$1").equals(name)) return;
         }
         String[] newArguments = new String[arguments.length + 1];
-        for (int i = 0; i < arguments.length; i++) newArguments[i] = arguments[i];
+        System.arraycopy(arguments, 0, newArguments, 0, arguments.length);
         newArguments[newArguments.length - 1] = name + ":" + value;
         arguments = newArguments;
     }
@@ -124,6 +124,8 @@ public class Launcher {
     private String[] arguments = new String[]{"lang:english", "scale:100"};
 
     public void startVersion(String version, String which) {
+        if(isDownloadingNewVersion) return;
+        isDownloadingNewVersion = true;
         launcher.setButtonsActive(false);
         version = version.replaceAll("(?:Version )?([^ ]+)(?: \\(installed\\))?", "$1");
         if (!isVersionInstalled(version, which)) { //need to install version
@@ -142,6 +144,7 @@ public class Launcher {
             notifyUser("Something went wrong during the installation...");
             FileManager.deleteDirectoryRecursively("files/" + which + "/" + version);
             launcher.setButtonsActive(true);
+            isDownloadingNewVersion = false;
         }
     }
 

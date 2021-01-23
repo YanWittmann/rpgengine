@@ -7,19 +7,20 @@ import java.util.Collections;
 public class Main {
 
     private static FTPTools ftp = null;
-    private final static String launcherVersion = "5", playVersion = "1.9.1", createVersion = "1.9.1";
+    private final static String launcherVersion = "6", playVersion = "1.10", createVersion = "1.10";
 
     public static void main(String[] args) {
 
         System.out.println("\n\t!!! MAKE SURE TO HAVE THE CORRECT VERSION STRINGS EVERYWHERE !!!");
+        System.out.println("\n\t!!! MAKE SURE TO HAVE BUILT ALL ARTIFACTS !!!");
         Sleep.milliseconds(2000);
 
         connectToFTP();
 
-        createAndUploadDocumentation();
-        //createAndUploadLauncher();
-        //createAndUploadCreateOrPlay("create", createVersion);
-        //createAndUploadCreateOrPlay("play", playVersion);
+        //createAndUploadDocumentation();
+        createAndUploadLauncher();
+        createAndUploadCreateOrPlay("create", createVersion);
+        createAndUploadCreateOrPlay("play", playVersion);
 
         cleanUp();
 

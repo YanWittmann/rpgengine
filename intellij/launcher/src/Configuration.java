@@ -44,7 +44,7 @@ public class Configuration {
             output = new StringBuilder(output.substring(0, output.length() - 1).replace(option + ":" + get(option), option + ":" + value));
             try {
                 writeToFile(filename, output.toString().replaceAll("(?m)^[ \t]*\r?\n", ""));
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             readConfig(filename);
         }

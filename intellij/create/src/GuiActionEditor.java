@@ -4,18 +4,16 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class GuiActionEditor extends JFrame {
-    private JMenuBar menuBar;
     private JButton b_save;
     private JButton b_editorOperation;
-    private JButton b_getFromEditor;
     private JLabel l_cond;
     private JLabel l_eventName;
     private JLabel l_info;
     private JTextArea ta_code;
     private JTextField tf_eventName;
-    private Entity entity;
-    private int event;
-    private String eventName;
+    private final Entity entity;
+    private final int event;
+    private final String eventName;
     private final boolean isActionEditorOpenDirectlyInExternalEditor = Manager.isActionEditorOpenDirectlyInExternalEditor();
 
     public GuiActionEditor(Entity entity, int event) {
@@ -24,7 +22,7 @@ public class GuiActionEditor extends JFrame {
         this.entity = entity;
         this.event = event;
         this.eventName = entity.eventName.get(event);
-        if (entity.eventName.size() <= event || event < 0) {
+        if (event < 0) {
             Popup.error(StaticStuff.projectName + " - Error", "This event does not exist");
             dispose();
             return;
@@ -229,10 +227,10 @@ public class GuiActionEditor extends JFrame {
         }
     }
 
-    public void setEditorText(String text[]) {
+    public void setEditorText(String[] text) {
         StringBuilder putToActionEditor = new StringBuilder();
         for (String s : text)
-            putToActionEditor.append(s + "\n");
+            putToActionEditor.append(s).append("\n");
         ta_code.setText(StaticStuff.replaceLast(putToActionEditor.toString(), "\n", ""));
         if (isActionEditorOpenDirectlyInExternalEditor) save();
     }
@@ -243,7 +241,7 @@ public class GuiActionEditor extends JFrame {
         if (currentEditorState && !isActionEditorOpenDirectlyInExternalEditor)
             FileManager.removeWatchFile("res/txt/actioneditor/" + entity.hashCode() + "_" + eventName + ".advtemp");
         if (isActionEditorOpenDirectlyInExternalEditor)
-            new GuiNotification("Detected event modification: " + entity.name + " - " + eventName);
+            new GuiNotification("Event saved: " + entity.name + " - " + eventName);
         dispose();
     }
 }

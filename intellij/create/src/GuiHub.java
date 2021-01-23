@@ -7,6 +7,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 public class GuiHub extends JFrame {
@@ -76,7 +77,7 @@ public class GuiHub extends JFrame {
         b_delete.setFont(StaticStuff.getBaseFont());
         b_delete.setText("Delete");
         b_delete.setVisible(true);
-        b_delete.addActionListener(evt -> deleteEntity(true));
+        b_delete.addActionListener(evt -> deleteEntity());
 
         b_edit = new JButton();
         b_edit.setBounds(801, 848, 90, 35);
@@ -86,7 +87,7 @@ public class GuiHub extends JFrame {
         b_edit.setFont(StaticStuff.getBaseFont());
         b_edit.setText("Edit");
         b_edit.setVisible(true);
-        b_edit.addActionListener(evt -> editEntity(true));
+        b_edit.addActionListener(evt -> editEntity());
 
         b_nextPage = new JButton();
         b_nextPage.setBounds(1360, 848, 90, 35);
@@ -118,60 +119,6 @@ public class GuiHub extends JFrame {
         b_refresh.setVisible(true);
         b_refresh.addActionListener(evt -> updateScreen());
 
-        l_pane1 = new JLabel();
-        l_pane1.setBounds(18, 8, 120, 20);
-        l_pane1.setBackground(StaticStuff.getColor("buttons"));
-        l_pane1.setForeground(StaticStuff.getColor("text_color"));
-        l_pane1.setEnabled(true);
-        l_pane1.setFont(StaticStuff.getBaseFont());
-        l_pane1.setText("<html><b>Locations");
-        l_pane1.setVisible(true);
-
-        l_pane2 = new JLabel();
-        l_pane2.setBounds(18, 8, 120, 20);
-        l_pane2.setBackground(StaticStuff.getColor("buttons"));
-        l_pane2.setForeground(StaticStuff.getColor("text_color"));
-        l_pane2.setEnabled(true);
-        l_pane2.setFont(StaticStuff.getBaseFont());
-        l_pane2.setText("<html><b>NPCs");
-        l_pane2.setVisible(true);
-
-        l_pane3 = new JLabel();
-        l_pane3.setBounds(18, 8, 120, 20);
-        l_pane3.setBackground(StaticStuff.getColor("buttons"));
-        l_pane3.setForeground(StaticStuff.getColor("text_color"));
-        l_pane3.setEnabled(true);
-        l_pane3.setFont(StaticStuff.getBaseFont());
-        l_pane3.setText("<html><b>Item types");
-        l_pane3.setVisible(true);
-
-        l_pane4 = new JLabel();
-        l_pane4.setBounds(18, 8, 120, 20);
-        l_pane4.setBackground(StaticStuff.getColor("buttons"));
-        l_pane4.setForeground(StaticStuff.getColor("text_color"));
-        l_pane4.setEnabled(true);
-        l_pane4.setFont(StaticStuff.getBaseFont());
-        l_pane4.setText("<html><b>Inventories");
-        l_pane4.setVisible(true);
-
-        l_pane5 = new JLabel();
-        l_pane5.setBounds(18, 8, 120, 20);
-        l_pane5.setBackground(StaticStuff.getColor("buttons"));
-        l_pane5.setForeground(StaticStuff.getColor("text_color"));
-        l_pane5.setEnabled(true);
-        l_pane5.setFont(StaticStuff.getBaseFont());
-        l_pane5.setText("<html><b>Inventories");
-        l_pane5.setVisible(true);
-
-        l_pane6 = new JLabel();
-        l_pane6.setBounds(18, 8, 120, 20);
-        l_pane6.setBackground(StaticStuff.getColor("buttons"));
-        l_pane6.setForeground(StaticStuff.getColor("text_color"));
-        l_pane6.setEnabled(true);
-        l_pane6.setFont(StaticStuff.getBaseFont());
-        l_pane6.setText("<html><b>Inventories");
-        l_pane6.setVisible(true);
-
         l_credits = new JLabel();
         l_credits.setBounds(20, 848, creditsWidth, 26);
         l_credits.setBackground(StaticStuff.getColor("buttons"));
@@ -181,131 +128,26 @@ public class GuiHub extends JFrame {
         l_credits.setText("<html><b>" + StaticStuff.projectName + " by Yan Wittmann (v. " + Manager.version + ")");
         l_credits.setVisible(true);
 
-        panel1 = new JPanel(null);
-        panel1.setBorder(BorderFactory.createEtchedBorder(1));
-        panel1.setBounds(10, 16, 360, 821);
-        panel1.setBackground(StaticStuff.getColor("buttons"));
-        panel1.setForeground(StaticStuff.getColor("text_color"));
-        panel1.setEnabled(true);
-        panel1.setFont(StaticStuff.getBaseFont());
-        panel1.setVisible(true);
+        l_pane1 = createAJLabel();
+        l_pane2 = createAJLabel();
+        l_pane3 = createAJLabel();
+        l_pane4 = createAJLabel();
+        l_pane5 = createAJLabel();
+        l_pane6 = createAJLabel();
 
-        panel2 = new JPanel(null);
-        panel2.setBorder(BorderFactory.createEtchedBorder(1));
-        panel2.setBounds(381, 16, 360, 821);
-        panel2.setBackground(StaticStuff.getColor("buttons"));
-        panel2.setForeground(StaticStuff.getColor("text_color"));
-        panel2.setEnabled(true);
-        panel2.setFont(StaticStuff.getBaseFont());
-        panel2.setVisible(true);
+        panel1 = createAJPanel();
+        panel2 = createAJPanel();
+        panel3 = createAJPanel();
+        panel4 = createAJPanel();
+        panel5 = createAJPanel();
+        panel6 = createAJPanel();
 
-        panel3 = new JPanel(null);
-        panel3.setBorder(BorderFactory.createEtchedBorder(1));
-        panel3.setBounds(752, 16, 360, 821);
-        panel3.setBackground(StaticStuff.getColor("buttons"));
-        panel3.setForeground(StaticStuff.getColor("text_color"));
-        panel3.setEnabled(true);
-        panel3.setFont(StaticStuff.getBaseFont());
-        panel3.setVisible(true);
-
-        panel4 = new JPanel(null);
-        panel4.setBorder(BorderFactory.createEtchedBorder(1));
-        panel4.setBounds(1123, 16, 360, 821);
-        panel4.setBackground(StaticStuff.getColor("buttons"));
-        panel4.setForeground(StaticStuff.getColor("text_color"));
-        panel4.setEnabled(true);
-        panel4.setFont(StaticStuff.getBaseFont());
-        panel4.setVisible(true);
-
-        panel5 = new JPanel(null);
-        panel5.setBorder(BorderFactory.createEtchedBorder(1));
-        panel5.setBounds(1123, 16, 360, 821);
-        panel5.setBackground(StaticStuff.getColor("buttons"));
-        panel5.setForeground(StaticStuff.getColor("text_color"));
-        panel5.setEnabled(true);
-        panel5.setFont(StaticStuff.getBaseFont());
-        panel5.setVisible(true);
-
-        panel6 = new JPanel(null);
-        panel6.setBorder(BorderFactory.createEtchedBorder(1));
-        panel6.setBounds(1123, 16, 360, 821);
-        panel6.setBackground(StaticStuff.getColor("buttons"));
-        panel6.setForeground(StaticStuff.getColor("text_color"));
-        panel6.setEnabled(true);
-        panel6.setFont(StaticStuff.getBaseFont());
-        panel6.setVisible(true);
-
-        ta_pane1 = new JTextArea();
-        ta_pane1.setBounds(6, 34, 348, 780);
-        ta_pane1.setBackground(StaticStuff.getColor("text_background"));
-        ta_pane1.setForeground(StaticStuff.getColor("text_color"));
-        ta_pane1.setEnabled(true);
-        ta_pane1.setFont(StaticStuff.getBaseFont());
-        ta_pane1.setText("");
-        ta_pane1.setBorder(BorderFactory.createBevelBorder(1));
-        ta_pane1.setLineWrap(true);
-        ta_pane1.setVisible(true);
-        ta_pane1.addMouseWheelListener(this::scroll);
-
-        ta_pane2 = new JTextArea();
-        ta_pane2.setBounds(6, 34, 348, 780);
-        ta_pane2.setBackground(StaticStuff.getColor("text_background"));
-        ta_pane2.setForeground(StaticStuff.getColor("text_color"));
-        ta_pane2.setEnabled(true);
-        ta_pane2.setFont(StaticStuff.getBaseFont());
-        ta_pane2.setText("");
-        ta_pane2.setBorder(BorderFactory.createBevelBorder(1));
-        ta_pane2.setLineWrap(true);
-        ta_pane2.setVisible(true);
-        ta_pane2.addMouseWheelListener(this::scroll);
-
-        ta_pane3 = new JTextArea();
-        ta_pane3.setBounds(7, 34, 348, 780);
-        ta_pane3.setBackground(StaticStuff.getColor("text_background"));
-        ta_pane3.setForeground(StaticStuff.getColor("text_color"));
-        ta_pane3.setEnabled(true);
-        ta_pane3.setFont(StaticStuff.getBaseFont());
-        ta_pane3.setText("");
-        ta_pane3.setBorder(BorderFactory.createBevelBorder(1));
-        ta_pane3.setLineWrap(true);
-        ta_pane3.setVisible(true);
-        ta_pane3.addMouseWheelListener(this::scroll);
-
-        ta_pane4 = new JTextArea();
-        ta_pane4.setBounds(5, 34, 348, 780);
-        ta_pane4.setBackground(StaticStuff.getColor("text_background"));
-        ta_pane4.setForeground(StaticStuff.getColor("text_color"));
-        ta_pane4.setEnabled(true);
-        ta_pane4.setFont(StaticStuff.getBaseFont());
-        ta_pane4.setText("");
-        ta_pane4.setBorder(BorderFactory.createBevelBorder(1));
-        ta_pane4.setLineWrap(true);
-        ta_pane4.setVisible(true);
-        ta_pane4.addMouseWheelListener(this::scroll);
-
-        ta_pane5 = new JTextArea();
-        ta_pane5.setBounds(5, 34, 348, 780);
-        ta_pane5.setBackground(StaticStuff.getColor("text_background"));
-        ta_pane5.setForeground(StaticStuff.getColor("text_color"));
-        ta_pane5.setEnabled(true);
-        ta_pane5.setFont(StaticStuff.getBaseFont());
-        ta_pane5.setText("");
-        ta_pane5.setBorder(BorderFactory.createBevelBorder(1));
-        ta_pane5.setLineWrap(true);
-        ta_pane5.setVisible(true);
-        ta_pane5.addMouseWheelListener(this::scroll);
-
-        ta_pane6 = new JTextArea();
-        ta_pane6.setBounds(5, 34, 348, 780);
-        ta_pane6.setBackground(StaticStuff.getColor("text_background"));
-        ta_pane6.setForeground(StaticStuff.getColor("text_color"));
-        ta_pane6.setEnabled(true);
-        ta_pane6.setFont(StaticStuff.getBaseFont());
-        ta_pane6.setText("");
-        ta_pane6.setBorder(BorderFactory.createBevelBorder(1));
-        ta_pane6.setLineWrap(true);
-        ta_pane6.setVisible(true);
-        ta_pane6.addMouseWheelListener(this::scroll);
+        ta_pane1 = createTaPane();
+        ta_pane2 = createTaPane();
+        ta_pane3 = createTaPane();
+        ta_pane4 = createTaPane();
+        ta_pane5 = createTaPane();
+        ta_pane6 = createTaPane();
 
         panel1.add(l_pane1);
         panel2.add(l_pane2);
@@ -376,7 +218,7 @@ public class GuiHub extends JFrame {
 
         Action copyAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                editEntity(false);
+                editEntity();
             }
         };
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "OPEN");
@@ -392,7 +234,7 @@ public class GuiHub extends JFrame {
 
         Action removeAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                deleteEntity(false);
+                deleteEntity();
             }
         };
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "REMOVE");
@@ -579,6 +421,59 @@ public class GuiHub extends JFrame {
         updateScreen();
     }
 
+    private final HashMap<JTextArea, Boolean> isTextAreaFocused = new HashMap<>();
+
+    private JTextArea createTaPane() {
+        JTextArea ta_pane = new JTextArea();
+        ta_pane.setBounds(6, 34, 348, 780);
+        ta_pane.setBackground(StaticStuff.getColor("text_background"));
+        ta_pane.setForeground(StaticStuff.getColor("text_color"));
+        ta_pane.setEnabled(true);
+        ta_pane.setFont(StaticStuff.getBaseFont());
+        ta_pane.setText("");
+        ta_pane.setBorder(BorderFactory.createBevelBorder(1));
+        ta_pane.setLineWrap(true);
+        ta_pane.setVisible(true);
+        ta_pane.addMouseWheelListener(this::scroll);
+        isTextAreaFocused.put(ta_pane, false);
+        ta_pane.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                isTextAreaFocused.replace(ta_pane, true);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                isTextAreaFocused.replace(ta_pane, false);
+            }
+        });
+        return ta_pane;
+    }
+
+    private JPanel createAJPanel() {
+        JPanel panel = new JPanel(null);
+        panel.setBorder(BorderFactory.createEtchedBorder(1));
+        panel.setBounds(1123, 16, 360, 821);
+        panel.setBackground(StaticStuff.getColor("buttons"));
+        panel.setForeground(StaticStuff.getColor("text_color"));
+        panel.setEnabled(true);
+        panel.setFont(StaticStuff.getBaseFont());
+        panel.setVisible(true);
+        return panel;
+    }
+
+    private JLabel createAJLabel() {
+        JLabel l_pane = new JLabel();
+        l_pane.setBounds(18, 8, 120, 20);
+        l_pane.setBackground(StaticStuff.getColor("buttons"));
+        l_pane.setForeground(StaticStuff.getColor("text_color"));
+        l_pane.setEnabled(true);
+        l_pane.setFont(StaticStuff.getBaseFont());
+        l_pane.setText("<html><b>Pls wait working on it");
+        l_pane.setVisible(true);
+        return l_pane;
+    }
+
     private int amountPanelsVisible = 4;
 
     private void setPanelVisible(int amount) {
@@ -725,25 +620,56 @@ public class GuiHub extends JFrame {
         if (type.equals("")) return;
         manager.newEntity(type);
         updateScreen();
-        editEntity(false);
+        editEntity();
     }
 
-    private void deleteEntity(boolean confirmationRequired) {
-        if (confirmationRequired)
-            manager.deleteEntity(StaticStuff.autoDetectUID("Enter the UID to delete:"));
-        else
-            new Thread(() -> manager.deleteEntity(StaticStuff.autoDetectUID())).start();
+    private String getSelectedText() {
+        String s = getSelectedTextInJTextArea(ta_pane1);
+        if (s != null) return s;
+        s = getSelectedTextInJTextArea(ta_pane2);
+        if (s != null) return s;
+        s = getSelectedTextInJTextArea(ta_pane3);
+        if (s != null) return s;
+        s = getSelectedTextInJTextArea(ta_pane4);
+        if (s != null) return s;
+        s = getSelectedTextInJTextArea(ta_pane5);
+        if (s != null) return s;
+        s = getSelectedTextInJTextArea(ta_pane6);
+        if (s != null) return s;
+        return "";
     }
 
-    private void editEntity(boolean confirmationRequired) {
-        if (confirmationRequired)
-            manager.openEntity(StaticStuff.autoDetectUID("Enter the UID to open."));
-        else
-            new Thread(() -> manager.openEntity(StaticStuff.autoDetectUID())).start();
+    private String getSelectedTextInJTextArea(JTextArea textArea) {
+        if (textArea.isFocusOwner() && isTextAreaFocused.get(textArea)) {
+            if (textArea.getSelectedText() != null) return textArea.getSelectedText();
+            return StaticStuff.getWordAtIndex(textArea.getText(), textArea.getCaretPosition());
+        }
+        return null;
+    }
+
+    private String getSelectedUID(String message) {
+        String selectedText = getSelectedText().replaceAll("(?:.+)?(?: |\\b)([a-z0-9]{16})(?: |\\b)(?:.+)?", "$1");
+        if (StaticStuff.isValidUIDSilent(selectedText))
+            return selectedText;
+        selectedText = StaticStuff.autoDetectUID(message);
+        if (selectedText != null) {
+            selectedText = selectedText.replaceAll("(?:.+)?(?: |\\b)([a-z0-9]{16})(?: |\\b)(?:.+)?", "$1");
+            if (StaticStuff.isValidUIDSilent(selectedText))
+                return selectedText;
+        }
+        return "";
+    }
+
+    private void deleteEntity() {
+        manager.deleteEntity(getSelectedUID("Enter the UID to delete:"));
+    }
+
+    private void editEntity() {
+        manager.openEntity(getSelectedUID("Enter the UID to open:"));
     }
 
     private void cloneEntity() {
-        new Thread(() -> manager.cloneEntity(StaticStuff.autoDetectUID())).start();
+        manager.cloneEntity(getSelectedUID("Enter the UID to clone:"));
     }
 
     public void nextScreen() {
@@ -892,7 +818,7 @@ public class GuiHub extends JFrame {
     }
 
     private void toggleActionEditor() {
-        manager.toggleActionEditor();
+        Manager.toggleActionEditor();
     }
 
     private boolean refactorUIDwarningShow = true;
