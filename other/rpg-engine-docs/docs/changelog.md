@@ -1,21 +1,21 @@
 # Changelog
 ___
 
-## 26.01.2020 - RELEASE 1.11
-#### Bugfixes:
-
- * 
-
+## 26.01.2020 - RELEASE `1.11`
 #### New / Modification:
 
- * 
+ * added `popup` object type that allows for the creation of custom frames
+
+#### Removed:
+
+ * the `reload` command is no longer available since it was never used
 
 #### Other:
 
- * accidentially deleted source code of version `1.10.1` which meant that i had to reprogram all of the features
+ * accidentially deleted source code of version `1.10.1` which meant that i had to reprogram all of the features lol
 
 
-## 21.01.2020 - RELEASE 1.10.1
+## 21.01.2020 - RELEASE `1.10.1`
 #### Bugfixes:
 
  * editor would not open newly created objects instantly but only after confirming a popup

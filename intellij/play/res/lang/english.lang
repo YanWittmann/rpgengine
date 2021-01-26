@@ -82,6 +82,7 @@ objectNameNPC:NPC
 objectNameEvent:Event
 objectNameColor:Color
 objectNameLootTable:Loot table
+objectNamePopup:Popup
 
 playerStatsInventory:Inventory
 playerStatsStats:Stats

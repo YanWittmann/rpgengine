@@ -2,6 +2,9 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Manager {
     public static String filename = "", extraFilePath = "../generator/";
@@ -16,13 +19,14 @@ public class Manager {
     public static ArrayList<CustomCommand> customCommands = new ArrayList<>();
     public static ArrayList<ColorObject> colors = new ArrayList<>();
     public static ArrayList<FileObject> fileObjects = new ArrayList<>();
+    public static ArrayList<CustomPopup> popups = new ArrayList<>();
     public static Images images;
     public static Audios audios;
     public static Variables variables;
     public static PlayerSettings player;
     public static ProjectSettings project;
     private Event generalEventCollection;
-    private Interpreter interpreter;
+    private final Interpreter interpreter;
 
     public static boolean ready = false;
 
@@ -44,6 +48,8 @@ public class Manager {
         customCommands.clear();
         colors.clear();
         lootTable.clear();
+        fileObjects.clear();
+        popups.clear();
         setFilename(filename);
         readFile();
     }
@@ -82,92 +88,100 @@ public class Manager {
 
             player = new PlayerSettings(FileManager.readFile(extraFilePath + "adventures/" + filename + "/project/player" + StaticStuff.dataFileEnding));
             project = new ProjectSettings(FileManager.readFile(extraFilePath + "adventures/" + filename + "/project/settings" + StaticStuff.dataFileEnding));
-            String files[] = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/locations", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            String[] files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/locations", StaticStuff.dataFileEndingNoDot);
+            for (String file : files) {
                 try {
-                    locations.add(new Location(FileManager.readFile(extraFilePath + "adventures/" + filename + "/locations/" + files[i])));
+                    locations.add(new Location(FileManager.readFile(extraFilePath + "adventures/" + filename + "/locations/" + file)));
                 } catch (Exception e) {
-                    exitError("Location '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 100);
+                    exitError("Location '" + file + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 100);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/npcs", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    npcs.add(new NPC(FileManager.readFile(extraFilePath + "adventures/" + filename + "/npcs/" + files[i])));
+                    npcs.add(new NPC(FileManager.readFile(extraFilePath + "adventures/" + filename + "/npcs/" + file)));
                 } catch (Exception e) {
-                    exitError("NPC '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 101);
+                    exitError("NPC '" + file + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 101);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/itemtypes", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    items.add(new Item(FileManager.readFile(extraFilePath + "adventures/" + filename + "/itemtypes/" + files[i])));
+                    items.add(new Item(FileManager.readFile(extraFilePath + "adventures/" + filename + "/itemtypes/" + file)));
                 } catch (Exception e) {
-                    exitError("ItemType '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 102);
+                    exitError("ItemType '" + file + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 102);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/inventories", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    inventories.add(new Inventory(FileManager.readFile(extraFilePath + "adventures/" + filename + "/inventories/" + files[i])));
+                    inventories.add(new Inventory(FileManager.readFile(extraFilePath + "adventures/" + filename + "/inventories/" + file)));
                 } catch (Exception e) {
-                    exitError("Inventory '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 104);
+                    exitError("Inventory '" + file + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 104);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/battlemaps", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    battleMaps.add(new BattleMap(FileManager.readFile(extraFilePath + "adventures/" + filename + "/battlemaps/" + files[i]), this));
+                    battleMaps.add(new BattleMap(FileManager.readFile(extraFilePath + "adventures/" + filename + "/battlemaps/" + file), this));
                 } catch (Exception e) {
-                    exitError("BattleMap '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 105);
+                    exitError("BattleMap '" + file + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 105);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/talents", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    talents.add(new Talent(FileManager.readFile(extraFilePath + "adventures/" + filename + "/talents/" + files[i])));
+                    talents.add(new Talent(FileManager.readFile(extraFilePath + "adventures/" + filename + "/talents/" + file)));
                 } catch (Exception e) {
-                    exitError("Talent '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 106);
+                    exitError("Talent '" + file + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 106);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/events", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    events.add(new Event(FileManager.readFile(extraFilePath + "adventures/" + filename + "/events/" + files[i])));
+                    events.add(new Event(FileManager.readFile(extraFilePath + "adventures/" + filename + "/events/" + file)));
                 } catch (Exception e) {
-                    exitError("Event '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 107);
+                    exitError("Event '" + file + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 107);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/lootTable", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    lootTable.add(new LootTable(FileManager.readFile(extraFilePath + "adventures/" + filename + "/lootTable/" + files[i])));
+                    lootTable.add(new LootTable(FileManager.readFile(extraFilePath + "adventures/" + filename + "/lootTable/" + file)));
                 } catch (Exception e) {
-                    exitError("LootTable '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 107);
+                    exitError("LootTable '" + file + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 107);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/customCommands", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    customCommands.add(new CustomCommand(FileManager.readFile(extraFilePath + "adventures/" + filename + "/customCommands/" + files[i])));
+                    customCommands.add(new CustomCommand(FileManager.readFile(extraFilePath + "adventures/" + filename + "/customCommands/" + file)));
                 } catch (Exception e) {
-                    exitError("CustomCommand '" + files[i] + "' contains invalid data.\nRPG Engine will exit:\n" + e, 108);
+                    exitError("CustomCommand '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 108);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/colors", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    colors.add(new ColorObject(FileManager.readFile(extraFilePath + "adventures/" + filename + "/colors/" + files[i])));
+                    colors.add(new ColorObject(FileManager.readFile(extraFilePath + "adventures/" + filename + "/colors/" + file)));
                 } catch (Exception e) {
-                    exitError("Color '" + files[i] + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
+                    exitError("Color '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
                 }
             }
             files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/fileObjects", StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
+            for (String file : files) {
                 try {
-                    fileObjects.add(new FileObject(FileManager.readFile(extraFilePath + "adventures/" + filename + "/fileObjects/" + files[i]), FileManager.readFileToByteArray(extraFilePath + "adventures/" + filename + "/fileObjects/" + files[i].replace(StaticStuff.dataFileEnding, "") + ".file")));
+                    fileObjects.add(new FileObject(FileManager.readFile(extraFilePath + "adventures/" + filename + "/fileObjects/" + file), FileManager.readFileToByteArray(extraFilePath + "adventures/" + filename + "/fileObjects/" + file.replace(StaticStuff.dataFileEnding, "") + ".file")));
                 } catch (Exception e) {
-                    exitError("FileObject '" + files[i] + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
+                    exitError("FileObject '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
+                }
+            }
+            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/popups", StaticStuff.dataFileEndingNoDot);
+            for (String file : files) {
+                try {
+                    popups.add(new CustomPopup(FileManager.readFile(extraFilePath + "adventures/" + filename + "/popups/" + file)));
+                } catch (Exception e) {
+                    exitError("Color '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
                 }
             }
             variables = new Variables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/variables/vars" + StaticStuff.dataFileEnding));
@@ -179,178 +193,6 @@ public class Manager {
             variables.addVariable("bar", "String", "");
             ready = true;
         }
-        FileManager.deleteDirectoryRecursively(extraFilePath + "adventures/" + filename);
-    }
-
-    public void reload(String what) {
-        String whatToReload[] = what.split(" ");
-        for (int i = 0; i < whatToReload.length; i++) Log.add("Reloading: " + whatToReload[i]);
-        if (filename.length() > 0) {
-            if (!FileManager.fileExists(extraFilePath + "adventures/" + filename + "" + StaticStuff.adventureFileEnding)) {
-                exitError("File does not exist.", 99);
-            }
-            FileManager.deleteDirectoryRecursively(extraFilePath + "adventures/" + filename);
-            FileManager.unzip(extraFilePath + "adventures/" + filename + "" + StaticStuff.adventureFileEnding, extraFilePath + "adventures/");
-            String files[] = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/locations", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < locations.size(); j++)
-                        if (locations.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                locations.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/locations/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                locations.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/locations/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                locations.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/locations/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("Location '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 100);
-                }
-            }
-            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/npcs", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < npcs.size(); j++)
-                        if (npcs.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                npcs.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/npcs/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                npcs.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/npcs/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                npcs.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/npcs/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("NPC '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 101);
-                }
-            }
-            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/itemtypes", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < items.size(); j++)
-                        if (items.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                items.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/itemtypes/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                items.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/itemtypes/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                items.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/itemtypes/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("ItemType '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 102);
-                }
-            }
-            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/inventories", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < inventories.size(); j++)
-                        if (inventories.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                inventories.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/inventories/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                inventories.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/inventories/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                inventories.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/inventories/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("Inventory '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 104);
-                }
-            }
-            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/battlemaps", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < battleMaps.size(); j++)
-                        if (battleMaps.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                battleMaps.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/battlemaps/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                battleMaps.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/battlemaps/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                battleMaps.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/battlemaps/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("BattleMap '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 105);
-                }
-            }
-            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/events", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < events.size(); j++)
-                        if (events.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                events.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/events/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                events.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/events/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                events.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/events/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("Event '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 107);
-                }
-            }
-            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/lootTable", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < lootTable.size(); j++)
-                        if (lootTable.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                events.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/events/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                events.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/events/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                events.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/events/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("Loot Table '" + files[i] + "' contains invalid data.<br>RPG Engine will exit:<br>" + e, 107);
-                }
-            }
-            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/customCommands", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < customCommands.size(); j++)
-                        if (customCommands.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                customCommands.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/customCommands/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                customCommands.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/customCommands/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                customCommands.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/customCommands/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("CustomCommand '" + files[i] + "' contains invalid data.\nRPG Engine will exit:\n" + e, 108);
-                }
-            }
-            files = FileManager.getFilesWithEnding(extraFilePath + "adventures/" + filename + "/colors", "" + StaticStuff.dataFileEndingNoDot);
-            for (int i = 0; i < files.length; i++) {
-                try {
-                    for (int j = 0; j < colors.size(); j++)
-                        if (colors.get(j).uid.equals(files[i].replace("" + StaticStuff.dataFileEnding, ""))) {
-                            if (what.contains("events") || what.contains("all"))
-                                colors.get(i).setEvents(FileManager.readFile(extraFilePath + "adventures/" + filename + "/colors/" + files[i]));
-                            if (what.contains("localvars") || what.contains("all"))
-                                colors.get(i).setVariables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/colors/" + files[i]));
-                            if (what.contains("names") || what.contains("all"))
-                                colors.get(i).name = FileManager.readFile(extraFilePath + "adventures/" + filename + "/colors/" + files[i])[0];
-                            break;
-                        }
-                } catch (Exception e) {
-                    exitError("Color '" + files[i] + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
-                }
-            }
-        }
-        if (what.contains("variables") || what.contains("all")) variables = new
-                Variables(FileManager.readFile(extraFilePath + "adventures/" + filename + "/variables/vars" + StaticStuff.dataFileEnding));
-        if (what.contains("images") || what.contains("all")) images = new
-                Images(filename, FileManager.readFile(extraFilePath + "adventures/" + filename + "/images/imagelist" + StaticStuff.dataFileEnding));
-        if (what.contains("audios") || what.contains("all")) audios = new
-                Audios(filename, FileManager.readFile(extraFilePath + "adventures/" + filename + "/audio/audiolist" + StaticStuff.dataFileEnding));
         FileManager.deleteDirectoryRecursively(extraFilePath + "adventures/" + filename);
     }
 
@@ -373,50 +215,51 @@ public class Manager {
         for (CustomCommand cc : customCommands) objects.add(cc.uid);
         for (ColorObject color : colors) objects.add(color.uid);
         for (FileObject fileObject : fileObjects) objects.add(fileObject.uid);
-        for (String audio : audios.getUIDs()) objects.add(audio);
-        for (String image : images.getUIDs()) objects.add(image);
-        for (String variable : variables.getUIDs()) objects.add(variable);
+        for (CustomPopup popup : popups) objects.add(popup.uid);
+        Collections.addAll(objects, audios.getUIDs());
+        Collections.addAll(objects, images.getUIDs());
+        Collections.addAll(objects, variables.getUIDs());
         return objects;
     }
 
     public static boolean lootTableExists(String uid) {
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(uid))
+        for (LootTable table : lootTable)
+            if (table.uid.equals(uid))
                 return true;
         return false;
     }
 
     public static boolean itemTypeExists(String uid) {
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).uid.equals(uid))
+        for (Item item : items)
+            if (item.uid.equals(uid))
                 return true;
         return false;
     }
 
     public static boolean battleMapExists(String uid) {
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid))
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.uid.equals(uid))
                 return true;
         return false;
     }
 
     public static boolean locationExists(String uid) {
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid))
+        for (Location location : locations)
+            if (location.uid.equals(uid))
                 return true;
         return false;
     }
 
     public static boolean inventoryExists(String uid) {
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid))
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid))
                 return true;
         return false;
     }
 
     public static boolean npcExists(String uid) {
-        for (int i = 0; i < npcs.size(); i++)
-            if (npcs.get(i).uid.equals(uid))
+        for (NPC npc : npcs)
+            if (npc.uid.equals(uid))
                 return true;
         return false;
     }
@@ -426,7 +269,7 @@ public class Manager {
     }
 
     public static BufferedImage getImage(String uid) {
-        if (imageExists(uid)) return images.getBufferedImage(uid);
+        if (imageExists(uid)) return Images.getBufferedImage(uid);
         return Images.readImageFromFile("res/img/null.png");
     }
 
@@ -465,51 +308,51 @@ public class Manager {
     }
 
     public static String[] getVariableNames() {
-        String names[] = new String[variables.name.size()];
+        String[] names = new String[variables.name.size()];
         for (int i = 0; i < names.length; i++) names[i] = variables.name.get(i);
         return names;
     }
 
     public static String getItemName(String uid) {
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).uid.equals(uid))
-                return items.get(i).name;
+        for (Item item : items)
+            if (item.uid.equals(uid))
+                return item.name;
         return "item does not exist";
     }
 
     public static String getItemImageUID(String uid) {
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).uid.equals(uid))
-                if (items.get(i).image.equals("")) StaticStuff.error("This item does not have an image.");
-                else return items.get(i).image;
+        for (Item item : items)
+            if (item.uid.equals(uid))
+                if (item.image.equals("")) StaticStuff.error("This item does not have an image.");
+                else return item.image;
         return "item does not exist";
     }
 
     public static String getLocationName(String uid) {
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid))
-                return locations.get(i).name;
+        for (Location location : locations)
+            if (location.uid.equals(uid))
+                return location.name;
         return "location does not exist";
     }
 
     public static String getLocationUID(String name) {
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).name.equals(name))
-                return locations.get(i).uid;
+        for (Location location : locations)
+            if (location.name.equals(name))
+                return location.uid;
         return "location does not exist";
     }
 
     public static String getInventoryName(String uid) {
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid))
-                return inventories.get(i).name;
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid))
+                return inventory.name;
         return "inventory does not exist";
     }
 
     public static String getBattleMapName(String uid) {
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid))
-                return battleMaps.get(i).name;
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.uid.equals(uid))
+                return battleMap.name;
         return "battle map does not exist";
     }
 
@@ -518,54 +361,55 @@ public class Manager {
     }
 
     public String[] getTalentAttributes(String uid) {
-        for (int i = 0; i < talents.size(); i++)
-            if (talents.get(i).uid.equals(uid)) return talents.get(i).getAttributesArray();
+        for (Talent talent : talents) if (talent.uid.equals(uid)) return talent.getAttributesArray();
         return "courage courage courage".split(" ");
     }
 
     public boolean isType(String uid, String type) {
-        if (type.equals("npc")) for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) return true;
+        if (type.equals("npc")) for (NPC npc : npcs) if (npc.uid.equals(uid)) return true;
         if (type.equals("inventory"))
-            for (int i = 0; i < inventories.size(); i++) if (inventories.get(i).uid.equals(uid)) return true;
+            for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return true;
         if (type.equals("location"))
-            for (int i = 0; i < locations.size(); i++) if (locations.get(i).uid.equals(uid)) return true;
-        if (type.equals("item")) for (int i = 0; i < items.size(); i++) if (items.get(i).uid.equals(uid)) return true;
+            for (Location location : locations) if (location.uid.equals(uid)) return true;
+        if (type.equals("item")) for (Item item : items) if (item.uid.equals(uid)) return true;
         if (type.equals("inventory"))
-            for (int i = 0; i < inventories.size(); i++) if (inventories.get(i).uid.equals(uid)) return true;
+            for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return true;
         if (type.equals("talent"))
-            for (int i = 0; i < talents.size(); i++) if (talents.get(i).uid.equals(uid)) return true;
+            for (Talent talent : talents) if (talent.uid.equals(uid)) return true;
         if (type.equals("battleMap"))
-            for (int i = 0; i < battleMaps.size(); i++) if (battleMaps.get(i).uid.equals(uid)) return true;
+            for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return true;
         if (type.equals("eventCollection"))
-            for (int i = 0; i < events.size(); i++) if (events.get(i).uid.equals(uid)) return true;
+            for (Event event : events) if (event.uid.equals(uid)) return true;
         if (type.equals("lootTable"))
-            for (int i = 0; i < lootTable.size(); i++) if (lootTable.get(i).uid.equals(uid)) return true;
+            for (LootTable table : lootTable) if (table.uid.equals(uid)) return true;
         if (type.equals("customCommand"))
-            for (int i = 0; i < customCommands.size(); i++) if (customCommands.get(i).uid.equals(uid)) return true;
+            for (CustomCommand customCommand : customCommands) if (customCommand.uid.equals(uid)) return true;
         if (type.equals("color"))
-            for (int i = 0; i < colors.size(); i++) if (colors.get(i).uid.equals(uid)) return true;
+            for (ColorObject color : colors) if (color.uid.equals(uid)) return true;
         if (type.equals("fileObject"))
-            for (int i = 0; i < fileObjects.size(); i++) if (fileObjects.get(i).uid.equals(uid)) return true;
+            for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return true;
+        if (type.equals("popup"))
+            for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return true;
         if (type.equals("audio")) if (audioExists(uid)) return true;
         if (type.equals("image")) if (imageExists(uid)) return true;
-        if (type.equals("variable")) if (variableExists(uid)) return true;
+        if (type.equals("variable")) return variableExists(uid);
         return false;
     }
 
     public String getTypeByUID(String uid) {
-        for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) return "npc";
-        for (int i = 0; i < inventories.size(); i++) if (inventories.get(i).uid.equals(uid)) return "inventory";
-        for (int i = 0; i < locations.size(); i++) if (locations.get(i).uid.equals(uid)) return "location";
-        for (int i = 0; i < items.size(); i++) if (items.get(i).uid.equals(uid)) return "item";
-        for (int i = 0; i < inventories.size(); i++) if (inventories.get(i).uid.equals(uid)) return "inventory";
-        for (int i = 0; i < talents.size(); i++) if (talents.get(i).uid.equals(uid)) return "talent";
-        for (int i = 0; i < battleMaps.size(); i++) if (battleMaps.get(i).uid.equals(uid)) return "battleMap";
-        for (int i = 0; i < events.size(); i++) if (events.get(i).uid.equals(uid)) return "eventCollection";
-        for (int i = 0; i < lootTable.size(); i++) if (lootTable.get(i).uid.equals(uid)) return "lootTable";
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid)) return "customCommand";
-        for (int i = 0; i < colors.size(); i++) if (colors.get(i).uid.equals(uid)) return "color";
-        for (int i = 0; i < fileObjects.size(); i++) if (fileObjects.get(i).uid.equals(uid)) return "fileObject";
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return "npc";
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return "inventory";
+        for (Location location : locations) if (location.uid.equals(uid)) return "location";
+        for (Item item : items) if (item.uid.equals(uid)) return "item";
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return "inventory";
+        for (Talent talent : talents) if (talent.uid.equals(uid)) return "talent";
+        for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return "battleMap";
+        for (Event event : events) if (event.uid.equals(uid)) return "eventCollection";
+        for (LootTable table : lootTable) if (table.uid.equals(uid)) return "lootTable";
+        for (CustomCommand customCommand : customCommands) if (customCommand.uid.equals(uid)) return "customCommand";
+        for (ColorObject color : colors) if (color.uid.equals(uid)) return "color";
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return "fileObject";
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return "fileObject";
         if (audioExists(uid)) return "audio";
         if (imageExists(uid)) return "image";
         if (variableExists(uid)) return "variable";
@@ -573,89 +417,58 @@ public class Manager {
     }
 
     public String getLocationFromNPC(String uid) {
-        for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) return npcs.get(i).location;
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return npc.location;
         return "null";
     }
 
     public void setLocationFromNPC(String uid, String value) {
         Log.add("Set location of " + uid + " to " + value);
         if (locationExists(value)) {
-            for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) npcs.get(i).location = value;
+            for (NPC npc : npcs) if (npc.uid.equals(uid)) npc.location = value;
         }
     }
 
     public void setImage(String uid, String value) {
         Log.add("Set image " + value + " to " + uid);
         if (imageExists(value)) {
-            for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) npcs.get(i).image = value;
-            for (int i = 0; i < locations.size(); i++)
-                if (locations.get(i).uid.equals(uid)) locations.get(i).image = value;
-            for (int i = 0; i < items.size(); i++) if (items.get(i).uid.equals(uid)) items.get(i).image = value;
+            for (NPC npc : npcs) if (npc.uid.equals(uid)) npc.image = value;
+            for (Location location : locations) if (location.uid.equals(uid)) location.image = value;
+            for (Item item : items) if (item.uid.equals(uid)) item.image = value;
         }
     }
 
     public ArrayList<String> getAllEventNames(String uid) {
-        for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) return npcs.get(i).eventName;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) return inventories.get(i).eventName;
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid)) return locations.get(i).eventName;
-        for (int i = 0; i < items.size(); i++) if (items.get(i).uid.equals(uid)) return items.get(i).eventName;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) return inventories.get(i).eventName;
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid)) return battleMaps.get(i).eventName;
-        for (int i = 0; i < events.size(); i++) if (events.get(i).uid.equals(uid)) return events.get(i).eventName;
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(uid)) return lootTable.get(i).eventName;
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid)) return customCommands.get(i).eventName;
-        for (int i = 0; i < colors.size(); i++) if (colors.get(i).uid.equals(uid)) return colors.get(i).eventName;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) return fileObjects.get(i).eventName;
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return npc.eventName;
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return inventory.eventName;
+        for (Location location : locations) if (location.uid.equals(uid)) return location.eventName;
+        for (Item item : items) if (item.uid.equals(uid)) return item.eventName;
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return inventory.eventName;
+        for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return battleMap.eventName;
+        for (Event event : events) if (event.uid.equals(uid)) return event.eventName;
+        for (LootTable table : lootTable) if (table.uid.equals(uid)) return table.eventName;
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.uid.equals(uid)) return customCommand.eventName;
+        for (ColorObject color : colors) if (color.uid.equals(uid)) return color.eventName;
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return fileObject.eventName;
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return popup.eventName;
         return new ArrayList<String>();
     }
 
-    public String getDescription(String uid) {
-        for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) return npcs.get(i).description;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) return inventories.get(i).description;
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid)) return locations.get(i).description;
-        for (int i = 0; i < items.size(); i++) if (items.get(i).uid.equals(uid)) return items.get(i).description;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) return inventories.get(i).description;
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid)) return battleMaps.get(i).description;
-        for (int i = 0; i < events.size(); i++) if (events.get(i).uid.equals(uid)) return events.get(i).description;
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(uid)) return lootTable.get(i).description;
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid)) return customCommands.get(i).description;
-        for (int i = 0; i < colors.size(); i++) if (colors.get(i).uid.equals(uid)) return colors.get(i).description;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) return fileObjects.get(i).description;
-        return "null";
-    }
-
     public String getUID(String name) {
-        for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).name.equals(name)) return npcs.get(i).uid;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).name.equals(name)) return inventories.get(i).uid;
-        for (int i = 0; i < locations.size(); i++) if (locations.get(i).name.equals(name)) return locations.get(i).uid;
-        for (int i = 0; i < items.size(); i++) if (items.get(i).name.equals(name)) return items.get(i).uid;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).name.equals(name)) return inventories.get(i).uid;
-        for (int i = 0; i < talents.size(); i++) if (talents.get(i).name.equals(name)) return talents.get(i).uid;
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).name.equals(name)) return battleMaps.get(i).uid;
-        for (int i = 0; i < events.size(); i++) if (events.get(i).name.equals(name)) return events.get(i).uid;
-        for (int i = 0; i < lootTable.size(); i++) if (lootTable.get(i).name.equals(name)) return lootTable.get(i).uid;
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).name.equals(name)) return customCommands.get(i).uid;
-        for (int i = 0; i < colors.size(); i++) if (colors.get(i).name.equals(name)) return colors.get(i).uid;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).name.equals(name)) return fileObjects.get(i).uid;
+        for (NPC npc : npcs) if (npc.name.equals(name)) return npc.uid;
+        for (Inventory inventory : inventories) if (inventory.name.equals(name)) return inventory.uid;
+        for (Location location : locations) if (location.name.equals(name)) return location.uid;
+        for (Item item : items) if (item.name.equals(name)) return item.uid;
+        for (Inventory inventory : inventories) if (inventory.name.equals(name)) return inventory.uid;
+        for (Talent talent : talents) if (talent.name.equals(name)) return talent.uid;
+        for (BattleMap battleMap : battleMaps) if (battleMap.name.equals(name)) return battleMap.uid;
+        for (Event event : events) if (event.name.equals(name)) return event.uid;
+        for (LootTable table : lootTable) if (table.name.equals(name)) return table.uid;
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.name.equals(name)) return customCommand.uid;
+        for (ColorObject color : colors) if (color.name.equals(name)) return color.uid;
+        for (FileObject fileObject : fileObjects) if (fileObject.name.equals(name)) return fileObject.uid;
+        for (CustomPopup popup : popups) if (popup.name.equals(name)) return popup.uid;
         if (audioExists(name)) return audios.getAudioUID(name);
         if (imageExists(name)) return images.getImageUID(name);
         if (variableExists(name)) return variables.getVariableUID(name);
@@ -663,23 +476,19 @@ public class Manager {
     }
 
     public static String getName(String uid) {
-        for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) return npcs.get(i).name;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) return inventories.get(i).name;
-        for (int i = 0; i < locations.size(); i++) if (locations.get(i).uid.equals(uid)) return locations.get(i).name;
-        for (int i = 0; i < items.size(); i++) if (items.get(i).uid.equals(uid)) return items.get(i).name;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) return inventories.get(i).name;
-        for (int i = 0; i < talents.size(); i++) if (talents.get(i).uid.equals(uid)) return talents.get(i).name;
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid)) return battleMaps.get(i).name;
-        for (int i = 0; i < events.size(); i++) if (events.get(i).uid.equals(uid)) return events.get(i).name;
-        for (int i = 0; i < lootTable.size(); i++) if (lootTable.get(i).uid.equals(uid)) return lootTable.get(i).name;
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid)) return customCommands.get(i).name;
-        for (int i = 0; i < colors.size(); i++) if (colors.get(i).uid.equals(uid)) return colors.get(i).name;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) return fileObjects.get(i).name;
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return npc.name;
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return inventory.name;
+        for (Location location : locations) if (location.uid.equals(uid)) return location.name;
+        for (Item item : items) if (item.uid.equals(uid)) return item.name;
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return inventory.name;
+        for (Talent talent : talents) if (talent.uid.equals(uid)) return talent.name;
+        for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return battleMap.name;
+        for (Event event : events) if (event.uid.equals(uid)) return event.name;
+        for (LootTable table : lootTable) if (table.uid.equals(uid)) return table.name;
+        for (CustomCommand customCommand : customCommands) if (customCommand.uid.equals(uid)) return customCommand.name;
+        for (ColorObject color : colors) if (color.uid.equals(uid)) return color.name;
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return fileObject.name;
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return popup.name;
         if (audioExists(uid)) return audios.getAudioName(uid);
         if (imageExists(uid)) return images.getImageName(uid);
         if (variableExists(uid)) return variables.getVariableName(uid);
@@ -725,6 +534,9 @@ public class Manager {
         for (FileObject fileObject : fileObjects)
             if (fileObject.localVarUids.contains(varUID))
                 return fileObject.localVarValue.get(fileObject.localVarUids.indexOf(varUID));
+        for (CustomPopup popup : popups)
+            if (popup.localVarUids.contains(varUID))
+                return popup.localVarValue.get(popup.localVarUids.indexOf(varUID));
         return "";
     }
 
@@ -763,60 +575,61 @@ public class Manager {
         for (FileObject fileObject : fileObjects)
             if (fileObject.uid.equals(uid)) if (fileObject.localVarName.contains(varName))
                 return fileObject.localVarValue.get(fileObject.localVarName.indexOf(varName));
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) if (popup.localVarName.contains(varName))
+                return popup.localVarValue.get(popup.localVarName.indexOf(varName));
         return "";
     }
 
     public boolean hasLocalVariableByUID(String uid, String varUID) {
-        for (int i = 0; i < npcs.size(); i++)
-            if (npcs.get(i).uid.equals(uid)) if (npcs.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) if (inventories.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid)) if (locations.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).uid.equals(uid)) if (items.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) if (inventories.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid)) if (battleMaps.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < events.size(); i++)
-            if (events.get(i).uid.equals(uid)) if (events.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(uid)) if (lootTable.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid))
-                if (customCommands.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < colors.size(); i++)
-            if (colors.get(i).uid.equals(uid)) if (colors.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) if (fileObjects.get(i).localVarUids.contains(varUID)) return true;
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) if (npc.localVarUids.contains(varUID)) return true;
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid)) if (inventory.localVarUids.contains(varUID)) return true;
+        for (Location location : locations)
+            if (location.uid.equals(uid)) if (location.localVarUids.contains(varUID)) return true;
+        for (Item item : items) if (item.uid.equals(uid)) if (item.localVarUids.contains(varUID)) return true;
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid)) if (inventory.localVarUids.contains(varUID)) return true;
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.uid.equals(uid)) if (battleMap.localVarUids.contains(varUID)) return true;
+        for (Event event : events) if (event.uid.equals(uid)) if (event.localVarUids.contains(varUID)) return true;
+        for (LootTable table : lootTable)
+            if (table.uid.equals(uid)) if (table.localVarUids.contains(varUID)) return true;
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.uid.equals(uid))
+                if (customCommand.localVarUids.contains(varUID)) return true;
+        for (ColorObject color : colors)
+            if (color.uid.equals(uid)) if (color.localVarUids.contains(varUID)) return true;
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.uid.equals(uid)) if (fileObject.localVarUids.contains(varUID)) return true;
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) if (popup.localVarUids.contains(varUID)) return true;
         return false;
     }
 
     public boolean hasLocalVariableByName(String uid, String varName) {
-        for (int i = 0; i < npcs.size(); i++)
-            if (npcs.get(i).uid.equals(uid)) if (npcs.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) if (inventories.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid)) if (locations.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).uid.equals(uid)) if (items.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) if (inventories.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid)) if (battleMaps.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < events.size(); i++)
-            if (events.get(i).uid.equals(uid)) if (events.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(uid)) if (lootTable.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid))
-                if (customCommands.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < colors.size(); i++)
-            if (colors.get(i).uid.equals(uid)) if (colors.get(i).localVarName.contains(varName)) return true;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) if (fileObjects.get(i).localVarName.contains(varName)) return true;
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) if (npc.localVarName.contains(varName)) return true;
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid)) if (inventory.localVarName.contains(varName)) return true;
+        for (Location location : locations)
+            if (location.uid.equals(uid)) if (location.localVarName.contains(varName)) return true;
+        for (Item item : items) if (item.uid.equals(uid)) if (item.localVarName.contains(varName)) return true;
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid)) if (inventory.localVarName.contains(varName)) return true;
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.uid.equals(uid)) if (battleMap.localVarName.contains(varName)) return true;
+        for (Event event : events) if (event.uid.equals(uid)) if (event.localVarName.contains(varName)) return true;
+        for (LootTable table : lootTable)
+            if (table.uid.equals(uid)) if (table.localVarName.contains(varName)) return true;
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.uid.equals(uid))
+                if (customCommand.localVarName.contains(varName)) return true;
+        for (ColorObject color : colors)
+            if (color.uid.equals(uid)) if (color.localVarName.contains(varName)) return true;
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.uid.equals(uid)) if (fileObject.localVarName.contains(varName)) return true;
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) if (popup.localVarName.contains(varName)) return true;
         return false;
     }
 
@@ -851,9 +664,12 @@ public class Manager {
         for (int i = 0; i < colors.size(); i++)
             if (colors.get(i).uid.equals(uid))
                 if (colors.get(i).localVarName.contains(varName)) colors.get(i).setVariableByName(varName, value);
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) if (fileObjects.get(i).localVarName.contains(varName))
-                fileObjects.get(i).setVariableByName(varName, value);
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.uid.equals(uid)) if (fileObject.localVarName.contains(varName))
+                fileObject.setVariableByName(varName, value);
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) if (popup.localVarName.contains(varName))
+                popup.setVariableByName(varName, value);
     }
 
     public void setLocalVariableByVarUID(String varUID, String value) {
@@ -878,8 +694,10 @@ public class Manager {
                 customCommands.get(i).setVariableByUID(varUID, value);
         for (int i = 0; i < colors.size(); i++)
             if (colors.get(i).localVarUids.contains(varUID)) colors.get(i).setVariableByUID(varUID, value);
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).localVarUids.contains(varUID)) fileObjects.get(i).setVariableByUID(varUID, value);
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.localVarUids.contains(varUID)) fileObject.setVariableByUID(varUID, value);
+        for (CustomPopup popup : popups)
+            if (popup.localVarUids.contains(varUID)) popup.setVariableByUID(varUID, value);
     }
 
     public boolean hasLocalVariableByVarUID(String varUID) {
@@ -894,7 +712,8 @@ public class Manager {
         for (int i = 0; i < customCommands.size(); i++)
             if (customCommands.get(i).localVarUids.contains(varUID)) return true;
         for (int i = 0; i < colors.size(); i++) if (colors.get(i).localVarUids.contains(varUID)) return true;
-        for (int i = 0; i < fileObjects.size(); i++) if (fileObjects.get(i).localVarUids.contains(varUID)) return true;
+        for (FileObject fileObject : fileObjects) if (fileObject.localVarUids.contains(varUID)) return true;
+        for (CustomPopup popup : popups) if (popup.localVarUids.contains(varUID)) return true;
         return false;
     }
 
@@ -918,8 +737,8 @@ public class Manager {
         for (int i = 0; i < customCommands.size(); i++)
             if (customCommands.get(i).uid.equals(uid)) customCommands.get(i).name = value;
         for (int i = 0; i < colors.size(); i++) if (colors.get(i).uid.equals(uid)) colors.get(i).name = value;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) fileObjects.get(i).name = value;
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) fileObject.name = value;
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) popup.name = value;
     }
 
     public void setDescription(String uid, String value) {
@@ -939,8 +758,8 @@ public class Manager {
         for (int i = 0; i < customCommands.size(); i++)
             if (customCommands.get(i).uid.equals(uid)) customCommands.get(i).description = value;
         for (int i = 0; i < colors.size(); i++) if (colors.get(i).uid.equals(uid)) colors.get(i).description = value;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) fileObjects.get(i).description = value;
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) fileObject.description = value;
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) popup.description = value;
     }
 
     public boolean hasTag(String uid, String tag) {
@@ -964,8 +783,10 @@ public class Manager {
             if (customCommands.get(i).uid.equals(uid)) if (customCommands.get(i).tags.contains(tag)) return true;
         for (int i = 0; i < colors.size(); i++)
             if (colors.get(i).uid.equals(uid)) if (colors.get(i).tags.contains(tag)) return true;
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) if (fileObjects.get(i).tags.contains(tag)) return true;
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.uid.equals(uid)) if (fileObject.tags.contains(tag)) return true;
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) if (popup.tags.contains(tag)) return true;
         return false;
     }
 
@@ -997,9 +818,9 @@ public class Manager {
                 if (!customCommands.get(i).tags.contains(tag)) customCommands.get(i).tags.add(tag);
         for (int i = 0; i < colors.size(); i++)
             if (colors.get(i).uid.equals(uid)) if (!colors.get(i).tags.contains(tag)) colors.get(i).tags.add(tag);
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid))
-                if (!fileObjects.get(i).tags.contains(tag)) fileObjects.get(i).tags.add(tag);
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid))
+                if (!popup.tags.contains(tag)) popup.tags.add(tag);
     }
 
     public void removeTag(String uid, String tag) {
@@ -1030,9 +851,12 @@ public class Manager {
                 if (customCommands.get(i).tags.contains(tag)) customCommands.get(i).tags.remove(tag);
         for (int i = 0; i < colors.size(); i++)
             if (colors.get(i).uid.equals(uid)) if (colors.get(i).tags.contains(tag)) colors.get(i).tags.remove(tag);
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid))
-                if (fileObjects.get(i).tags.contains(tag)) fileObjects.get(i).tags.remove(tag);
+        for (FileObject object : fileObjects)
+            if (object.uid.equals(uid))
+                if (object.tags.contains(tag)) object.tags.remove(tag);
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid))
+                if (popup.tags.contains(tag)) popup.tags.remove(tag);
     }
 
     public String[] getEventCode(String uid, String eventName) {
@@ -1056,50 +880,50 @@ public class Manager {
             if (customCommands.get(i).uid.equals(uid)) return customCommands.get(i).getEventCode(eventName);
         for (int i = 0; i < colors.size(); i++)
             if (colors.get(i).uid.equals(uid)) return colors.get(i).getEventCode(eventName);
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) return fileObjects.get(i).getEventCode(eventName);
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.uid.equals(uid)) return fileObject.getEventCode(eventName);
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) return popup.getEventCode(eventName);
         return new String[]{""};
     }
 
     public void openFileObjectFile(String uid) {
         Log.add("Opening fileObject file " + uid);
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) fileObjects.get(i).openFile();
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) fileObject.openFile();
     }
 
     public String[] getFileObjectAsTextArray(String uid) {
         Log.add("Getting text from fileObject " + uid);
-        for (int i = 0; i < fileObjects.size(); i++)
-            if (fileObjects.get(i).uid.equals(uid)) return fileObjects.get(i).toStringArray();
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return fileObject.toStringArray();
         return new String[]{""};
     }
 
     public boolean isPlayerInventoryOverloaded() {
         try {
             return getInventoryWeight(player.getValue("inventory")) > Integer.parseInt(player.getValue("maxLoad"));
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return false;
     }
 
     public int getInventoryWeight(String inventoryUid) {
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(inventoryUid)) return inventories.get(i).getInventoryWeight();
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(inventoryUid)) return inventory.getInventoryWeight();
         return -1;
     }
 
     public boolean inventoryContains(String itemUid, String inventoryUid) {
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(inventoryUid))
-                if (inventories.get(i).items.contains(itemUid)) return true;
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(inventoryUid))
+                if (inventory.items.contains(itemUid)) return true;
         return false;
     }
 
     public int inventoryGetAmount(String itemUid, String inventoryUid) {
         int amount = 0;
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(inventoryUid)) if (inventories.get(i).items.contains(itemUid))
-                amount = Integer.parseInt(inventories.get(i).itemAmount.get(inventories.get(i).items.indexOf(itemUid)));
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(inventoryUid)) if (inventory.items.contains(itemUid))
+                amount = Integer.parseInt(inventory.itemAmount.get(inventory.items.indexOf(itemUid)));
         Log.add("Amount of " + itemUid + " in inventory " + inventoryUid + " is " + amount);
         return amount;
     }
@@ -1114,8 +938,8 @@ public class Manager {
             interpreter.executeEventFromObject(itemUid, "drop", new String[]{"amount:" + (amount * -1), "inventory:" + inventoryUid});
             interpreter.executeEventFromObject(inventoryUid, "drop", new String[]{"amount:" + (amount * -1), "item:" + itemUid});
         }
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(inventoryUid)) inventories.get(i).addItem(itemUid, amount);
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(inventoryUid)) inventory.addItem(itemUid, amount);
     }
 
     public void inventorySetItem(String itemUid, String inventoryUid, int amount) {
@@ -1128,8 +952,8 @@ public class Manager {
             interpreter.executeEventFromObject(itemUid, "drop", new String[]{"amount:" + ((amount - before) * -1), "inventory:" + inventoryUid});
             interpreter.executeEventFromObject(inventoryUid, "drop", new String[]{"amount:" + ((amount - before) * -1), "item:" + itemUid});
         }
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(inventoryUid)) inventories.get(i).setItem(itemUid, amount);
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(inventoryUid)) inventory.setItem(itemUid, amount);
     }
 
     public ArrayList<CustomCommand> getAllCC() {
@@ -1149,8 +973,8 @@ public class Manager {
     }
 
     public CustomCommand getCCObject(String name) {
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).syntaxName.equals(name)) return customCommands.get(i);
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.syntaxName.equals(name)) return customCommand;
         return null;
     }
 
@@ -1160,18 +984,18 @@ public class Manager {
     }
 
     public BattleMap getBattleMap(String uid) {
-        for (int i = 0; i < battleMaps.size(); i++) if (battleMaps.get(i).uid.equals(uid)) return battleMaps.get(i);
+        for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return battleMap;
         return null;
     }
 
     public NPC getNPC(String uid) {
-        for (int i = 0; i < npcs.size(); i++) if (npcs.get(i).uid.equals(uid)) return npcs.get(i);
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return npc;
         return null;
     }
 
     public int dropLootTable(String lootTableUID, String inventoryUID) {
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(lootTableUID)) return lootTable.get(i).drop(interpreter, inventoryUID);
+        for (LootTable table : lootTable)
+            if (table.uid.equals(lootTableUID)) return table.drop(interpreter, inventoryUID);
         return 0;
     }
 
@@ -1187,6 +1011,7 @@ public class Manager {
         for (CustomCommand customCommand : customCommands) if (customCommand.uid.equals(uid)) return customCommand;
         for (ColorObject color : colors) if (color.uid.equals(uid)) return color;
         for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return fileObject;
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return popup;
         return null;
     }
 
@@ -1229,6 +1054,87 @@ public class Manager {
         return generalEventCollection;
     }
 
+    private HashMap<String, GuiCustomPopup> customPopupsMap = new HashMap<>();
+
+    public void openCustomPopup(String uid, String asName) {
+        for (CustomPopup popup : popups) {
+            if (popup.uid.equals(uid)) {
+                customPopupsMap.put(asName, popup.openPopup(asName));
+            }
+        }
+    }
+
+    public void closeCustomPopup(String uidOrName) {
+        for (Map.Entry<String, GuiCustomPopup> entry : customPopupsMap.entrySet()) {
+            String key = entry.getKey();
+            GuiCustomPopup value = entry.getValue();
+            if (StaticStuff.isValidUIDSilent(uidOrName)) {
+                if (value.getCustomPopup().uid.equals(uidOrName)) {
+                    value.close();
+                    customPopupsMap.remove(key);
+                    return;
+                }
+            } else {
+                if (key.equals(uidOrName)) {
+                    value.close();
+                    customPopupsMap.remove(key);
+                    return;
+                }
+            }
+        }
+    }
+
+    public String[] getCurrentCustomPopupNames() {
+        String[] names = new String[customPopupsMap.size()];
+        int counter = 0;
+        for (Map.Entry<String, GuiCustomPopup> entry : customPopupsMap.entrySet()) {
+            String key = entry.getKey();
+            names[counter] = key;
+            counter++;
+        }
+        return names;
+    }
+
+    public String[] getCurrentCustomPopupUIDs() {
+        String[] uids = new String[customPopupsMap.size()];
+        int counter = 0;
+        for (Map.Entry<String, GuiCustomPopup> entry : customPopupsMap.entrySet()) {
+            GuiCustomPopup value = entry.getValue();
+            uids[counter] = value.getCustomPopup().uid;
+            counter++;
+        }
+        return uids;
+    }
+
+    public GuiCustomPopup[] getCurrentCustomPopupObjects() {
+        GuiCustomPopup[] objects = new GuiCustomPopup[customPopupsMap.size()];
+        int counter = 0;
+        for (Map.Entry<String, GuiCustomPopup> entry : customPopupsMap.entrySet()) {
+            GuiCustomPopup value = entry.getValue();
+            objects[counter] = value;
+            counter++;
+        }
+        return objects;
+    }
+
+    public void setCustomPopupData(String uidOrName, String component, String attribute, String value) {
+        for (Map.Entry<String, GuiCustomPopup> entry : customPopupsMap.entrySet()) {
+            String key = entry.getKey();
+            GuiCustomPopup entryValue = entry.getValue();
+            if (StaticStuff.isValidUIDSilent(uidOrName)) {
+                if (entryValue.getCustomPopup().uid.equals(uidOrName)) {
+                    entryValue.setData(component, attribute, value);
+                    return;
+                }
+            } else {
+                if (key.equals(uidOrName)) {
+                    entryValue.setData(component, attribute, value);
+                    return;
+                }
+            }
+        }
+    }
+
     public final static String SAVESTATES_DIRECTORY = "../../adventures/savestates/adventures/";
 
     public void createSavestate(String extraName) {
@@ -1251,6 +1157,7 @@ public class Manager {
             FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/customCommands");
             FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/colors");
             FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/fileObjects");
+            FileManager.makeDirectory(SAVESTATES_DIRECTORY + localFilename + "/popups");
             FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/project/player" + StaticStuff.dataFileEnding, player.generateSaveString());
             FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/project/settings" + StaticStuff.dataFileEnding, project.generateSaveString());
             for (Location location : locations)
@@ -1277,6 +1184,8 @@ public class Manager {
                 FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/fileObjects/" + fileObject.uid + "" + StaticStuff.dataFileEnding, fileObject.generateSaveString());
                 FileManager.writeFileFromByteArray(SAVESTATES_DIRECTORY + localFilename + "/fileObjects/" + fileObject.uid + ".file", fileObject.getByteArray());
             }
+            for (CustomPopup popup : popups)
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/colors/" + popup.uid + "" + StaticStuff.dataFileEnding, popup.generateSaveString());
             FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/variables/vars" + StaticStuff.dataFileEnding, variables.generateSaveString());
             FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/images/imagelist" + StaticStuff.dataFileEnding, images.generateSaveString(SAVESTATES_DIRECTORY + localFilename + "/images/"));
             FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/audio/audiolist" + StaticStuff.dataFileEnding, audios.generateSaveString(SAVESTATES_DIRECTORY + localFilename + "/audio/"));

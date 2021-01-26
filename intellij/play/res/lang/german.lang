@@ -82,6 +82,7 @@ objectNameNPC:NPC
 objectNameEvent:Ereignis
 objectNameColor:Farbe
 objectNameLootTable:Beutetabelle
+objectNamePopup:Popup
 
 playerStatsInventory:Inventar
 playerStatsStats:Werte

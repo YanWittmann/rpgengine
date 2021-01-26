@@ -45,6 +45,7 @@ Time for a list of all possible variable bases:
 | `{web|[VALUE(url)]}                                                                    						` | Returns an entire website or file via the URL with each line being a new entry in the variable (requires `web` permission)                                                              |
 | `{file|[VALUE(path)]}                                                                  						` | Returns the selected file in the `res/advfiles/` folder with each line being a new entry in the variable (requires `fileread`/`filereadanywhere` permission)                            |
 | `{file|[SELECTOR(fileObject)]}                                                             					` | Reads content of `fileObject` as if it was text with each line being a new entry in the variable                            															|
+| `{popup|[uids;names]}                                                             							` | Returns all of the currently open popup uids or the individually defined names                            															|
 
 There are also object specific variables:  
 

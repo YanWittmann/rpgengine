@@ -6,7 +6,7 @@ public abstract class Entity {
     String name;
     String description;
     String image;
-    String type;
+    String type = "unset";
     ArrayList<String> eventName = new ArrayList<>();
     ArrayList<String> eventCode = new ArrayList<>();
     ArrayList<String> tags = new ArrayList<>();

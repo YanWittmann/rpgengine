@@ -126,6 +126,24 @@ Here's a list of all of the commands and actions that you can use:
 		open file #type:fileObject#
 		open file #name:foo.png#
    
+ * ##### `popup [SELECTOR(popup)] open as [VALUE(name)]`
+   Creates a new instance of a popup object and stores it with a name.
+   
+		popup #type:popup# open as displayData
+   
+ * ##### `popup [SELECTOR(popup);VALUE(name)] set [VALUE(component)] attribute [VALUE(attribute)] to [VALUE(value)]`
+   The selected popup instance (either selected through the popup object uid or the name that was defined when creating) will set the component's (with the component name defined in the event `popupData`) attribute to the given value.  
+   Note that listeners and hoverEffects cannot be modified after creation.
+   
+		popup #name:myPopup# set mainText attribute text to Hello there!
+		popup displayData set centerImage attribute x to 100
+   
+ * ##### `popup [SELECTOR(popup);VALUE(name)] close`
+   Closes the popup of all of the selected popup objects using a selector or the popup with the given name.
+   
+		popup displayData close
+		popup #type:popup# close
+   
  * ##### `alert [VALUE]`
    Opens a popup with only text.
    

@@ -17,6 +17,7 @@ nav:
         - Loot tables: topics/loot-tables.md
         - Battle maps: topics/battle-maps.md
         - Talents: topics/talents.md
+        - Popups: topics/popups.md
     - Other: other.md
     - About: about.md
     - Changelog: changelog.md

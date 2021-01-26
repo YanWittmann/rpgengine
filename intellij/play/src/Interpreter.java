@@ -12,7 +12,7 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.10";
+    private final String version = "1.11";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg;
@@ -322,6 +322,14 @@ public class Interpreter {
         }
     }
 
+    public static void executeEventFromObjectStatic(String uid, String event, String[] args) {
+        self.executeEvent(uid, self.manager.getEventCode(uid, event), args);
+    }
+
+    public static void executeEventFromGeneralEventCollectionStatic(String event, String[] args) {
+        self.executeEventFromGeneralEventCollection(event, args);
+    }
+
     public void executeEventFromGeneralEventCollection(String event, String[] args) {
         executeEvent(manager.getGeneralEventCollection().getUID(), manager.getEventCode(manager.getGeneralEventCollection().getUID(), event), args);
     }
@@ -529,6 +537,29 @@ public class Interpreter {
             return "continue";
         } else if (code.equals("break")) {
             return "break";
+        } else if (code.matches("popup .+ open as .+")) { //open popup
+            String asName = code.replaceAll("popup .+ open as (.+)", "$1");
+            for (String s : evaluateSelector(code.replaceAll("popup (.+) open as .+", "$1")))
+                manager.openCustomPopup(s, asName);
+        } else if (code.matches("popup .+ close")) { //close popup
+            String closeName = code.replaceAll("popup (.+) close", "$1");
+            if (closeName.matches("#.+#")) { //close via selector
+                for (String s : evaluateSelector(closeName))
+                    manager.closeCustomPopup(s);
+            } else { //close via name
+                manager.closeCustomPopup(closeName);
+            }
+        } else if (code.matches("popup .+ set .+ attribute .+ to .+")) { //edit popup
+            String setName = code.replaceAll("popup (.+) set .+ attribute .+ to .+", "$1");
+            String component = code.replaceAll("popup .+ set (.+) attribute .+ to .+", "$1");
+            String attribute = code.replaceAll("popup .+ set .+ attribute (.+) to .+", "$1");
+            String value = code.replaceAll("popup .+ set .+ attribute .+ to (.+)", "$1");
+            if (setName.matches("#.+#")) { //edit via selector
+                for (String s : evaluateSelector(setName))
+                    manager.setCustomPopupData(s, component, attribute, value);
+            } else { //edit via name
+                manager.setCustomPopupData(setName, component, attribute, value);
+            }
         } else if (codeWords[0].equals("goto")) {
             codeWords[1] = evaluateSelector(code.replace("goto ", ""))[0];
             if (Manager.locationExists(codeWords[1])) {
@@ -603,8 +634,6 @@ public class Interpreter {
             openFileCommand(code);
         } else if (codeWords[0].equals("open") && codeWords[1].equals("stats")) {
             playerStatus.open();
-        } else if (code.matches("reload ( ?events| ?names| ?localvars| ?variables| ?images| ?audios| ?all)+")) {
-            manager.reload(code.replace("reload ", ""));
         } else if (codeWords[0].equals("selector")) {
             evaluateSelector(code.replace("selector ", ""));
         } else if (codeWords[0].equals("player") && codeWords[1].equals("input")) {
@@ -1360,6 +1389,12 @@ public class Interpreter {
                 else results = new String[]{""};
             } else if (baseParam[0].equals("talent")) { //{talent|[VALUE(talentname)]|[VALUE(dc)]|[true;false(visible)]|[true;false(autoroll)]|[VALUE(message);none]}
                 results = new String[]{"" + rollTalent(baseParam[1], baseParam[2], baseParam[3], baseParam[4], baseParam[5])};
+            } else if (baseParam[0].equals("popup")) {
+                if (baseParam[1].equals("names")) {
+                    results = manager.getCurrentCustomPopupNames();
+                } else if (baseParam[1].equals("uids")) {
+                    results = manager.getCurrentCustomPopupUIDs();
+                }
             }
 
             if (modifiers != null)

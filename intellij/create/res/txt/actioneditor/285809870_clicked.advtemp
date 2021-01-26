@@ -1,0 +1,4 @@
+print you clicked me! This is the data that was passed over: {componentType} {componentName} {popupName}
+if {componentType} equals button (
+	popup {popupName} close
+)
