@@ -41,7 +41,7 @@ public class GuiHub extends JFrame {
     private final Manager manager;
     private final int creditsWidth = 220;
     private int currentScreen = 0;
-    private final int maxScreen = 14;
+    private final int maxScreen = 15;
     private final String[] boxNames = new String[maxScreen + 1];
 
     public GuiHub(Manager manager) {
@@ -198,6 +198,7 @@ public class GuiHub extends JFrame {
         boxNames[11] = "CustomCommand";
         boxNames[12] = "Color";
         boxNames[13] = "File";
+        boxNames[14] = "Popup";
         updateScreen();
 
         Action saveAction = new AbstractAction() {
@@ -615,12 +616,12 @@ public class GuiHub extends JFrame {
     }
 
     private void addEntity() {
+        if(Manager.filename.equals("")) return;
         String type = Popup.dropDown(StaticStuff.projectName, "Choose an entity to add:", boxNames);
         if (type == null) return;
         if (type.equals("")) return;
         manager.newEntity(type);
         updateScreen();
-        editEntity();
     }
 
     private String getSelectedText() {
@@ -661,14 +662,17 @@ public class GuiHub extends JFrame {
     }
 
     private void deleteEntity() {
+        if(Manager.filename.equals("")) return;
         manager.deleteEntity(getSelectedUID("Enter the UID to delete:"));
     }
 
     private void editEntity() {
+        if(Manager.filename.equals("")) return;
         manager.openEntity(getSelectedUID("Enter the UID to open:"));
     }
 
     private void cloneEntity() {
+        if(Manager.filename.equals("")) return;
         manager.cloneEntity(getSelectedUID("Enter the UID to clone:"));
     }
 

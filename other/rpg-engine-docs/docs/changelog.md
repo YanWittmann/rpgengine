@@ -1,6 +1,33 @@
 # Changelog
 ___
 
+## 26.01.2020 - RELEASE 1.11
+#### Bugfixes:
+
+ * 
+
+#### New / Modification:
+
+ * 
+
+#### Other:
+
+ * accidentially deleted source code of version `1.10.1` which meant that i had to reprogram all of the features
+
+
+## 21.01.2020 - RELEASE 1.10.1
+#### Bugfixes:
+
+ * editor would not open newly created objects instantly but only after confirming a popup
+ * certain actions in editor would even be usable when no adventure was opened
+ * events would not open when set to edit in text editor
+ * new adventure frame would close after changing the value of one of the drop downs
+
+#### Other:
+
+ * had to delete 1.10 of create since it contained a bug that would make it impossible to edit adventures correctly
+
+
 ## 23.01.2020 - RELEASE `1.10`
 #### Bugfixes:
 

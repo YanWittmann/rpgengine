@@ -69,8 +69,8 @@ public class Audios {
             try {
                 byteArrays.add(FileManager.readFileToByteArray(path));
                 this.filename.add(name);
-                this.uids.add(UID.generateUID());
-                StaticStuff.copyString(uids.get(uids.size() - 1));
+                StaticStuff.setLastCreatedUID(UID.generateUID());
+                this.uids.add(StaticStuff.getLastCreatedUID());
                 return true;
             } catch (Exception e) {
                 Popup.error(StaticStuff.projectName, "Unable to get audio file:\n" + e);

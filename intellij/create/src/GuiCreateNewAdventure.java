@@ -58,11 +58,6 @@ public class GuiCreateNewAdventure extends JFrame {
         cb_language.setEnabled(true);
         cb_language.setFont(StaticStuff.getBaseFont());
         cb_language.setVisible(true);
-        cb_language.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                start();
-            }
-        });
 
         cb_talents = new JComboBox(new String[]{"D&D", "DSA", "Pathfinder", "Empty"});
         cb_talents.setBounds(132, 155, 149, 31);
@@ -71,11 +66,6 @@ public class GuiCreateNewAdventure extends JFrame {
         cb_talents.setEnabled(true);
         cb_talents.setFont(StaticStuff.getBaseFont());
         cb_talents.setVisible(true);
-        cb_talents.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                start();
-            }
-        });
 
         l_author = new JLabel();
         l_author.setBounds(33, 88, 70, 24);

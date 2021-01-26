@@ -18,6 +18,7 @@ public class Manager {
     public static ArrayList<CustomCommand> customCommands = new ArrayList<>();
     public static ArrayList<ColorObject> colors = new ArrayList<>();
     public static ArrayList<FileObject> fileObjects = new ArrayList<>();
+    public static ArrayList<CustomPopup> popups = new ArrayList<>();
     public static Images images;
     public static Audios audios;
     public static Variables variables;
@@ -67,6 +68,7 @@ public class Manager {
         customCommands.clear();
         colors.clear();
         fileObjects.clear();
+        popups.clear();
         FileManager.deleteFilesInDirectory("res/txt/actioneditor");
         setFilename(filename);
         readFile();
@@ -89,6 +91,7 @@ public class Manager {
         colors.clear();
         generateColors();
         fileObjects.clear();
+        popups.clear();
         variables = new Variables();
         images = new Images(filename);
         audios = new Audios(filename);
@@ -131,6 +134,7 @@ public class Manager {
         colors.clear();
         generateColors();
         fileObjects.clear();
+        popups.clear();
         variables = new Variables();
         images = new Images(filename);
         audios = new Audios(filename);
@@ -174,6 +178,7 @@ public class Manager {
             FileManager.makeDirectory(pathExtension + "adventures/" + filename + "/customCommands");
             FileManager.makeDirectory(pathExtension + "adventures/" + filename + "/colors");
             FileManager.makeDirectory(pathExtension + "adventures/" + filename + "/fileObjects");
+            FileManager.makeDirectory(pathExtension + "adventures/" + filename + "/popups");
             FileManager.writeToFile(pathExtension + "adventures/" + filename + "/project/player" + StaticStuff.dataFileEnding, player.generateSaveString());
             FileManager.writeToFile(pathExtension + "adventures/" + filename + "/project/settings" + StaticStuff.dataFileEnding, projectSettings.generateSaveString());
             for (Location location : locations)
@@ -196,6 +201,8 @@ public class Manager {
                 FileManager.writeToFile(pathExtension + "adventures/" + filename + "/customCommands/" + customCommand.uid + "" + StaticStuff.dataFileEnding, customCommand.generateSaveString());
             for (ColorObject color : colors)
                 FileManager.writeToFile(pathExtension + "adventures/" + filename + "/colors/" + color.uid + "" + StaticStuff.dataFileEnding, color.generateSaveString());
+            for (CustomPopup popup : popups)
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/popups/" + popup.uid + "" + StaticStuff.dataFileEnding, popup.generateSaveString());
             for (FileObject fileObject : fileObjects) {
                 FileManager.writeToFile(pathExtension + "adventures/" + filename + "/fileObjects/" + fileObject.uid + "" + StaticStuff.dataFileEnding, fileObject.generateSaveString());
                 FileManager.writeFileFromByteArray(pathExtension + "adventures/" + filename + "/fileObjects/" + fileObject.uid + ".file", fileObject.getByteArray());
@@ -349,6 +356,14 @@ public class Manager {
                     exitError("FileObject '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
                 }
             }
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/popups", StaticStuff.dataFileEndingNoDot);
+            for (String file : files) {
+                try {
+                    popups.add(new CustomPopup(FileManager.readFile(pathExtension + "adventures/" + filename + "/popups/" + file)));
+                } catch (Exception e) {
+                    exitError("Popup '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
+                }
+            }
             variables = new Variables(FileManager.readFile(pathExtension + "adventures/" + filename + "/variables/vars" + StaticStuff.dataFileEnding));
             images = new Images(filename, FileManager.readFile(pathExtension + "adventures/" + filename + "/images/imagelist" + StaticStuff.dataFileEnding));
             audios = new Audios(filename, FileManager.readFile(pathExtension + "adventures/" + filename + "/audio/audiolist" + StaticStuff.dataFileEnding));
@@ -377,6 +392,7 @@ public class Manager {
         for (CustomCommand customCommand : customCommands) occ += customCommand.refactor(find, replace);
         for (ColorObject color : colors) occ += color.refactor(find, replace);
         for (FileObject fileObject : fileObjects) occ += fileObject.refactor(find, replace);
+        for (CustomPopup popup : popups) occ += popup.refactor(find, replace);
         occ += player.refactor(find, replace);
         occ += projectSettings.refactor(find, replace);
         occ += variables.refactor(find, replace);
@@ -537,6 +553,11 @@ public class Manager {
                 found = true;
                 fileObject.openEditor();
             }
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) {
+                found = true;
+                popup.openEditor();
+            }
         if (variables.openVariable(uid)) found = true;
         if (images.openImage(uid)) found = true;
         if (audios.playAudio(uid)) found = true;
@@ -569,6 +590,7 @@ public class Manager {
             case "EventCollection" -> events.add(new Event());
             case "CustomCommand" -> customCommands.add(new CustomCommand());
             case "Color" -> colors.add(new ColorObject());
+            case "Popup" -> popups.add(new CustomPopup());
             case "File" -> {
                 String name = FileManager.filePicker();
                 if (name == null) return;
@@ -580,6 +602,7 @@ public class Manager {
             }
             case "Loot Table" -> lootTable.add(new LootTable());
         }
+        openEntity(StaticStuff.getLastCreatedUID());
         openActionEditor = true;
     }
 
@@ -606,10 +629,11 @@ public class Manager {
                                         if (!deleteColor(uid))
                                             if (!deleteFileObject(uid))
                                                 if (!deleteLootTable(uid))
-                                                    if (!images.deleteImage(uid))
-                                                        if (!audios.deleteAudio(uid)) {
-                                                            variables.deleteVariable(uid);
-                                                        }
+                                                    if (!deleteCustomPopup(uid))
+                                                        if (!images.deleteImage(uid))
+                                                            if (!audios.deleteAudio(uid)) {
+                                                                variables.deleteVariable(uid);
+                                                            }
         updateGui();
     }
 
@@ -635,6 +659,15 @@ public class Manager {
         for (int i = 0; i < fileObjects.size(); i++)
             if (fileObjects.get(i).uid.equals(uid)) {
                 fileObjects.remove(i);
+                return true;
+            }
+        return false;
+    }
+
+    private boolean deleteCustomPopup(String uid) {
+        for (int i = 0; i < popups.size(); i++)
+            if (popups.get(i).uid.equals(uid)) {
+                popups.remove(i);
                 return true;
             }
         return false;
@@ -868,6 +901,7 @@ public class Manager {
         StringBuilder lootTable;
         StringBuilder color;
         StringBuilder fileObject;
+        StringBuilder popup;
         location = new StringBuilder(locations.size() + " location(s):");
         for (Location value : locations) location.append("\n").append(value.name).append(" --- ").append(value.uid);
         npc = new StringBuilder(npcs.size() + " npc(s):");
@@ -883,17 +917,23 @@ public class Manager {
         event = new StringBuilder(events.size() + " eventCollection(s):");
         for (Event value : events) event.append("\n").append(value.name).append(" --- ").append(value.uid);
         lootTable = new StringBuilder(Manager.lootTable.size() + " loot table(s):");
-        for (LootTable table : Manager.lootTable) lootTable.append("\n").append(table.name).append(" --- ").append(table.uid);
+        for (LootTable table : Manager.lootTable)
+            lootTable.append("\n").append(table.name).append(" --- ").append(table.uid);
         customCommand = new StringBuilder(customCommands.size() + " customCommand(s):");
-        for (CustomCommand command : customCommands) customCommand.append("\n").append(command.name).append(" --- ").append(command.uid);
+        for (CustomCommand command : customCommands)
+            customCommand.append("\n").append(command.name).append(" --- ").append(command.uid);
         color = new StringBuilder(colors.size() + " color(s):");
-        for (ColorObject colorObject : colors) color.append("\n").append(colorObject.name).append(" --- ").append(colorObject.uid);
+        for (ColorObject colorObject : colors)
+            color.append("\n").append(colorObject.name).append(" --- ").append(colorObject.uid);
         fileObject = new StringBuilder(fileObjects.size() + " file(s):");
-        for (FileObject object : fileObjects) fileObject.append("\n").append(object.name).append(" --- ").append(object.uid);
+        for (FileObject object : fileObjects)
+            fileObject.append("\n").append(object.name).append(" --- ").append(object.uid);
+        popup = new StringBuilder(popups.size() + " popup(s):");
+        for (CustomPopup object : popups) popup.append("\n").append(object.name).append(" --- ").append(object.uid);
         variable = variables.generateMenuString();
         image = images.generateMenuString();
         audio = audios.generateMenuString();
-        guiHub.updateTextAreas(new String[]{location.toString(), npc.toString(), itemType.toString(), inventory.toString(), image, audio, battleMap.toString(), talent.toString(), lootTable.toString(), variable, event.toString(), customCommand.toString(), color.toString(), fileObject.toString()});
+        guiHub.updateTextAreas(new String[]{location.toString(), npc.toString(), itemType.toString(), inventory.toString(), image, audio, battleMap.toString(), talent.toString(), lootTable.toString(), variable, event.toString(), customCommand.toString(), color.toString(), fileObject.toString(), popup.toString()});
     }
 
     private void generateTalents(String which) {
@@ -967,7 +1007,7 @@ public class Manager {
     }
 
     public static void main(String[] args) {
-        if(args.length > 0) System.out.println(Arrays.toString(args));
+        if (args.length > 0) System.out.println(Arrays.toString(args));
         new Manager();
     }
 }

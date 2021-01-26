@@ -46,27 +46,26 @@ public class FileObject extends Entity {
     }
 
     public String generateSaveString() {
-        String str = "" + name + "\n" + description + "\n" + uid + "\n";
+        StringBuilder str = new StringBuilder("" + name + "\n" + description + "\n" + uid + "\n");
         for (int i = 0; i < eventName.size(); i++)
-            str = str + "\n++ev++" + eventName.get(i) + "---" + eventCode.get(i);
-        for (int i = 0; i < tags.size(); i++)
-            str = str + "\n++tag++" + tags.get(i);
+            str.append("\n++ev++").append(eventName.get(i)).append("---").append(eventCode.get(i));
+        for (String tag : tags) str.append("\n++tag++").append(tag);
         for (int i = 0; i < localVarName.size(); i++)
-            str = str + "\n++variable++" + localVarUids.get(i) + "---" + localVarName.get(i) + "---" + localVarType.get(i) + "---" + localVarValue.get(i) + "\n";
-        return str;
+            str.append("\n++variable++").append(localVarUids.get(i)).append("---").append(localVarName.get(i)).append("---").append(localVarType.get(i)).append("---").append(localVarValue.get(i)).append("\n");
+        return str.toString();
     }
 
     public String generateInformation() {
-        String str = "Name: " + name + "\nDescription: " + description + "\nEvents: ";
+        StringBuilder str = new StringBuilder("Name: " + name + "\nDescription: " + description + "\nEvents: ");
         for (int i = 0; i < eventName.size(); i++)
-            str = str + "\n   " + i + ": " + eventName.get(i);
-        str = str + "\nTags:\n";
+            str.append("\n   ").append(i).append(": ").append(eventName.get(i));
+        str.append("\nTags:\n");
         for (int i = 0; i < tags.size(); i++)
-            str = str + " " + i + ": " + tags.get(i) + ";";
-        str = str + "\nLocal variables:\n";
+            str.append(" ").append(i).append(": ").append(tags.get(i)).append(";");
+        str.append("\nLocal variables:\n");
         for (int i = 0; i < localVarName.size(); i++)
-            str = str + " " + localVarUids.get(i) + " - " + localVarName.get(i) + " - " + localVarType.get(i) + " - " + localVarValue.get(i) + "\n";
-        return str;
+            str.append(" ").append(localVarUids.get(i)).append(" - ").append(localVarName.get(i)).append(" - ").append(localVarType.get(i)).append(" - ").append(localVarValue.get(i)).append("\n");
+        return str.toString();
     }
 
     public int additionalRefactor(String find, String replace) {
@@ -84,37 +83,37 @@ public class FileObject extends Entity {
                 String str;
                 int choice;
                 switch (index) {
-                    case 0:
+                    case 0 -> {
                         str = Popup.input("New name:", name);
                         if (str == null) return;
                         if (str.equals("")) return;
                         name = str;
-                        break;
-                    case 1:
+                    }
+                    case 1 -> {
                         str = Popup.input("New description:", description);
                         if (str == null) return;
                         if (str.equals("")) return;
                         description = str;
-                        break;
-                    case 2:
+                    }
+                    case 2 -> {
                         str = Popup.input("Event name:", "");
                         if (str == null) return;
                         if (str.equals("")) return;
                         addEvent(str);
-                        break;
-                    case 3:
+                    }
+                    case 3 -> {
                         str = Popup.input("Choose an event by its ID:", "");
                         if (str == null) return;
                         if (str.equals("")) return;
                         new GuiActionEditor(getEntity(), Integer.parseInt(str));
-                        break;
-                    case 4:
+                    }
+                    case 4 -> {
                         str = Popup.input("Choose an event by its ID:", "");
                         if (str == null) return;
                         if (str.equals("")) return;
                         deleteEvent(Integer.parseInt(str));
-                        break;
-                    case 5:
+                    }
+                    case 5 -> {
                         choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
                         if (choice == 0)
                             getEntity().addTag(Popup.input("Tag name:", ""));
@@ -122,8 +121,8 @@ public class FileObject extends Entity {
                             getEntity().deleteTag(Integer.parseInt(Popup.input("Tag index:", "")));
                         else if (choice == 2)
                             getEntity().editTag(Integer.parseInt(Popup.input("Tag index:", "")), Popup.input("Tag name:", ""));
-                        break;
-                    case 6:
+                    }
+                    case 6 -> {
                         choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
                         if (choice == 0) {
                             getEntity().addVariable(Popup.input("Variable name:", ""), true);
@@ -131,12 +130,12 @@ public class FileObject extends Entity {
                             getEntity().removeVariable(StaticStuff.autoDetectUID("Variable uid:"));
                         else if (choice == 2)
                             getEntity().openVariable(StaticStuff.autoDetectUID("Variable uid:"), true);
-                        break;
-                    case 7:
+                    }
+                    case 7 -> {
                         FileManager.writeFileFromByteArray("res/tmp/" + name, fileData);
                         FileManager.openFile("res/tmp/" + name);
-                        break;
-                    case 8:
+                    }
+                    case 8 -> {
                         String name = FileManager.filePicker();
                         if (name == null) return;
                         if (!FileManager.fileExists(name)) {
@@ -146,9 +145,8 @@ public class FileObject extends Entity {
                         setFileData(FileManager.readFileToByteArray(name));
                         setName(FileManager.getFilename(name));
                         setDescription(FileManager.getFilename(name));
-                        break;
-                    default:
-                        Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");
+                    }
+                    default -> Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");
                 }
                 update();
             }

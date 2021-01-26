@@ -15,10 +15,7 @@ public abstract class Entity {
 
     public Entity() {
         uid = UID.generateUID();
-        try {
-            StaticStuff.copyString(uid);
-        } catch (Exception e) {
-        }
+        StaticStuff.setLastCreatedUID(uid);
     }
 
     public String generateEventEditorString(String str) {

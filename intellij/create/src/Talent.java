@@ -3,6 +3,7 @@ public class Talent {
 
     public Talent() {
         uid = UID.generateUID();
+        StaticStuff.setLastCreatedUID(uid);
         name = "New Talent";
         attr1 = "";
         attr2 = "";

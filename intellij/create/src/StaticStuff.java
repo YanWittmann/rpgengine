@@ -119,6 +119,15 @@ public class StaticStuff {
         return count;
     }
 
+    private static String lastCreatedUID = "";
+    public static void setLastCreatedUID(String uid) {
+        lastCreatedUID = uid;
+    }
+
+    public static String getLastCreatedUID() {
+        return lastCreatedUID;
+    }
+
     public static int refactorArrayList(String find, String replace, ArrayList<String> list) {
         int occ = 0;
         for (int i = 0; i < list.size(); i++) {
