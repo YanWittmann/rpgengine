@@ -107,6 +107,16 @@ public class FileManager {
         return allFiles;
     }
 
+    public static String[] getDirs(String path) {
+        File file = new File(path);
+        return file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+    }
+
     public static String[] getFilesWithEnding(String path, String ending) {
         try {
             final String ending2 = ending.replace(".", "");
@@ -362,6 +372,29 @@ public class FileManager {
         try {
             Desktop.getDesktop().open(new File(filename));
         } catch (Exception e) {
+        }
+    }
+
+    /* thank you SO much,   Maurício Linhares   https://stackoverflow.com/questions/6811522/changing-the-working-directory-of-command-from-java/6811578
+     * and                  Aniket Thakur       https://stackoverflow.com/questions/17985036/run-a-jar-file-from-java-program
+     * this literally took me 2.5 hours to make.
+     */
+    public static void openJar(String jar, String path, String[] args) {
+        try {
+            File pathToExecutable = new File(jar);
+            String[] args2 = new String[args.length + 3];
+            args2[0] = "java";
+            args2[1] = "-jar";
+            args2[2] = pathToExecutable.getAbsolutePath();
+            System.arraycopy(args, 0, args2, 3, args2.length - 3); //TODO: test this
+            /*for (int i = 3; i < args2.length; i++)
+                args2[i] = args[i - 3];*/
+            ProcessBuilder builder = new ProcessBuilder(args2);
+            builder.directory(new File(path).getAbsoluteFile()); // this is where you set the root folder for the executable to run with
+            builder.redirectErrorStream(true);
+            builder.start();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

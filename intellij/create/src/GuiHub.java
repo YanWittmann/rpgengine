@@ -7,6 +7,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -224,6 +225,14 @@ public class GuiHub extends JFrame {
         };
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "OPEN");
         getRootPane().getActionMap().put("OPEN", copyAction);
+
+        Action openInPlayerAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                openAdventureInPlayer();
+            }
+        };
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_O, java.awt.event.InputEvent.SHIFT_DOWN_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "PLAYINPLAYER");
+        getRootPane().getActionMap().put("PLAYINPLAYER", openInPlayerAction);
 
         Action cloneAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -661,6 +670,23 @@ public class GuiHub extends JFrame {
         return "";
     }
 
+    private String lastTimeVersionUsed = "";
+    private void openAdventureInPlayer() {
+        if(Manager.filename.equals("")) return;
+        if(!FileManager.fileExists("../../play/versions.txt")) {
+            Popup.error("Error", "Cannot find versions folder.");
+            return;
+        }
+        String[] availableVersions = FileManager.getDirs("../../play");
+        lastTimeVersionUsed = Popup.dropDown("Version selection", "What version do you want to use to open the adventure?\nThis is a 1.11.1+ feature!", availableVersions, lastTimeVersionUsed);
+        if(!FileManager.fileExists("../../play/" + lastTimeVersionUsed + "/play.jar")) {
+            Popup.error("Error", "Cannot find version jar.");
+            return;
+        }
+        FileManager.openJar("../../play/" + lastTimeVersionUsed + "/play.jar", "../../play/" + lastTimeVersionUsed + "/", new String[]{"filename:" + Manager.filename});
+
+    }
+
     private void deleteEntity() {
         if(Manager.filename.equals("")) return;
         manager.deleteEntity(getSelectedUID("Enter the UID to delete:"));
@@ -746,7 +772,7 @@ public class GuiHub extends JFrame {
 
         JMenu file = new JMenu("File");
         JMenu properties = new JMenu("Adventure");
-        JMenu help = new JMenu("Other");
+        JMenu other = new JMenu("Other");
 
         JMenuItem createNew = new JMenuItem("New   ");
         JMenuItem open = new JMenuItem("Open   ");
@@ -756,6 +782,7 @@ public class GuiHub extends JFrame {
 
         JMenuItem selectStylesheet = new JMenuItem("Set stylesheet   ");
         JMenuItem toggleActionEditor = new JMenuItem("Toggle open actions directly in editor   ");
+        JMenuItem openAdventureInPlayer = new JMenuItem("Open current adventure in player   ");
         JMenuItem shortcuts = new JMenuItem("Shortcuts   ");
         JMenuItem documentation = new JMenuItem("Documentation   ");
         JMenuItem website = new JMenuItem("Website   ");
@@ -774,7 +801,7 @@ public class GuiHub extends JFrame {
 
         delete.addActionListener(evt -> deleteAdventure());
 
-        shortcuts.addActionListener(evt -> Popup.message(StaticStuff.projectName, "These are the shortcuts you can use on the main menu:\nctrl+shift+n: New adventure\nctrl+n: New entity\nctrl+e: Edit entity\nctrl+k: Clone entity\nctrl+d: Delete entity\nctrl+r: Reload\nctrl+q: Scroll left\nctrl+w: Scroll right\nctrl+shift+q: Scroll up\nctrl+shift+w: Scroll down\nctrl+s: Save\nctrl+shift+s: Save as\nctrl+o: Open File\nUse drag and drop to add adventures, images or audio files"));
+        shortcuts.addActionListener(evt -> Popup.message(StaticStuff.projectName, "These are the shortcuts you can use on the main menu:\nctrl+shift+n: New adventure\nctrl+n: New entity\nctrl+e: Edit entity\nctrl+k: Clone entity\nctrl+d: Delete entity\nctrl+r: Reload\nctrl+q: Scroll left\nctrl+w: Scroll right\nctrl+shift+q: Scroll up\nctrl+shift+w: Scroll down\nctrl+s: Save\nctrl+shift+s: Save as\nctrl+o: Open File\nctrl+shift+o: Open Adventure in player\nUse drag and drop to add adventures, images or audio files"));
 
         documentation.addActionListener(evt -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/documentation/"));
 
@@ -790,6 +817,8 @@ public class GuiHub extends JFrame {
 
         refactor.addActionListener(evt -> refactor());
 
+        openAdventureInPlayer.addActionListener(evt -> openAdventureInPlayer());
+
         file.add(createNew);
         file.add(open);
         file.add(save);
@@ -802,12 +831,13 @@ public class GuiHub extends JFrame {
         properties.add(refactor);
         menuBar.add(properties);
 
-        help.add(selectStylesheet);
-        help.add(toggleActionEditor);
-        help.add(shortcuts);
-        help.add(documentation);
-        help.add(website);
-        menuBar.add(help);
+        other.add(selectStylesheet);
+        other.add(toggleActionEditor);
+        other.add(openAdventureInPlayer);
+        other.add(shortcuts);
+        other.add(documentation);
+        other.add(website);
+        menuBar.add(other);
     }
 
     private void selectStylesheet() {

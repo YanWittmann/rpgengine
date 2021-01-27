@@ -1,5 +1,7 @@
+import java.awt.*;
+
 public class Launcher {
-    private final String version = "6";
+    private final String version = "7";
     private final Configuration mainCFG;
     private final GuiLauncher launcher;
     private boolean loadingScreenDone = false, isDownloadingNewVersion = false;
@@ -124,22 +126,20 @@ public class Launcher {
     private String[] arguments = new String[]{"lang:english", "scale:100"};
 
     public void startVersion(String version, String which) {
-        if(isDownloadingNewVersion) return;
+        if (isDownloadingNewVersion) return;
         isDownloadingNewVersion = true;
         launcher.setButtonsActive(false);
         version = version.replaceAll("(?:Version )?([^ ]+)(?: \\(installed\\))?", "$1");
         if (!isVersionInstalled(version, which)) { //need to install version
-            notifyUser("Installing " + which + " version " + version);
-            if (installVersion(version, which)) { //install version
-                notifyUser("Installed " + which + " version " + version);
-            } else { //version could not be installed
-                notifyUser("Unable to install " + which + " version " + version);
-                launcher.setButtonsActive(true);
+            if (!installVersion(version, which)) { //install version
+                launcher.setButtonsActive(true); //version could not be installed
+                isDownloadingNewVersion = false;
             }
         }
         if (FileManager.fileExists("files/" + which + "/" + version + "/" + which + ".jar")) {
             FileManager.openJar("files/" + which + "/" + version + "/" + which + ".jar", "files/" + which + "/" + version, arguments);
-            System.exit(0);
+            closeAfterLaunching();
+            isDownloadingNewVersion = false;
         } else {
             notifyUser("Something went wrong during the installation...");
             FileManager.deleteDirectoryRecursively("files/" + which + "/" + version);
@@ -148,15 +148,31 @@ public class Launcher {
         }
     }
 
-    private boolean installVersion(String version, String which) {
+    public boolean installVersion(String version, String which) {
+        notifyUser("Installing " + which + " version " + version);
+        isDownloadingNewVersion = true;
+
         FileManager.makeDirectory("files/" + which);
         FileManager.makeDirectory("files/res/tmp/");
-        if (!FileManager.saveUrl("files/res/tmp/" + which + version + ".zip", "http://yanwittmann.de/projects/rpgengine/" + which + "/" + version + ".zip"))
+
+        if (!FileManager.saveUrl("files/res/tmp/" + which + version + ".zip", "http://yanwittmann.de/projects/rpgengine/" + which + "/" + version + ".zip")) {
+            isDownloadingNewVersion = false;
+            notifyUser("Unable to install " + which + " version " + version);
             return false;
+        }
+
         FileManager.makeDirectory("files/" + which + "/" + version);
-        if (!FileManager.unzip("files/res/tmp/" + which + version + ".zip", "files/" + which + "/"))
+        if (!FileManager.unzip("files/res/tmp/" + which + version + ".zip", "files/" + which + "/")) {
+            isDownloadingNewVersion = false;
+            notifyUser("Unable to install " + which + " version " + version);
             return false;
+        }
+
         FileManager.delete("files/res/tmp/" + which + version + ".zip");
+        isDownloadingNewVersion = false;
+        notifyUser("Installed " + which + " version " + version);
+        launcher.setAvailableVersions(prepareVersionStringsForComboBox(getAvailableVersions("play"), "play"), "play");
+        launcher.setAvailableVersions(prepareVersionStringsForComboBox(getAvailableVersions("create"), "create"), "create");
         return true;
     }
 
@@ -208,9 +224,29 @@ public class Launcher {
 
     public void toggleFastMode() {
         mainCFG.set("fastsetup", !mainCFG.get("fastsetup").equals("true") + "");
-        if(mainCFG.get("fastsetup").equals("true"))
+        if (mainCFG.get("fastsetup").equals("true"))
             notifyUser("The launcher will now start up in fast mode");
         else notifyUser("The launcher will now start up in slow mode");
+    }
+
+    public boolean getFastMode() {
+        return mainCFG.get("fastsetup").equals("true");
+    }
+
+    public void toggleStayMode() {
+        mainCFG.set("stayopen", !mainCFG.get("stayopen").equals("true") + "");
+        if (mainCFG.get("stayopen").equals("true"))
+            notifyUser("The launcher will now stay open after launching a version");
+        else notifyUser("The launcher will now close open after launching a version");
+    }
+
+    public boolean getStayMode() {
+        return mainCFG.get("stayopen").equals("true");
+    }
+
+    public void closeAfterLaunching() {
+        if (!getStayMode()) System.exit(0);
+        else launcher.setState(Frame.ICONIFIED);
     }
 
     public static void main(String[] args) {

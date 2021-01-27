@@ -492,48 +492,51 @@ public class GuiPlayerStats extends JFrame {
                 }
                 String clickedUID = inventoryItemsUIDs[scrollIndex + id];
                 Log.add("Clicked item UID: " + clickedUID);
-                int amountOptions = 4, current = 0;
+                int amountOptions = 3, current = 0;
                 boolean isHoldingClickedItem = (player.getValue("holdingMain").equals(clickedUID) || player.getValue("holdingSecond").equals(clickedUID) || player.getValue("holdingArmor").equals(clickedUID));
-                String options[] = new String[amountOptions];
+                String[] options = new String[amountOptions];
                 options[current] = Interpreter.lang("playerStatsItemClickExamine");
                 current++;
                 options[current] = Interpreter.lang("playerStatsItemClickUse");
                 current++;
                 if (!isHoldingClickedItem) {
                     options[current] = Interpreter.lang("playerStatsItemClickEquip");
-                    current++;
                 } else {
                     options[current] = Interpreter.lang("playerStatsItemClickUnequip");
-                    current++;
                 }
-                options[current] = Interpreter.lang("playerStatsItemClickNothing");
-                int choice = StaticStuff.openPopup(Interpreter.lang("popupItemClicked", Manager.getName(clickedUID)), options);
+                //int choice = StaticStuff.openPopup(Interpreter.lang("popupItemClicked", Manager.getName(clickedUID)), options); //large frame
+                int choice = StaticStuff.openPopup(options, true);
                 if (choice == 0) {
-                    GuiObjectDisplay.create(manager.getEntity(clickedUID), Interpreter.lang("playerStatsItemOpenItem"));
+                    GuiObjectDisplay.create(Manager.getEntity(clickedUID), Interpreter.lang("playerStatsItemOpenItem"));
                 } else if (choice == 1) {
                     interpreter.executePlayerCommand("useWithUID " + clickedUID);
                 } else if ((choice == 2) && !isHoldingClickedItem) {
-                    Item toEquip = (Item) manager.getEntity(clickedUID);
+                    Item toEquip = (Item) Manager.getEntity(clickedUID);
+                    assert toEquip != null;
                     String slot = toEquip.getVariableValue("hands");
                     boolean current1 = false, current2 = false;
                     if (player.getValue("holdingMain").equals("")) current1 = true;
                     if (player.getValue("holdingSecond").equals("")) current2 = true;
-                    if (slot.equals("1")) {
-                        if (current1) player.setValue("holdingMain", clickedUID);
-                        else if (current2) player.setValue("holdingSecond", clickedUID);
-                        else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
-                    } else if (slot.equals("2")) {
-                        if (current1 && current2) {
-                            player.setValue("holdingMain", clickedUID);
-                            player.setValue("holdingSecond", clickedUID);
-                        } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
-                    } else if (slot.equals("armor")) {
-                        if (player.getValue("holdingArmor").equals("")) {
-                            player.setValue("holdingArmor", clickedUID);
-                        } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
+                    switch (slot) {
+                        case "1":
+                            if (current1) player.setValue("holdingMain", clickedUID);
+                            else if (current2) player.setValue("holdingSecond", clickedUID);
+                            else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
+                            break;
+                        case "2":
+                            if (current1 && current2) {
+                                player.setValue("holdingMain", clickedUID);
+                                player.setValue("holdingSecond", clickedUID);
+                            } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
+                            break;
+                        case "armor":
+                            if (player.getValue("holdingArmor").equals("")) {
+                                player.setValue("holdingArmor", clickedUID);
+                            } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
+                            break;
                     }
                     updateInventory();
-                } else if (choice == 2 && isHoldingClickedItem) {
+                } else if (choice == 2) {
                     if (player.getValue("holdingArmor").equals(clickedUID)) player.setValue("holdingArmor", "");
                     if (player.getValue("holdingMain").equals(clickedUID)) player.setValue("holdingMain", "");
                     if (player.getValue("holdingSecond").equals(clickedUID)) player.setValue("holdingSecond", "");

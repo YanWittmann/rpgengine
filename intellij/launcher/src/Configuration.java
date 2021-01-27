@@ -1,7 +1,8 @@
 import java.io.*;
 
 public class Configuration {
-    String config[][], filename;
+    String[][] config;
+    String filename;
     boolean ready = false;
 
     public Configuration(String pFilename) {
@@ -11,8 +12,8 @@ public class Configuration {
 
     public String get(String option) {
         if (ready) {
-            for (int i = 0; i < config.length; i++) {
-                if (config[i][0].equals(option)) return config[i][1];
+            for (String[] strings : config) {
+                if (strings[0].equals(option)) return strings[1];
             }
         }
         return "";
@@ -20,8 +21,8 @@ public class Configuration {
 
     public int getInt(String option) {
         if (ready) {
-            for (int i = 0; i < config.length; i++) {
-                if (config[i][0].equals(option)) return Integer.parseInt(config[i][1]);
+            for (String[] strings : config) {
+                if (strings[0].equals(option)) return Integer.parseInt(strings[1]);
             }
         }
         return -1;
@@ -76,7 +77,6 @@ public class Configuration {
             try {
                 writeToFile(filename, output.toString().replaceAll("(?m)^[ \t]*\r?\n", ""));
             } catch (Exception ignored) {
-                ;
             }
             readConfig(filename);
         }
@@ -84,14 +84,14 @@ public class Configuration {
 
     public void removeOption(String option) {
         if (ready && optionExists(option)) {
-            String output = "";
+            StringBuilder output = new StringBuilder();
             for (String[] strings : config) {
                 if (!strings[0].equals(option))
-                    output = output + strings[0] + ":" + strings[1] + "\n";
+                    output.append(strings[0]).append(":").append(strings[1]).append("\n");
             }
-            output = output.substring(0, output.length() - 1);
+            output = new StringBuilder(output.substring(0, output.length() - 1));
             try {
-                writeToFile(filename, output.replaceAll("(?m)^[ \t]*\r?\n", ""));
+                writeToFile(filename, output.toString().replaceAll("(?m)^[ \t]*\r?\n", ""));
             } catch (Exception ignored) {
             }
             readConfig(filename);
@@ -115,23 +115,21 @@ public class Configuration {
         if (!(new File(pFilename).isFile()))
             try {
                 writeToFile(pFilename, "");
-            } catch (Exception e) {
-                ;
+            } catch (Exception ignored) {
             }
         try {
-            String input[] = readFile(pFilename);
+            String[] input = readFile(pFilename);
             config = new String[input.length][2];
             for (int i = 0; i < input.length; i++) {
                 config[i] = input[i].split(":");
             }
             ready = true;
-        } catch (Exception e) {
-            ;
+        } catch (Exception ignored) {
         }
     }
 
     private String[] readFile(String pFilename) {
-        String result[];
+        String[] result;
         File file = new File(pFilename);
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "Windows-1252"));

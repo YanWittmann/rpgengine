@@ -1,6 +1,21 @@
 # Changelog
 ___
 
+## 20.01.2020 - RELEASE `1.11.1`
+#### Bugfixes:
+
+ * when opening more than one popup of the same type at the same time, the result clicked on one of them was also set to be the one on the other
+
+#### New / Modification:
+
+ * added the option to open adventures directly from the creator (`Other > Open current adventure in player`)
+ * there are now launcher settings that allow you to toggle `fast/slow startup mode` and `close launcher stay open/close after launching` (minimizes frame)
+ * redirected bug report and feature request in the launcher to [https://github.com/Skyball2000/rpgengine/issues](https://github.com/Skyball2000/rpgengine/issues)
+ * added a new type of popup `smallButtons` that can be used via the variable `{input|button|[BUTTONS]}`
+ * when clicking on an item in the inventory, the new popup `smallButtons` is used. the popup disappears if the mouse is moved too far away
+ * optimized text size calculation to be faster (doubled speed by reducing calculator frame size)
+
+
 ## 26.01.2020 - RELEASE `1.11`
 #### New / Modification:
 

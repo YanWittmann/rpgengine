@@ -282,8 +282,7 @@ public class GuiMainConsole extends JFrame {
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    List<File> droppedFiles = (List<File>)
-                            evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     new Thread(() -> {
                         for (File file : droppedFiles) {
                             dropFile(file.getAbsolutePath());

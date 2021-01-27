@@ -12,7 +12,7 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.11";
+    private final String version = "1.11.1";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg;
@@ -40,14 +40,20 @@ public class Interpreter {
         else
             lang = new Language(selectedArgsLang, "res/lang");
         //cfg = new Configuration("res/config/main.cfg");
-        String[] files = FileManager.getFilesWithEnding(extraFilePath + "adventures/", StaticStuff.adventureFileEndingNoDot);
-        if (files.length == 0) {
-            StaticStuff.error(lang("errorNoAdventuresFound"));
-            System.exit(100);
+        if (argsFilename.equals("")) {
+            String[] files = FileManager.getFilesWithEnding(extraFilePath + "adventures/", StaticStuff.adventureFileEndingNoDot);
+            if (files.length == 0) {
+                StaticStuff.error(lang("errorNoAdventuresFound"));
+                System.exit(100);
+            }
+            loadingScreenDone = true;
+            while (!mayOpenStartPopup) Sleep.milliseconds(300);
+            filename = StaticStuff.openPopup(StaticStuff.prepareString(lang("popupChooseAdventure")), StaticStuff.replaceAllLines(files, StaticStuff.adventureFileEnding, ""), files[0]);
+        } else {
+            filename = argsFilename;
+            loadingScreenDone = true;
+            loading.setVisible(false);
         }
-        loadingScreenDone = true;
-        while (!mayOpenStartPopup) Sleep.milliseconds(300);
-        filename = StaticStuff.openPopup(StaticStuff.prepareString(lang("popupChooseAdventure")), StaticStuff.replaceAllLines(files, StaticStuff.adventureFileEnding, ""), files[0]);
         filename = letUserPickSavestateIfAvailable(filename);
         manager = new Manager(this, filename, extraFilePath);
         StaticStuff.prepareColors(manager.getAllColors(), manager.getAllColorNames(), manager.getAllColorUIDs());
@@ -1352,9 +1358,12 @@ public class Interpreter {
                     results = new String[]{StaticStuff.openPopup(baseParam[2], "")};
                 else if (baseParam[1].equals("dropDown"))
                     results = new String[]{StaticStuff.openPopup(baseParam[2], baseParam[3].split(";"), "")};
-                else if (baseParam[1].equals("button"))
-                    results = new String[]{"" + StaticStuff.openPopup(baseParam[2], baseParam[3].split(";"))};
-                else if (baseParam[1].equals("dice"))
+                else if (baseParam[1].equals("button")) {
+                    if (baseParam.length == 4)
+                        results = new String[]{"" + StaticStuff.openPopup(baseParam[2], baseParam[3].split(";"))};
+                    else if (baseParam.length == 3)
+                        results = new String[]{"" + StaticStuff.openPopup(baseParam[2].split(";"), false)};
+                } else if (baseParam[1].equals("dice"))
                     results = new String[]{"" + StaticStuff.rollDice(baseParam[2], Integer.parseInt(baseParam[3]), Integer.parseInt(baseParam[4]), Boolean.parseBoolean(baseParam[5]))};
                 else if (baseParam[1].equals("line")) results = StaticStuff.waitForLineInput().split("LINEBREAK");
             } else if (baseParam[0].equals("value")) {
@@ -1826,19 +1835,20 @@ public class Interpreter {
 
     //debugging:
     /*private static final ArrayList<Long> times = new ArrayList<>();
-    private static long start = 0, finish;
+    public static long start = 0, finish;
 
-    private static void startTimer() {
+    public static void startTimer() {
         start = System.nanoTime();
     }
 
-    private static void stopTimer() {
+    public static void stopTimer() {
         long finish = System.nanoTime();
         times.add(finish - start);
-        System.out.println(times.get(times.size() - 1) + "   \t" + averageTime());
+        //System.out.println(times.get(times.size() - 1) + "  " + averageTime());
+        System.out.println(times.get(times.size() - 1));
     }
 
-    private static float averageTime() {
+    public static float averageTime() {
         float total = 0;
         for (Long f : times) total += f;
         total = total / times.size();
@@ -1849,6 +1859,7 @@ public class Interpreter {
     private int textSpeedFactor = 100;
     private String selectedArgsLang = null;
     private boolean forceDebugMode = false;
+    private String argsFilename = "";
 
     private void prepareArgs(String[] args) {
         for (String param : args) {
@@ -1860,6 +1871,7 @@ public class Interpreter {
                     case "scale" -> userSizeScale = Integer.parseInt(value);
                     case "forceDebug" -> forceDebugMode = value.equals("true");
                     case "textSpeed" -> textSpeedFactor = Integer.parseInt(value);
+                    case "filename" -> argsFilename = value;
                 }
             } catch (Exception e) {
                 Popup.error("An error occurred", "Unable to setup arguments:\n" + e);

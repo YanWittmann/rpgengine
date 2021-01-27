@@ -6,8 +6,8 @@ class FindRealTextSize {
     private JWindow w;
     private JLabel l;
     private JPanel p;
-    private int x_size = 6000, y_size = 3000;
-    private String text;
+    private final int x_size = StaticStuff.getScreenWidth();
+    private final int y_size = Math.min(500, StaticStuff.getScreenHeight());
 
     public static void init() {
         if (finder == null) finder = new FindRealTextSize();
@@ -25,7 +25,7 @@ class FindRealTextSize {
         finder.l.setFont(font);
         refresh(finder.l);
         refresh(finder.p);
-        refresh(finder.w);
+        //refresh(finder.w);
         return finder.l.getWidth();
     }
 
@@ -35,7 +35,7 @@ class FindRealTextSize {
         finder.l.setFont(font);
         refresh(finder.l);
         refresh(finder.p);
-        refresh(finder.w);
+        //refresh(finder.w);
         return finder.l.getHeight();
     }
 
@@ -51,7 +51,7 @@ class FindRealTextSize {
         w.setAlwaysOnTop(false);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         p = new JPanel();
@@ -64,7 +64,7 @@ class FindRealTextSize {
         l.setBorder(BorderFactory.createLineBorder(StaticStuff.getColor("white_border"), Interpreter.getScaledValue(4), true));
         p.add(l, gbc);
 
-        gbc.anchor = GridBagConstraints.CENTER;
+        //gbc.anchor = GridBagConstraints.CENTER;
 
         w.add(p);
 
@@ -74,6 +74,6 @@ class FindRealTextSize {
 
         w.setSize(x_size, y_size);
         w.setLocation((int) width + 1000, (int) height + 1000);
-        w.show();
+        w.setVisible(true);
     }
 }

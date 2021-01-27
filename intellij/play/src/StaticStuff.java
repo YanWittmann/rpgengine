@@ -51,6 +51,8 @@ public class StaticStuff {
             commandYellow.add("return");
             commandYellow.add("break");
             commandYellow.add("continue");
+            commandYellow.add("open");
+            commandYellow.add("popup");
             String[] files = FileManager.getFilesWithEnding("res/txt/basecolors/", StaticStuff.dataFileEndingNoDot);
             for (String file : files) {
                 try {
@@ -147,12 +149,10 @@ public class StaticStuff {
         return count;
     }
 
-    static PopupButtons popButtons;
-
     public static int openPopup(String text, String[] options) {
         Log.add("Open popup buttons '" + text + "'");
-        popButtons = new PopupButtons(text, options);
-        new Thread(() -> popButtons.createComponents()).start();
+        PopupButtons popButtons = new PopupButtons(text, options);
+        new Thread(popButtons::createComponents).start();
         while (popButtons.selected == -1) Sleep.milliseconds(100);
         try {
             lastInput = popButtons.selected + "";
@@ -162,21 +162,29 @@ public class StaticStuff {
         return popButtons.selected;
     }
 
-    static PopupText popText;
+    public static int openPopup(String[] options, boolean closeIfMouseTooFarAway) {
+        Log.add("Open popup small buttons '" + Arrays.toString(options) + "'");
+        PopupSmallButtons popButtonsSmall = new PopupSmallButtons(options, closeIfMouseTooFarAway);
+        while (popButtonsSmall.selected == -1) Sleep.milliseconds(100);
+        try {
+            lastInput = popButtonsSmall.selected + "";
+        } catch (Exception ignored) {
+        }
+        Log.add("Result: " + lastInput);
+        return popButtonsSmall.selected;
+    }
 
     public static void openPopup(String text) {
         Log.add("Open popup text '" + text + "'");
-        popText = new PopupText(text);
-        new Thread(() -> popText.createComponents()).start();
+        PopupText popText = new PopupText(text);
+        new Thread(popText::createComponents).start();
         while (popText.selected == -1) Sleep.milliseconds(100);
     }
 
-    static PopupTextInput popTextInput;
-
     public static String openPopup(String text, String pretext) {
         Log.add("Open popup text input '" + text + "'");
-        popTextInput = new PopupTextInput(text, pretext);
-        new Thread(() -> popTextInput.createComponents()).start();
+        PopupTextInput popTextInput = new PopupTextInput(text, pretext);
+        new Thread(popTextInput::createComponents).start();
         while (popTextInput.selected == -1) Sleep.milliseconds(100);
         try {
             lastInput = popTextInput.result;
@@ -186,12 +194,10 @@ public class StaticStuff {
         return popTextInput.result;
     }
 
-    static PopupDropDown popDropDown;
-
     public static String openPopup(String text, String[] options, String preselected) {
         Log.add("Open popup text input '" + text + "'");
-        popDropDown = new PopupDropDown(text, options, preselected);
-        new Thread(() -> popDropDown.createComponents()).start();
+        PopupDropDown popDropDown = new PopupDropDown(text, options, preselected);
+        new Thread(popDropDown::createComponents).start();
         while (popDropDown.selected == -1) Sleep.milliseconds(100);
         try {
             lastInput = popDropDown.result;
@@ -485,5 +491,11 @@ public class StaticStuff {
 
     public static int getRandomPopupMovement() {
         return randomNumber(-40, 40);
+    }
+
+    public static int[] getMouseLocation() {
+        PointerInfo a = MouseInfo.getPointerInfo();
+        Point b = a.getLocation();
+        return new int[]{(int) b.getX(), (int) b.getY()};
     }
 }

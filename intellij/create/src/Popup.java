@@ -5,6 +5,9 @@ public class Popup {
     public static String dropDown(String title, String message, String[] choice) {
         return (String) JOptionPane.showInputDialog(null, message, title, JOptionPane.PLAIN_MESSAGE, null, choice, choice[0]);
     }
+    public static String dropDown(String title, String message, String[] choice, String preselected) {
+        return (String) JOptionPane.showInputDialog(null, message, title, JOptionPane.PLAIN_MESSAGE, null, choice, preselected);
+    }
 
     public static String input(String message, String pretext) {
         return (String) JOptionPane.showInputDialog(null, message, pretext);

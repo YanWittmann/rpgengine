@@ -7,19 +7,19 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 
 public class GuiLauncher extends JFrame {
-    private JLabel l_createDesc;
-    private JLabel l_createStart;
-    private JLabel l_createTitle;
-    private JLabel l_manageButtons[];
-    private JLabel l_manageTitle;
-    private JLabel l_playDesc;
-    private JLabel l_playStart;
-    private JLabel l_playTitle;
-    private JLabel l_title;
-    private JLabel l_close;
-    private JComboBox cb_versionsPlay;
-    private JComboBox cb_versionsCreate;
-    private Launcher launcher;
+    private final JLabel l_createDesc;
+    private final JLabel l_createStart;
+    private final JLabel l_createTitle;
+    private final JLabel l_manageButtons[];
+    private final JLabel l_manageTitle;
+    private final JLabel l_playDesc;
+    private final JLabel l_playStart;
+    private final JLabel l_playTitle;
+    private final JLabel l_title;
+    private final JLabel l_close;
+    private final JComboBox cb_versionsPlay;
+    private final JComboBox cb_versionsCreate;
+    private final Launcher launcher;
     private int xSize = 1310, ySize = 753;
     private boolean ready = false, isSelectedPlay = false, isSelectedCreate = false, isSelectedOther[], isVisiblePlay = false, isVisibleCreate = false, isVisibleOther[];
     private static GuiLauncher self;
@@ -54,8 +54,7 @@ public class GuiLauncher extends JFrame {
         l_close.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 new Thread(() -> {
-                    if (buttonsAcitve)
-                        System.exit(0);
+                    System.exit(0);
                 }).start();
             }
         });
@@ -66,11 +65,6 @@ public class GuiLauncher extends JFrame {
         l_title.setForeground(new Color(255, 255, 255));
         l_title.setEnabled(true);
         l_title.setFont(StaticStuff.getPixelatedFont().deriveFont(30f));
-        l_title.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent evt) {
-                new Thread(launcher::toggleFastMode).start();
-            }
-        });
 
         l_createTitle = new JLabel("<html>" + StaticStuff.prepareString("[[gold:Create]]"), SwingConstants.CENTER);
         l_createTitle.setBounds(0, 175, 437, 60);
@@ -118,7 +112,11 @@ public class GuiLauncher extends JFrame {
                 new Thread() {
                     public void run() {
                         if (isVisibleCreate)
-                            launcher.startVersion(cb_versionsCreate.getSelectedItem().toString(), "create");
+                            if (e.isControlDown()) {
+                                launcher.installVersion(cb_versionsCreate.getSelectedItem().toString().replaceAll("(?:Version )?([^ ]+)(?: \\(installed\\))?", "$1"), "create");
+                            } else {
+                                launcher.startVersion(cb_versionsCreate.getSelectedItem().toString(), "create");
+                            }
                     }
                 }.start();
             }
@@ -167,16 +165,16 @@ public class GuiLauncher extends JFrame {
             }
 
             public void mouseClicked(MouseEvent e) {
-                new Thread() {
-                    public void run() {
-                        if (isVisiblePlay)
-                            if (e.isShiftDown()) {
-                                launcher.startVersionWithParameters(cb_versionsPlay.getSelectedItem().toString(), "play");
-                            } else {
-                                launcher.startVersion(cb_versionsPlay.getSelectedItem().toString(), "play");
-                            }
-                    }
-                }.start();
+                new Thread(() -> {
+                    if (isVisiblePlay)
+                        if (e.isShiftDown()) {
+                            launcher.startVersionWithParameters(cb_versionsPlay.getSelectedItem().toString(), "play");
+                        } else if (e.isControlDown()) {
+                            launcher.installVersion(cb_versionsPlay.getSelectedItem().toString().replaceAll("(?:Version )?([^ ]+)(?: \\(installed\\))?", "$1"), "play");
+                        } else {
+                            launcher.startVersion(cb_versionsPlay.getSelectedItem().toString(), "play");
+                        }
+                }).start();
             }
         });
 
@@ -201,12 +199,12 @@ public class GuiLauncher extends JFrame {
         l_manageTitle.setEnabled(true);
         l_manageTitle.setFont(StaticStuff.getPixelatedFont().deriveFont(20f));
 
-        String manageButtonsText[] = new String[]{"Manage adventures", "Open documentation", "Report a bug", "Request a feature", "Contact me!", "Buy me a coffee :)", "Website"};
-        l_manageButtons = new JLabel[manageButtonsText.length];
-        isSelectedOther = new boolean[manageButtonsText.length];
-        isVisibleOther = new boolean[manageButtonsText.length];
+        String[] otherButtonsText = new String[]{"Manage adventures", "Open documentation", "Bug fix/Feature request", "Contact me!", "Buy me a coffee :)", "Website", "Launcher settings"};
+        l_manageButtons = new JLabel[otherButtonsText.length];
+        isSelectedOther = new boolean[otherButtonsText.length];
+        isVisibleOther = new boolean[otherButtonsText.length];
         for (int i = 0; i < l_manageButtons.length; i++) {
-            l_manageButtons[i] = new JLabel("<html>" + StaticStuff.prepareString("[[aqua:" + manageButtonsText[i] + "]]"), SwingConstants.CENTER);
+            l_manageButtons[i] = new JLabel("<html>" + StaticStuff.prepareString("[[aqua:" + otherButtonsText[i] + "]]"), SwingConstants.CENTER);
             l_manageButtons[i].setBounds(874, 244 + (i * 60), 430, 60);
             l_manageButtons[i].setBackground(new Color(214, 217, 223));
             l_manageButtons[i].setForeground(new Color(255, 255, 255));
@@ -224,24 +222,22 @@ public class GuiLauncher extends JFrame {
                     isSelectedOther[ii] = false;
                     setMinusTextComponent(null, null);
                     if (isVisibleOther[ii])
-                        l_manageButtons[ii].setText("<html>" + StaticStuff.prepareString("[[aqua:" + manageButtonsText[ii] + "]]"));
+                        l_manageButtons[ii].setText("<html>" + StaticStuff.prepareString("[[aqua:" + otherButtonsText[ii] + "]]"));
                 }
 
                 public void mouseEntered(MouseEvent e) {
                     isSelectedOther[ii] = true;
                     if (isVisibleOther[ii]) {
-                        l_manageButtons[ii].setText("<html>" + StaticStuff.prepareString("[[gold:" + manageButtonsText[ii].toUpperCase() + "]]"));
-                        setMinusTextComponent(l_manageButtons[ii], "<html>" + StaticStuff.prepareString("[[gold:" + manageButtonsText[ii].toUpperCase() + "]]"));
+                        l_manageButtons[ii].setText("<html>" + StaticStuff.prepareString("[[gold:" + otherButtonsText[ii].toUpperCase() + "]]"));
+                        setMinusTextComponent(l_manageButtons[ii], "<html>" + StaticStuff.prepareString("[[gold:" + otherButtonsText[ii].toUpperCase() + "]]"));
                     }
                 }
 
                 public void mouseClicked(MouseEvent e) {
-                    new Thread() {
-                        public void run() {
-                            if (isVisibleOther[ii])
-                                clickManageButton(ii);
-                        }
-                    }.start();
+                    new Thread(() -> {
+                        if (isVisibleOther[ii])
+                            clickManageButton(ii);
+                    }).start();
                 }
             });
             l_manageButtons[i].setVisible(false);
@@ -495,45 +491,46 @@ public class GuiLauncher extends JFrame {
         return "<html>" + minusText[minusCounter] + minusBaseText.toUpperCase() + minusText[minusCounter + (minusText.length / 2)];
     }
 
-    private void clickManageButton(int id) { // "Manage adventures", "Open documentation", "Report a bug", "Request a feature", "Contact me!", "Buy me a coffee :)"
+    private void clickManageButton(int id) { // "Manage adventures", "Open documentation", "Bug fix/Feature request", "Contact me!", "Buy me a coffee :)", "Website", "Launcher settings"
         switch (id) {
-            case 0: //Manage adventures
-                launcher.manageAdventures();
-                break;
-
-            case 1: //Open documentation
-                StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/documentation/");
-                break;
-
-            case 2: //Report a bug
-                StaticStuff.mailto("mailto:rpg@yanwittmann.de?subject=Bug%20report%20%7C%20RPG%20Engine&body=Type%3A%20%5BEDITOR%5D%2F%5BPLAYER%5D%0D%0APriority%3A%20%5BLOW%5D%2F%5BMEDIUM%5D%2F%5BHIGH%5D%2F%5BCRITICAL%5D%0D%0A%0D%0ADescription%2Fsummary%3A%0D%0A%0D%0AVisual%20proof%3A%0D%0A%0D%0ASteps%20to%20reproduce%3A%0D%0A%0D%0AOther%20notes%3A%0D%0A");
-                break;
-
-            case 3: //Request a feature
-                StaticStuff.mailto("mailto:rpg@yanwittmann.de?subject=Feature%20request%20%7C%20RPG%20Engine&body=Type%3A%20%5BNEW%5D%2F%5BMOD%5D%0D%0APriority%3A%20%5BLOW%5D%2F%5BMEDIUM%5D%2F%5BHIGH%5D%2F%5BCRITICAL%5D%0D%0A%0D%0ADescribe%20your%20request%3A%0D%0A%0D%0AWhy%20it%20should%20be%20implemented%3A%0D%0A%0D%0AOther%20notes%3A%0D%0A");
-                break;
-
-            case 4: //Contact me!
-                StaticStuff.mailto("mailto:rpg@yanwittmann.de?subject=Contact%20%7C%20RPG%20Engine&body=%3A)");
-                break;
-
-            case 5: //Buy me a coffee :)
-                StaticStuff.openURL("https://paypal.me/yanwittmann");
-                break;
-
-            case 6: //Website
-                StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/site/");
-                break;
+//Manage adventures
+            case 0 -> launcher.manageAdventures();
+//Open documentation
+            case 1 -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/documentation/");
+//Bug fix/Feature request
+            case 2 -> StaticStuff.openURL("https://github.com/Skyball2000/rpgengine/issues");
+//Contact me!
+            case 3 -> StaticStuff.mailto("mailto:rpg@yanwittmann.de?subject=Contact%20%7C%20RPG%20Engine&body=%3A)");
+//Buy me a coffee :)
+            case 4 -> StaticStuff.openURL("https://paypal.me/yanwittmann");
+//Website
+            case 5 -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/site/");
+//Launcher settings
+            case 6 -> launcherSettings();
         }
     }
 
-    public void setAvailableVersions(String versions[], String what) {
+    private void launcherSettings() {
+        int operation = StaticStuff.openPopup("What do you want to do?", new String[]{launcher.getFastMode() ? "Start launcher in slow mode" : "Start launcher in fast mode", launcher.getStayMode() ? "Make launcher close after launching version" : "Make launcher stay open after launching version", "Nothing at all"});
+        if (operation == 0) {
+            launcher.toggleFastMode();
+        } else if (operation == 1) {
+            launcher.toggleStayMode();
+        } else if (operation == 2) {
+            StaticStuff.openPopup("<html>" + StaticStuff.prepareString("You can [[orange:hold control]] to install a<br>version without launching it!"));
+        }
+    }
+
+    public void setAvailableVersions(String[] versions, String what) {
         if (what.equals("play"))
-            for (int i = 0; i < versions.length; i++)
-                cb_versionsPlay.addItem(versions[i]);
+            cb_versionsPlay.removeAllItems();
         else
-            for (int i = 0; i < versions.length; i++)
-                cb_versionsCreate.addItem(versions[i]);
+            cb_versionsCreate.removeAllItems();
+
+        if (what.equals("play"))
+            for (String version : versions) cb_versionsPlay.addItem(version);
+        else
+            for (String version : versions) cb_versionsCreate.addItem(version);
     }
 
     private boolean buttonsAcitve = true;

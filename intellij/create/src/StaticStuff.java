@@ -61,7 +61,6 @@ public class StaticStuff {
         try {
             return (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return "Have a nice day! :)";
     }

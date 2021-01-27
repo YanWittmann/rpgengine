@@ -7,9 +7,10 @@ class PopupButtons {
     private JWindow w;
     private int x_size, y_size;
     public int selected = -1;
-    private String text, buttons[];
+    private final String text;
+    private final String[] buttons;
 
-    PopupButtons(String text, String buttons[]) {
+    PopupButtons(String text, String[] buttons) {
         this.text = StaticStuff.prepareString(text);
         this.buttons = buttons;
         //int longestLineLength = StaticStuff.getLongestLineLength(text.replaceAll("\\[\\[[^:]+:([^\\]]+)\\]\\]","$1").split("<br>"));
@@ -35,7 +36,7 @@ class PopupButtons {
         w.setAlwaysOnTop(true);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         //figure out required size
@@ -62,25 +63,21 @@ class PopupButtons {
         w.setLocation(9999, 9999);
 
         int maxSize = 0;
-        w.show();
+        w.setVisible(true);
         maxSize = Math.max(maxSize, l.getWidth());
-        w.hide();
+        w.setVisible(false);
 
         JButton options;
         for (int i = 0; i < buttons.length; i++) {
             options = new JButton("<html>" + StaticStuff.prepareString(buttons[i]));
             options.setFont(StaticStuff.getPixelatedFont());
             final int ii = i;
-            options.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    click(ii);
-                }
-            });
+            options.addActionListener(evt -> click(ii));
             p.add(options, gbc);
 
-            w.show();
+            w.setVisible(true);
             maxSize = Math.max(maxSize, options.getWidth());
-            w.hide();
+            w.setVisible(false);
         }
 
         this.x_size = maxSize + Interpreter.getScaledValue(100);
@@ -137,7 +134,7 @@ class PopupButtons {
         addListener(w);
         addListener(l);
 
-        w.show();
+        w.setVisible(true);
     }
 
     private int pX, pY;
