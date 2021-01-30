@@ -385,7 +385,7 @@ public class FileManager {
             args2[0] = "java";
             args2[1] = "-jar";
             args2[2] = pathToExecutable.getAbsolutePath();
-            System.arraycopy(args, 0, args2, 3, args2.length - 3); //TODO: test this
+            System.arraycopy(args, 0, args2, 3, args2.length - 3);
             /*for (int i = 3; i < args2.length; i++)
                 args2[i] = args[i - 3];*/
             ProcessBuilder builder = new ProcessBuilder(args2);

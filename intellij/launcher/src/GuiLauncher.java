@@ -199,7 +199,7 @@ public class GuiLauncher extends JFrame {
         l_manageTitle.setEnabled(true);
         l_manageTitle.setFont(StaticStuff.getPixelatedFont().deriveFont(20f));
 
-        String[] otherButtonsText = new String[]{"Manage adventures", "Open documentation", "Bug fix/Feature request", "Contact me!", "Buy me a coffee :)", "Website", "Launcher settings"};
+        String[] otherButtonsText = new String[]{"Manage adventures", "Open documentation", "Bug fix/Feature request", "Contact me!", "Buy me a coffee :)", "Website", "Launcher settings", "Community manager"};
         l_manageButtons = new JLabel[otherButtonsText.length];
         isSelectedOther = new boolean[otherButtonsText.length];
         isVisibleOther = new boolean[otherButtonsText.length];
@@ -474,39 +474,39 @@ public class GuiLauncher extends JFrame {
     }
 
     private void initMinusText() {
-        new Thread() {
-            public void run() {
-                while (true) {
-                    Sleep.milliseconds(500);
-                    minusCounter = (minusCounter + 1) % (minusText.length / 2);
-                    if (minusBaseText != null && minusBaseText != null) {
-                        minusLabel.setText(getMinusText());
-                    }
+        new Thread(() -> {
+            while (true) {
+                Sleep.milliseconds(500);
+                minusCounter = (minusCounter + 1) % (minusText.length / 2);
+                if (minusBaseText != null) {
+                    minusLabel.setText(getMinusText());
                 }
             }
-        }.start();
+        }).start();
     }
 
     private String getMinusText() {
         return "<html>" + minusText[minusCounter] + minusBaseText.toUpperCase() + minusText[minusCounter + (minusText.length / 2)];
     }
 
-    private void clickManageButton(int id) { // "Manage adventures", "Open documentation", "Bug fix/Feature request", "Contact me!", "Buy me a coffee :)", "Website", "Launcher settings"
+    private void clickManageButton(int id) { // "Manage adventures", "Open documentation", "Bug fix/Feature request", "Contact me!", "Buy me a coffee :)", "Website", "Launcher settings", "Community manager"
         switch (id) {
-//Manage adventures
+            //Manage adventures
             case 0 -> launcher.manageAdventures();
-//Open documentation
+            //Open documentation
             case 1 -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/documentation/");
-//Bug fix/Feature request
+            //Bug fix/Feature request
             case 2 -> StaticStuff.openURL("https://github.com/Skyball2000/rpgengine/issues");
-//Contact me!
+            //Contact me!
             case 3 -> StaticStuff.mailto("mailto:rpg@yanwittmann.de?subject=Contact%20%7C%20RPG%20Engine&body=%3A)");
-//Buy me a coffee :)
+            //Buy me a coffee :)
             case 4 -> StaticStuff.openURL("https://paypal.me/yanwittmann");
-//Website
+            //Website
             case 5 -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/site/");
-//Launcher settings
+            //Launcher settings
             case 6 -> launcherSettings();
+            //Community manager
+            case 7 -> launcher.openCommunityManager();
         }
     }
 

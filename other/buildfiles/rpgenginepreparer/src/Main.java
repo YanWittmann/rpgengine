@@ -17,9 +17,9 @@ public class Main {
 
         connectToFTP();
 
-        //createAndUploadDocumentation();
-        createAndUploadLauncher();
-        createAndUploadCreateOrPlay("create", createVersion);
+        createAndUploadDocumentation();
+        //createAndUploadLauncher();
+        //createAndUploadCreateOrPlay("create", createVersion);
         //createAndUploadCreateOrPlay("play", playVersion);
 
         cleanUp();

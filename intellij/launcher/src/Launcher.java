@@ -1,4 +1,7 @@
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Launcher {
     private final String version = "7";
@@ -247,6 +250,30 @@ public class Launcher {
     public void closeAfterLaunching() {
         if (!getStayMode()) System.exit(0);
         else launcher.setState(Frame.ICONIFIED);
+    }
+
+    private GuiCommunity community;
+    private boolean communityIsOpen = false;
+
+    public void openCommunityManager() {
+        if(communityIsOpen) return;
+        if(community == null) community = new GuiCommunity(this);
+        JFrame communityManager = new JFrame("Community Manager");
+        community = new GuiCommunity(this);
+        communityManager.setContentPane(community.getMainPanel());
+        communityManager.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        communityManager.setLocationRelativeTo(null);
+        communityManager.setIconImage(new ImageIcon("files/res/img/iconyellow.png").getImage());
+        communityManager.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                communityIsOpen = false;
+                e.getWindow().dispose();
+            }
+        });
+        communityManager.pack();
+        communityManager.setVisible(true);
+        communityIsOpen = true;
     }
 
     public static void main(String[] args) {

@@ -1,7 +1,13 @@
 # Changelog
 ___
 
-## 20.01.2020 - RELEASE `1.11.1`
+## 30.01.2020
+#### New / Modification:
+
+ * started working on a new profile system that will allow you to upload adventures
+
+
+## 27.01.2020 - RELEASE `1.11.1`
 #### Bugfixes:
 
  * when opening more than one popup of the same type at the same time, the result clicked on one of them was also set to be the one on the other
