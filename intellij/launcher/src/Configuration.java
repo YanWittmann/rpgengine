@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Arrays;
 
 public class Configuration {
     String[][] config;
@@ -13,19 +14,13 @@ public class Configuration {
     public String get(String option) {
         if (ready) {
             for (String[] strings : config) {
-                if (strings[0].equals(option)) return strings[1];
+                if (strings[0].equals(option))
+                    if (strings.length >= 2)
+                        return strings[1];
+                    else return "";
             }
         }
         return "";
-    }
-
-    public int getInt(String option) {
-        if (ready) {
-            for (String[] strings : config) {
-                if (strings[0].equals(option)) return Integer.parseInt(strings[1]);
-            }
-        }
-        return -1;
     }
 
     public void addIfNotExist(String option, String value) {
@@ -40,7 +35,10 @@ public class Configuration {
             addIfNotExist(option, value);
             StringBuilder output = new StringBuilder();
             for (String[] strings : config) {
-                output.append(strings[0]).append(":").append(strings[1]).append("\n");
+                if (strings.length >= 2)
+                    output.append(strings[0]).append(":").append(strings[1]).append("\n");
+                else
+                    output.append(strings[0]).append(":").append("\n");
             }
             output = new StringBuilder(output.substring(0, output.length() - 1).replace(option + ":" + get(option), option + ":" + value));
             try {

@@ -1,6 +1,10 @@
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class StaticStuff {
     public static Font pixelFont = null;
@@ -53,11 +57,7 @@ public class StaticStuff {
 
     public static int openPopup(String text, String[] options) {
         popButtons = new PopupButtons(text, options);
-        new Thread() {
-            public void run() {
-                popButtons.createComponents();
-            }
-        }.start();
+        new Thread(() -> popButtons.createComponents()).start();
         while (popButtons.selected == -1) Sleep.milliseconds(100);
         return popButtons.selected;
     }
@@ -66,11 +66,7 @@ public class StaticStuff {
 
     public static void openPopup(String text) {
         popText = new PopupText(text);
-        new Thread() {
-            public void run() {
-                popText.createComponents();
-            }
-        }.start();
+        new Thread(() -> popText.createComponents()).start();
         while (popText.selected == -1) Sleep.milliseconds(100);
     }
 
@@ -78,11 +74,7 @@ public class StaticStuff {
 
     public static String openPopup(String text, String pretext) {
         popTextInput = new PopupTextInput(text, pretext);
-        new Thread() {
-            public void run() {
-                popTextInput.createComponents();
-            }
-        }.start();
+        new Thread(() -> popTextInput.createComponents()).start();
         while (popTextInput.selected == -1) Sleep.milliseconds(100);
         return popTextInput.result;
     }
@@ -108,13 +100,11 @@ public class StaticStuff {
         return min + (int) (Math.random() * ((max - min) + 1));
     }
 
-    public static String[] append(String base[], String append) {
+    public static String[] append(String[] base, String append) {
         if (base == null) base = new String[]{};
-        String ret[] = new String[base.length + 1];
+        String[] ret = new String[base.length + 1];
         ret[0] = append;
-        for (int i = 0; i < base.length; i++) {
-            ret[i + 1] = base[i];
-        }
+        System.arraycopy(base, 0, ret, 1, base.length);
         return ret;
     }
 
@@ -139,5 +129,18 @@ public class StaticStuff {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String[] filterEmptyLines(String[] arr) {
+        ArrayList<String> list = new ArrayList<>(Arrays.asList(arr));
+        list.removeAll(Arrays.asList("", null));
+        return list.toArray(new String[0]);
+    }
+
+    //https://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon; Thanks to trolologuy!
+    public static ImageIcon getScaledImage(ImageIcon srcImg, int w, int h) {
+        Image image = srcImg.getImage();
+        Image newimg = image.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(newimg);
     }
 }

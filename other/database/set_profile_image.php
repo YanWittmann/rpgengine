@@ -5,6 +5,8 @@
 //parameters: user_name, password, image
 //for example: set_profile_image.php?user_name=test&password=12345678&image=http://yanwittmann.de/images/missing_profile_picture.png
 
+include('includefunctions.php');
+
 if(isset($_GET['user_name']) && isset($_GET['image']) && isset($_GET['password'])) { //check if everything is filled out
 
 	//get data from html
@@ -34,30 +36,6 @@ if(isset($_GET['user_name']) && isset($_GET['image']) && isset($_GET['password']
 	
 } else {
 	echo "ERROR: You need to fill out all of the details first";
-}
-
-
-
-function execute_SQL($db, $sql) {
-	if(!$db) {
-		die("ERROR: Connection failed: " . mysqli_connect_error());
-	}
-	if ($db->query($sql) === TRUE) {
-		return true;
-	} else {
-		echo "ERROR: " . $sql . "<br>" . $db->error;
-		return false;
-	}
-}
-
-function remote_file_exists($url)
-{
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_NOBODY, true);
-    curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    if( $httpCode == 200 ){return true;}
 }
 
 ?>

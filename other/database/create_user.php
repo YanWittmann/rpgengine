@@ -5,6 +5,8 @@
 //parameters: user_name, e_mail, password
 //for example: create_user.php?user_name=test&e_mail=test@hmm.de&password=12345678
 
+include('includefunctions.php');
+
 if(isset($_GET['user_name']) && isset($_GET['e_mail']) && isset($_GET['password'])) { //check if everything is filled out
 
 	//get data from html
@@ -47,29 +49,11 @@ if(isset($_GET['user_name']) && isset($_GET['e_mail']) && isset($_GET['password'
 			echo "ERROR: E-Mail is invalid";
 		}
 	} else {
-		echo "ERROR: Username may only contain the following characters: A-Z a-z 0-9 _ + and length must be between 2 and 30: [0-9a-zA-Z_+]{2,30}";
+		echo "ERROR: Username may only contain the following characters:<br>A-Z a-z 0-9 _ + and length must be between 2 and 30";
 	}
 	
 } else {
 	echo "ERROR: You need to fill out all of the details first";
-}
-
-
-
-function execute_SQL($db, $sql) {
-	if(!$db) {
-		die("ERROR: Connection failed: " . mysqli_connect_error());
-	}
-	if ($db->query($sql) === TRUE) {
-		return true;
-	} else {
-		echo "ERROR: " . $sql . "<br>" . $db->error;
-		return false;
-	}
-}
-
-function isRegularExpression($string) {
-    return @preg_match($string, '') !== FALSE;
 }
 
 ?>

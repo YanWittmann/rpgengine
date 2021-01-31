@@ -1,6 +1,16 @@
 # Changelog
 ___
 
+## 31.01.2020
+#### Bugfixes:
+
+ * thread would crash if configuration value was empty
+ 
+#### New / Modification:
+
+ * created a profile system that allows you to create a profile and upload and search adventures! (via the launcher)
+
+
 ## 30.01.2020
 #### New / Modification:
 

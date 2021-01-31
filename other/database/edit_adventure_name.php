@@ -1,18 +1,19 @@
 
 <?php
 
-//delete an adventure
-//parameters: user_name, password, adventure_id
-//for example: remove_adventure.php?user_name=test&password=12345678&adventure_id=0
+//edit an adventure
+//parameters: user_name, password, adventure_id, new_attribute
+//for example: edit_adventure_name.php?user_name=test&password=12345678&adventure_id=0&new_attribute=newattr
 
 include('includefunctions.php');
 
-if(isset($_GET['user_name']) && isset($_GET['password']) && isset($_GET['adventure_id'])) { //check if everything is filled out
+if(isset($_GET['user_name']) && isset($_GET['password']) && isset($_GET['adventure_id']) && isset($_GET['new_attribute'])) { //check if everything is filled out
 
 	//get data from html
 	$user_name = htmlspecialchars($_GET['user_name']);
 	$password = htmlspecialchars($_GET['password']);
 	$adventure_id = htmlspecialchars($_GET['adventure_id']);
+	$new_attribute = htmlspecialchars($_GET['new_attribute']);
 	
 	//check if user exists
 	include('is_valid_user.php');
@@ -29,9 +30,9 @@ if(isset($_GET['user_name']) && isset($_GET['password']) && isset($_GET['adventu
 			$query = mysqli_query($db, "SELECT * FROM rpg_adventure WHERE user_id = '" . $user_id_from_name . "' AND adventure_id = " . $adventure_id);
 			if($query->num_rows > 0) {
 				
-				//remove adventure
-				execute_SQL($db, "DELETE FROM `rpg_adventure` WHERE `rpg_adventure`.`adventure_id` = " . $adventure_id);
-				echo "Removed adventure with id " . $adventure_id;
+				//edit adventure
+				execute_SQL($db, "UPDATE `rpg_adventure` SET `adv_name` = '" . $new_attribute . "' WHERE `rpg_adventure`.`adventure_id` = " . $adventure_id);
+				echo "Edited adventure with id " . $adventure_id;
 				
 			} else {
 				echo "ERROR: You are either not the owner of the adventure or the adventure doesn't exist";

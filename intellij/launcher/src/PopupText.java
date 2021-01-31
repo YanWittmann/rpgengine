@@ -25,7 +25,7 @@ class PopupText{
         w = new JWindow();
         w.setBackground(new Color(0, 0, 0, 0));
         w.setAlwaysOnTop(true);
-        try{ UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());}catch(Exception e){}
+        try{ UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());}catch(Exception ignored){}
 
         JPanel p = new JPanel(new BorderLayout()){
                 public void paintComponent(Graphics g){
@@ -56,11 +56,7 @@ class PopupText{
             options = new JButton("<html>"+StaticStuff.prepareString(buttons[i]));
             options.setFont(StaticStuff.getPixelatedFont());
             final int ii = i;
-            options.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        click(ii);
-                    }
-                });
+            options.addActionListener(evt -> click(ii));
             p.add(options, gbc);
         }
 

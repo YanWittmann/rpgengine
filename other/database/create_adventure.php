@@ -5,6 +5,8 @@
 //parameters: user_name, password, adventure_name, adventure_description, adventure_link
 //for example: create_adventure.php?user_name=test&password=12345678&adventure_name=new adventure&adventure_description=An adventure&adventure_link=http://string-functions.com/string-functions.gif
 
+include('includefunctions.php');
+
 if(isset($_GET['user_name']) && isset($_GET['password']) && isset($_GET['adventure_name']) && isset($_GET['adventure_description']) && isset($_GET['adventure_link'])) { //check if everything is filled out
 
 	//get data from html
@@ -47,30 +49,6 @@ if(isset($_GET['user_name']) && isset($_GET['password']) && isset($_GET['adventu
 	
 } else {
 	echo "ERROR: You need to fill out all of the details first";
-}
-
-
-
-function execute_SQL($db, $sql) {
-	if(!$db) {
-		die("ERROR: Connection failed: " . mysqli_connect_error());
-	}
-	if ($db->query($sql) === TRUE) {
-		return true;
-	} else {
-		echo "ERROR: " . $sql . "<br>" . $db->error;
-		return false;
-	}
-}
-
-function remote_file_exists($url)
-{
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_NOBODY, true);
-    curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    if( $httpCode == 200 ){return true;}
 }
 
 ?>

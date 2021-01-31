@@ -2,19 +2,21 @@
 <?php
 
 //prints all adventures with their name, description, author and download link
-//parameters: none
+//parameters: 
 //for example: get_all_adventures.php
 
 //get $db variable
 include('login.php');
 
-//get adventure entries
-$query = mysqli_query($db, "SELECT * FROM rpg_adventure");
-
-while($adventure = mysqli_fetch_array($query)) {
-	$user_id = $adventure['user_id'];
+$result = mysqli_query($db,"SELECT * FROM rpg_adventure");
+	 
+while($adv = mysqli_fetch_array($result)){	
+	$user_id = $adv['user_id'];
 	include("user_id_to_name.php");
-	echo $adventure['adventure_id'] . ";;" . $adventure['user_id'] . ";;" . $user_name_from_id . ";;" . $adventure['adv_name'] . ";;" . $adventure['adv_desc'] . ";;" . $adventure['download_link'];
+	
+	include("get_profile_image.php");
+	
+	echo $adv['adventure_id'] . ";;" . $adv['user_id'] . ";;" . $profile_image . ";;" . $user_name_from_id . ";;" . $adv['adv_name'] . ";;" . $adv['adv_desc'] . ";;" . $adv['download_link'] . "<br>";
 }
 
 ?>

@@ -4,7 +4,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class Launcher {
-    private final String version = "7";
+    private final String version = "8";
     private final Configuration mainCFG;
     private final GuiLauncher launcher;
     private boolean loadingScreenDone = false, isDownloadingNewVersion = false;
@@ -182,7 +182,7 @@ public class Launcher {
     public void manageAdventures() {
         int operation = StaticStuff.openPopup("What do you want to do?", new String[]{"Install adventure from file", "Install adventure from URL", "Uninstall adventure", "Open adventure list", "Nothing"});
         switch (operation) {
-//Install adventure from file
+            //Install adventure from file
             case 0 -> {
                 String[] files = FileManager.windowsFilePicker();
                 for (String file : files) {
@@ -192,21 +192,9 @@ public class Launcher {
                         notifyUser("Could not install " + FileManager.getFilename(file));
                 }
             }
-//Install adventure from URL
-            case 1 -> {
-                String url = StaticStuff.openPopup("<html>" + StaticStuff.prepareString("Enter a valid URL (with [[green:http://]] or [[green:https://]]):"), "");
-                if (url.contains("http://") || url.contains("https://")) ;
-                else if (url.equals("")) return;
-                else {
-                    notifyUser("Could not install adventure (malformed URL)");
-                    return;
-                }
-                if (FileManager.saveUrl("files/adventures/" + FileManager.getFilename(url).replace("%20", " "), url))
-                    notifyUser("Installed " + FileManager.getFilename(url).replace("%20", " "));
-                else
-                    notifyUser("Could not install " + FileManager.getFilename(url).replace("%20", " "));
-            }
-//Uninstall adventure
+            //Install adventure from URL
+            case 1 -> installAdventure(StaticStuff.openPopup("<html>" + StaticStuff.prepareString("Enter a valid URL (with [[green:http://]] or [[green:https://]]):"), ""));
+            //Uninstall adventure
             case 2 -> {
                 String[] adventures = StaticStuff.append(FileManager.getFilesWithEnding("files/adventures/", "adv"), "Cancel");
                 int index = StaticStuff.openPopup("Which adventure do you want to uninstall?", adventures);
@@ -216,7 +204,7 @@ public class Launcher {
                 else
                     notifyUser("Could not uninstall " + adventures[index]);
             }
-//Open adventure list
+            //Open adventure list
             case 3 -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/site/Adventures.html");
         }
     }
@@ -253,27 +241,98 @@ public class Launcher {
     }
 
     private GuiCommunity community;
+    private JFrame communityManager;
     private boolean communityIsOpen = false;
 
     public void openCommunityManager() {
+        if(!FileManager.connectedToInternet()) {
+            StaticStuff.openPopup("You need to be connected to the internet to do this!");
+            return;
+        }
         if(communityIsOpen) return;
-        if(community == null) community = new GuiCommunity(this);
-        JFrame communityManager = new JFrame("Community Manager");
-        community = new GuiCommunity(this);
-        communityManager.setContentPane(community.getMainPanel());
-        communityManager.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        communityManager.setLocationRelativeTo(null);
-        communityManager.setIconImage(new ImageIcon("files/res/img/iconyellow.png").getImage());
-        communityManager.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                communityIsOpen = false;
-                e.getWindow().dispose();
-            }
-        });
-        communityManager.pack();
-        communityManager.setVisible(true);
-        communityIsOpen = true;
+        if(community == null) {
+            community = new GuiCommunity(this);
+            communityManager = new JFrame("Community Manager");
+            communityManager.setContentPane(community.getMainPanel());
+            communityManager.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            communityManager.setLocationRelativeTo(null);
+            communityManager.setIconImage(new ImageIcon("files/res/img/iconyellow.png").getImage());
+            communityManager.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    communityIsOpen = false;
+                    e.getWindow().setVisible(communityIsOpen);
+                }
+            });
+            communityManager.pack();
+            communityManager.setVisible(true);
+            communityIsOpen = true;
+        } else {
+            communityIsOpen = true;
+            communityManager.setVisible(communityIsOpen);
+        }
+    }
+
+    private GuiBrowseAdventures borwseAdventures;
+    private JFrame borwseAdventuresFrame;
+    private boolean borwseAdventuresIsOpen = false;
+
+    public void openBorwseAdventures() {
+        if(!FileManager.connectedToInternet()) {
+            StaticStuff.openPopup("You need to be connected to the internet to do this!");
+            return;
+        }
+        if(borwseAdventuresIsOpen) return;
+        if(borwseAdventures == null) {
+            borwseAdventures = new GuiBrowseAdventures(this);
+            borwseAdventuresFrame = new JFrame("Browse Adventures");
+            borwseAdventuresFrame.setContentPane(borwseAdventures.getMainPanel());
+            borwseAdventuresFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            borwseAdventuresFrame.setLocationRelativeTo(null);
+            borwseAdventuresFrame.setIconImage(new ImageIcon("files/res/img/iconyellow.png").getImage());
+            borwseAdventuresFrame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    borwseAdventuresIsOpen = false;
+                    e.getWindow().setVisible(borwseAdventuresIsOpen);
+                }
+            });
+            borwseAdventuresFrame.pack();
+            borwseAdventuresFrame.setVisible(true);
+            borwseAdventuresIsOpen = true;
+        } else {
+            borwseAdventuresIsOpen = true;
+            borwseAdventuresFrame.setVisible(borwseAdventuresIsOpen);
+        }
+    }
+
+    public void searchAdventureTerms(String terms) {
+        borwseAdventures.searchForAdventures(terms);
+    }
+
+    public void setMainCFGentry(String key, String value) {
+        mainCFG.set(key, value);
+    }
+
+    public String getMainCFGentry(String key) {
+        try {
+            return mainCFG.get(key);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public void installAdventure(String url) {
+        if (url.contains("http://") || url.contains("https://")) ;
+        else if (url.equals("")) return;
+        else {
+            notifyUser("Could not install adventure (malformed URL)");
+            return;
+        }
+        if (FileManager.saveUrl("files/adventures/" + FileManager.getFilename(url).replace("%20", " "), url))
+            notifyUser("Installed " + FileManager.getFilename(url).replace("%20", " "));
+        else
+            notifyUser("Could not install " + FileManager.getFilename(url).replace("%20", " "));
     }
 
     public static void main(String[] args) {

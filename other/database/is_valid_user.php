@@ -2,7 +2,7 @@
 <?php
 
 //checks if a user with the password exists
-//parameters: user_name, password
+//parameters: user_name, password, <response>
 //for example: is_valid_user.php?user_name=test&password=12345678
 
 $is_valid_user = false;
@@ -27,6 +27,11 @@ if(isset($_GET['user_name']) && isset($_GET['password'])) { //check if everythin
 				$row = mysqli_fetch_array($query);
 				if(password_verify($password, $row['password'])) {
 					$is_valid_user = true;
+					if(isset($_GET['response'])) {
+						if($_GET['response'] == "true") {
+							echo "Valid user";
+						}
+					}
 				} else {
 					echo "ERROR: Invalid password!";
 				}
@@ -36,10 +41,10 @@ if(isset($_GET['user_name']) && isset($_GET['password'])) { //check if everythin
 			}
 			
 		} else {
-			echo "ERROR: Password can only contain digits and lower/uppercase characters. Length must be between 8 and 32";
+			echo "ERROR: Password can only contain digits and lower/uppercase characters.<br>Length must be between 8 and 32";
 		}
 	} else {
-		echo "ERROR: Username may only contain the following characters: A-Z a-z 0-9 _ + and length must be between 2 and 30: [0-9a-zA-Z_+]{2,30}";
+		echo "ERROR: Username may only contain the following characters:<br>A-Z a-z 0-9 _ + and length must be between 2 and 30";
 	}
 	
 } else {

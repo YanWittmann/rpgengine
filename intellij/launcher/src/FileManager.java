@@ -2,6 +2,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -248,7 +250,7 @@ public class FileManager {
     private static final int BUFFER_SIZE = 4096;
 
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-        makeDirectory(filePath.replace(new File(filePath).getName(),""));
+        makeDirectory(filePath.replace(new File(filePath).getName(), ""));
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;
@@ -303,7 +305,9 @@ public class FileManager {
         }
     }
 
-    public static String[] getStringArrayFromURL(String pUrl) {
+    public static String[] getResponseFromURL(String pUrl) {
+        pUrl = pUrl.replace(" ", "%20");
+        //System.out.println(pUrl);
         ArrayList<String> lines = new ArrayList<>();
         try {
             URL url = new URL(pUrl);
@@ -395,5 +399,30 @@ public class FileManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static int getFileSize(String url) {
+        try {
+            URL url1 = new URL(url);
+            URLConnection conn = null;
+            try {
+                conn = url1.openConnection();
+                if (conn != null) {
+                    ((HttpURLConnection) conn).setRequestMethod("HEAD");
+                }
+                assert conn != null;
+                conn.getInputStream();
+                return conn.getContentLength();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (conn instanceof HttpURLConnection) {
+                    ((HttpURLConnection) conn).disconnect();
+                }
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }
