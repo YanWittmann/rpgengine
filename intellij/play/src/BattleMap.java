@@ -3,11 +3,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BattleMap extends Entity {
-    ArrayList<String> npcs = new ArrayList<String>();
-    ArrayList<NPC> npcObjects = new ArrayList<NPC>();
-    ArrayList<String> items = new ArrayList<String>();
-    ArrayList<String> extraGroundTiles = new ArrayList<String>();
-    ArrayList<String> obstacles = new ArrayList<String>();
+    ArrayList<String> npcs = new ArrayList<>();
+    ArrayList<NPC> npcObjects = new ArrayList<>();
+    ArrayList<String> items = new ArrayList<>();
+    ArrayList<String> extraGroundTiles = new ArrayList<>();
+    ArrayList<String> obstacles = new ArrayList<>();
     int size;
     String groundTileUID, playerPos;
     public Manager manager;
@@ -66,8 +66,7 @@ public class BattleMap extends Entity {
     }
 
     private GuiBattleMap gui;
-    private ArrayList<NPC> turnOrder = new ArrayList<>();
-    private Coordinates currentObjectLocation;
+    private final ArrayList<NPC> turnOrder = new ArrayList<>();
     private int currentObjectTurn = 0;
     public static boolean isPlayerTurn = false, playerCanWalk = false, playerCanAttack = false, battleIsActive = false, battleCanEnd = true, freewalk = false;
 
@@ -80,14 +79,14 @@ public class BattleMap extends Entity {
         turnOrder.add(null); //player = null
         ArrayList<Integer> courage = new ArrayList<Integer>();
         for (int i = 0; i < turnOrder.size(); i++)
-            if (turnOrder.get(i) == null) courage.add(Integer.parseInt(manager.player.getValue("courage")));
+            if (turnOrder.get(i) == null) courage.add(Integer.parseInt(Manager.player.getValue("courage")));
             else courage.add(Integer.parseInt(npcObjects.get(i).getVariableValue("courage")));
         bubbleSort(courage, turnOrder);
         Log.addIndent();
         Log.add("Turn order:");
         for (int i = 0; i < turnOrder.size(); i++)
             if (turnOrder.get(i) == null)
-                Log.add(manager.player.getValue("name") + " (player) (courage: " + courage.get(i) + ")");
+                Log.add(Manager.player.getValue("name") + " (player) (courage: " + courage.get(i) + ")");
             else Log.add(turnOrder.get(i).name + " (courage: " + courage.get(i) + ")");
         Log.removeIndent();
     }
@@ -116,17 +115,17 @@ public class BattleMap extends Entity {
         checkIfStillActive();
         if (battleOver(checkBattleOver())) return;
         currentObjectTurn = (currentObjectTurn + 1) % turnOrder.size();
-        currentObjectLocation = getLocationByTurnOrderIndex(currentObjectTurn);
+        Coordinates currentObjectLocation = getLocationByTurnOrderIndex(currentObjectTurn);
         if (turnOrder.get(currentObjectTurn) == null) { //player turn
             isPlayerTurn = true;
             playerCanAttack = true;
             Log.add("Player turn!");
-            playerWalkDistance = Math.max(2, (int) (Integer.parseInt(manager.player.getValue("speed")) + Math.ceil(0.2f * Integer.parseInt(manager.player.getValue("dexterity")))));
+            playerWalkDistance = Math.max(2, (int) (Integer.parseInt(Manager.player.getValue("speed")) + Math.ceil(0.2f * Integer.parseInt(Manager.player.getValue("dexterity")))));
             if (manager.isPlayerInventoryOverloaded())
                 playerWalkDistance = Math.max(2, (int) Math.ceil(((double) playerWalkDistance) / 2));
-            if (manager.player.getValue("battleMapImage") != null)
-                if (manager.player.getValue("battleMapImage").length() > 0)
-                    manager.openImage(manager.player.getValue("battleMapImage"), Interpreter.lang("battleMapShowTurnYou", manager.player.getValue("name")), 200, true);
+            if (Manager.player.getValue("battleMapImage") != null)
+                if (Manager.player.getValue("battleMapImage").length() > 0)
+                    Manager.openImage(Manager.player.getValue("battleMapImage"), Interpreter.lang("battleMapShowTurnYou", Manager.player.getValue("name")), 200, true);
 
             if (generateWalkableTiles(getLocationByUID(""), playerWalkDistance, true, false)) {
                 playerCanWalk = true;
@@ -141,7 +140,7 @@ public class BattleMap extends Entity {
 
             String npcImage = getNPCImageViaUID(turnOrder.get(currentObjectTurn).uid);
             if (npcImage != null) if (npcImage.length() > 0)
-                manager.openImage(npcImage, Interpreter.lang("battleMapShowTurn", turnOrder.get(currentObjectTurn).name), 200, true);
+                Manager.openImage(npcImage, Interpreter.lang("battleMapShowTurn", turnOrder.get(currentObjectTurn).name), 200, true);
             Sleep.milliseconds(1000);
             gui.setOverlay(currentObjectLocation.x, currentObjectLocation.y, 0);
 
@@ -152,12 +151,14 @@ public class BattleMap extends Entity {
             playerWalkDistance = Integer.parseInt(turnOrder.get(currentObjectTurn).getVariableValue("speed"));
             float desiredDistance = getDesiredDistance(currentObjectTurn, true, !turnOrder.get(currentObjectTurn).tags.contains("canNotChangeWeapon"));
             String equipped = turnOrder.get(currentObjectTurn).getVariableValue("equippedWeapon");
-            Item equippedItem = null;
+            Item equippedItem;
             boolean viewCanBeObstructed = false, obstacles[][] = generateObstacleMap();
             if (equipped.length() > 0) {
-                equippedItem = (Item) manager.getEntity(equipped);
-                viewCanBeObstructed = equippedItem.tags.contains("viewCanBeObstructed");
-                Log.add("NPC's (" + turnOrder.get(currentObjectTurn).name + ") desired distance to player: " + desiredDistance + " using weapon: " + equippedItem.name);
+                equippedItem = (Item) Manager.getEntity(equipped);
+                if(equippedItem != null) {
+                    viewCanBeObstructed = equippedItem.tags.contains("viewCanBeObstructed");
+                    Log.add("NPC's (" + turnOrder.get(currentObjectTurn).name + ") desired distance to player: " + desiredDistance + " using weapon: " + equippedItem.name);
+                } else Log.add("NPC cannot find itemType using uid " + equipped + ". This should not be the case.");
             } else
                 Log.add("NPC's (" + turnOrder.get(currentObjectTurn).name + ") desired distance to player: " + desiredDistance + " using its hand to attack");
 
@@ -302,26 +303,29 @@ public class BattleMap extends Entity {
     }
 
     private boolean arrayListContains(ArrayList<Coordinates> list, Coordinates find) {
-        for (int i = 0; i < list.size(); i++)
-            if (list.get(i).isCoordinates(find)) return true;
+        for (Coordinates coordinates : list) if (coordinates.isCoordinates(find)) return true;
         return false;
     }
 
     private float getDesiredDistance(int objectTurn, boolean viewCanBeObstructed, boolean tryForceNewEquip) {
         NPC npc = turnOrder.get(objectTurn);
-        Inventory inv = (Inventory) manager.getEntity(npc.inventory);
+        Inventory inv = (Inventory) Manager.getEntity(npc.inventory);
+        if(inv == null) {
+            Log.add("NPC cannot equip item because it doesn't have an inventory");
+            return 5;
+        }
         int speed = Integer.parseInt(npc.getVariableValue("speed"));
         String equipped = npc.getVariableValue("equippedWeapon");
         if (equipped.equals("") || tryForceNewEquip) { //has nothing equipped, equip something if has items
             if (inv.items.size() > 0) {
                 Coordinates npcLoc = getLocationByTurnOrderIndex(objectTurn), playerLoc = getLocationByUID(""); //getFloatDistance(npcLoc.x, npcLoc.y, playerLoc.x, playerLoc.y)
-                Entity item = manager.getEntity(inv.getMaxDamageWithMinRangeAndLOS(getDistanceFromTo(npcLoc, playerLoc) - speed + 1, getFloatDistance(npcLoc.x, npcLoc.y, playerLoc.x, playerLoc.y) - speed + 1, viewCanBeObstructed));
+                Entity item = Manager.getEntity(inv.getMaxDamageWithMinRangeAndLOS(getDistanceFromTo(npcLoc, playerLoc) - speed + 1, getFloatDistance(npcLoc.x, npcLoc.y, playerLoc.x, playerLoc.y) - speed + 1, viewCanBeObstructed));
                 npc.setVariableByName("equippedWeapon", item.uid); //getDistanceFromTo(npcLoc, playerLoc) - getFloatDistance(npcLoc.x, npcLoc.y, playerLoc.x, playerLoc.y))
                 Log.add("NPC equipped item: " + npc.getVariableValue("equippedWeapon"));
                 return Float.parseFloat(item.getVariableValue("range"));
             } else return 1.0f;
         } else
-            return Float.parseFloat(manager.getEntity(equipped).getVariableValue("range"));
+            return Float.parseFloat(Manager.getEntity(equipped).getVariableValue("range"));
     }
 
     ArrayList<Coordinates> walkableTiles = new ArrayList<Coordinates>();

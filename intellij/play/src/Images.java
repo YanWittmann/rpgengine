@@ -3,6 +3,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Images extends JFrame {
@@ -104,6 +105,14 @@ public class Images extends JFrame {
     }
 
     public static BufferedImage getBufferedImage(String uid) {
+        int index = uids.indexOf(uid);
+        if(index == -1) {
+            try {
+                return ImageIO.read(new File("res/img/null.png"));
+            } catch (IOException e) {
+                return null;
+            }
+        }
         return images.get(uids.indexOf(uid));
     }
 

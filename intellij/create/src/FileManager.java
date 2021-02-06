@@ -38,6 +38,7 @@ public class FileManager {
     public static void writeToFile(String filename, String[] text) {
         try {
             File file = new File(filename);
+            makeDirectory(file.getAbsolutePath().replace(file.getName(), ""));
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
             for (int i = 0; i < text.length - 1; i++) {
                 bw.write(text[i]);
@@ -52,6 +53,7 @@ public class FileManager {
     public static void writeToFile(String filename, String text) {
         try {
             File file = new File(filename);
+            makeDirectory(file.getAbsolutePath().replace(file.getName(), ""));
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
             bw.write(text);
             bw.close();
@@ -238,7 +240,7 @@ public class FileManager {
                 entry = zipIn.getNextEntry();
             }
             zipIn.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -263,7 +265,7 @@ public class FileManager {
             zipFile(fileToZip, fileToZip.getName(), zipOut);
             zipOut.close();
             fos.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -295,7 +297,7 @@ public class FileManager {
                 zipOut.write(bytes, 0, length);
             }
             fis.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -318,9 +320,9 @@ public class FileManager {
             while ((i = read.readLine()) != null)
                 lines.add(i);
             read.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
-        String result[] = new String[lines.size()];
+        String[] result = new String[lines.size()];
         for (int i = 0; i < lines.size(); i++)
             result[i] = lines.get(i);
         return result;
@@ -338,14 +340,10 @@ public class FileManager {
             while ((count = in.read(data, 0, 1024)) != -1) {
                 fout.write(data, 0, count);
             }
-            if (in != null) {
-                in.close();
-            }
-            if (fout != null) {
-                fout.close();
-            }
+            in.close();
+            fout.close();
             return true;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return false;
     }
@@ -363,7 +361,7 @@ public class FileManager {
 
     public static String[] getTextFromURL(String url) {
         saveUrl("downloaded.fm", url);
-        String ret[] = readFile("downloaded.fm");
+        String[] ret = readFile("downloaded.fm");
         delete("downloaded.fm");
         return ret;
     }
@@ -371,7 +369,7 @@ public class FileManager {
     public static void openFile(String filename) {
         try {
             Desktop.getDesktop().open(new File(filename));
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 

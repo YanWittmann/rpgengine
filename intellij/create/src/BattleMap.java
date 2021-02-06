@@ -2,10 +2,10 @@
 import java.util.ArrayList;
 
 public class BattleMap extends Entity {
-    ArrayList<String> npcs = new ArrayList<String>();
-    ArrayList<String> items = new ArrayList<String>();
-    ArrayList<String> extraGroundTiles = new ArrayList<String>();
-    ArrayList<String> obstacles = new ArrayList<String>();
+    ArrayList<String> npcs = new ArrayList<>();
+    ArrayList<String> items = new ArrayList<>();
+    ArrayList<String> extraGroundTiles = new ArrayList<>();
+    ArrayList<String> obstacles = new ArrayList<>();
     int size;
     String groundTileUID, playerStartingPos;
 

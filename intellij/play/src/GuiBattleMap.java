@@ -12,36 +12,40 @@ import java.awt.event.MouseMotionAdapter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GuiBattleMap extends JFrame {
-    private Interpreter interpreter;
-    private BattleMap battleMap;
+    private final Interpreter interpreter;
+    private final BattleMap battleMap;
 
-    private JPanel contentPane;
+    private final JPanel contentPane;
 
     private JLabel l_BattleTitle;
 
-    private JLabel l_goundTiles[][];
-    private JLabel l_extraGoundTiles[][];
-    private JLabel l_obstacles[][];
-    private JLabel l_overlay[][];
-    private JLabel l_clickable[][];
+    private JLabel[][] l_goundTiles;
+    private JLabel[][] l_extraGoundTiles;
+    private JLabel[][] l_obstacles;
+    private JLabel[][] l_overlay;
+    private JLabel[][] l_clickable;
     private JLabel l_playerPos, l_attackAnimation, l_nextTurn, l_close;
-    private ArrayList<JLabel> l_npcs = new ArrayList<JLabel>();
-    private ArrayList<JLabel> l_items = new ArrayList<JLabel>();
-    private JLabel dummy = new JLabel();
+    private final ArrayList<JLabel> l_npcs = new ArrayList<JLabel>();
+    private final ArrayList<JLabel> l_items = new ArrayList<JLabel>();
+    private final JLabel dummy = new JLabel();
 
     private ImageIcon groundTile, scaledGroundTile, selectedTile, scaledSelectedTile, clickedTile, scaledClickedTile, playerTile, scaledPlayerTile;
     private ImageIcon overlayWalkable, scaledOverlayWalkable, overlayCurrentNPC, scaledOverlayCurrentNPC;
 
-    private int tileSize, scale, x_offset = Interpreter.getScaledValue(40), y_offset = Interpreter.getScaledValue(40), currentMode = 0;
+    private final int tileSize;
+    private final int x_offset = Interpreter.getScaledValue(40);
+    private final int y_offset = Interpreter.getScaledValue(40);
+    private final int currentMode = 0;
     private int x_size = Interpreter.getScaledValue(1140), y_size = Interpreter.getScaledValue(920);
 
     public GuiBattleMap(BattleMap battleMap, Interpreter interpreter) {
         this.battleMap = battleMap;
         this.interpreter = interpreter;
         this.setTitle(StaticStuff.projectName + " - Battle time!");
-        scale = Interpreter.getScaledValue(282 / battleMap.size);
+        int scale = Interpreter.getScaledValue(282 / battleMap.size);
         tileSize = 3 * scale;
         x_size = tileSize * battleMap.size + Interpreter.getScaledValue(80);
         y_size = tileSize * battleMap.size + Interpreter.getScaledValue(80);
@@ -168,9 +172,9 @@ public class GuiBattleMap extends JFrame {
     }
 
     private void letTheBattleBegin() {
-        selectedTile = new ImageIcon(Images.readImageFromFile("res/img/selected.png"));
+        selectedTile = new ImageIcon(Objects.requireNonNull(Images.readImageFromFile("res/img/selected.png")));
         scaledSelectedTile = getScaledImage(selectedTile, tileSize, tileSize);
-        clickedTile = new ImageIcon(Images.readImageFromFile("res/img/clicked.png"));
+        clickedTile = new ImageIcon(Objects.requireNonNull(Images.readImageFromFile("res/img/clicked.png")));
         scaledClickedTile = getScaledImage(clickedTile, tileSize, tileSize);
         l_clickable = new JLabel[battleMap.size][battleMap.size];
         for (int i = 0; i < battleMap.size; i++) {
@@ -208,9 +212,9 @@ public class GuiBattleMap extends JFrame {
             }
         }
 
-        overlayWalkable = new ImageIcon(Images.readImageFromFile("res/img/walkableTile.png"));
+        overlayWalkable = new ImageIcon(Objects.requireNonNull(Images.readImageFromFile("res/img/walkableTile.png")));
         scaledOverlayWalkable = getScaledImage(overlayWalkable, tileSize, tileSize);
-        overlayCurrentNPC = new ImageIcon(Images.readImageFromFile("res/img/currentNPC.png"));
+        overlayCurrentNPC = new ImageIcon(Objects.requireNonNull(Images.readImageFromFile("res/img/currentNPC.png")));
         scaledOverlayCurrentNPC = getScaledImage(overlayCurrentNPC, tileSize, tileSize);
         l_overlay = new JLabel[battleMap.size][battleMap.size];
         for (int i = 0; i < battleMap.size; i++) {
@@ -235,7 +239,7 @@ public class GuiBattleMap extends JFrame {
         int nextTurnScale = 8;
         l_nextTurn = new JLabel();
         l_nextTurn.setBounds((x_size / 2) - Interpreter.getScaledValue(256 / nextTurnScale), y_size - Interpreter.getScaledValue(280 / nextTurnScale), Interpreter.getScaledValue(512 / nextTurnScale), Interpreter.getScaledValue(200 / nextTurnScale));
-        l_nextTurn.setIcon(getScaledImage(new ImageIcon(Images.readImageFromFile("res/img/nextturn.png")), Interpreter.getScaledValue(512 / nextTurnScale), Interpreter.getScaledValue(200 / nextTurnScale)));
+        l_nextTurn.setIcon(getScaledImage(new ImageIcon(Objects.requireNonNull(Images.readImageFromFile("res/img/nextturn.png"))), Interpreter.getScaledValue(512 / nextTurnScale), Interpreter.getScaledValue(200 / nextTurnScale)));
         l_nextTurn.setEnabled(true);
         l_nextTurn.setVisible(true);
         l_nextTurn.addMouseListener(new MouseListener() {
@@ -252,17 +256,15 @@ public class GuiBattleMap extends JFrame {
             }
 
             public void mouseClicked(MouseEvent e) {
-                if (battleMap.isPlayerTurn)
-                    new Thread() {
-                        public void run() {
-                            if (battleMap.isPlayerTurn && !battleMap.playerIsWalking) battleMap.beginNextTurn();
-                        }
-                    }.start();
+                if (BattleMap.isPlayerTurn)
+                    new Thread(() -> {
+                        if (BattleMap.isPlayerTurn && !battleMap.playerIsWalking) battleMap.beginNextTurn();
+                    }).start();
             }
         });
         contentPane.add(l_nextTurn);
 
-        playerTile = new ImageIcon(Images.getBufferedImage(battleMap.manager.player.getValue("battleMapImage")));
+        playerTile = new ImageIcon(Objects.requireNonNull(Images.getBufferedImage(Manager.player.getValue("battleMapImage"))));
         scaledPlayerTile = getScaledImage(playerTile, tileSize, tileSize);
         l_playerPos = new JLabel();
         l_playerPos.setBounds(x_offset + (tileSize * Integer.parseInt(battleMap.playerPos.split("AAA")[0])), y_offset + (tileSize * Integer.parseInt(battleMap.playerPos.split("AAA")[1])), tileSize, tileSize);
@@ -274,7 +276,7 @@ public class GuiBattleMap extends JFrame {
         contentPane.add(l_playerPos);
 
         for (int i = 0; i < battleMap.npcs.size(); i++) {
-            String splitted[] = battleMap.npcs.get(i).split("AAA");
+            String[] splitted = battleMap.npcs.get(i).split("AAA");
             l_npcs.add(new JLabel());
             if (Integer.parseInt(splitted[1]) < battleMap.size && Integer.parseInt(splitted[2]) < battleMap.size) {
                 l_npcs.get(l_npcs.size() - 1).setBounds(x_offset + (tileSize * Integer.parseInt(splitted[1])), y_offset + (tileSize * Integer.parseInt(splitted[2])), tileSize, tileSize);
@@ -292,7 +294,7 @@ public class GuiBattleMap extends JFrame {
         }
 
         for (int i = 0; i < battleMap.items.size(); i++) {
-            String splitted[] = battleMap.items.get(i).split("AAA");
+            String[] splitted = battleMap.items.get(i).split("AAA");
             l_items.add(new JLabel());
             if (Integer.parseInt(splitted[1]) < battleMap.size && Integer.parseInt(splitted[2]) < battleMap.size) {
                 l_items.get(l_items.size() - 1).setBounds(x_offset + (tileSize * Integer.parseInt(splitted[1])), y_offset + (tileSize * Integer.parseInt(splitted[2])), tileSize, tileSize);

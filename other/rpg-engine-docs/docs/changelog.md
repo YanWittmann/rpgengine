@@ -1,6 +1,14 @@
 # Changelog
 ___
 
+## 06.02.2020 - RELEASE `1.11.2`
+#### Bugfixes:
+
+ * editor would not open file when trying to edit event
+ * battlemap would freeze when opening without player icon defined
+ * added images `notnull.png` and `null.png` to the player
+ * battlemap would freeze if enemy had no inventory
+
 ## 31.01.2020
 #### Bugfixes:
 

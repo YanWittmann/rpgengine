@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -13,11 +14,11 @@ import java.util.zip.ZipOutputStream;
 
 public class FileManager {
     public static String[] readFile(String filename) {
-        String result[];
+        String[] result;
         File file = new File(filename);
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-            BufferedReader br2 = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+            BufferedReader br2 = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 
             int lines = 0, counter = 0;
             while (br2.readLine() != null) lines++;
@@ -39,7 +40,8 @@ public class FileManager {
     public static void writeToFile(String filename, String[] text) {
         try {
             File file = new File(filename);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            makeDirectory(file.getAbsolutePath().replace(file.getName(), ""));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
             for (int i = 0; i < text.length - 1; i++) {
                 bw.write(text[i]);
                 bw.newLine();
@@ -55,7 +57,8 @@ public class FileManager {
     public static void writeToFile(String filename, String text) {
         try {
             File file = new File(filename);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            makeDirectory(file.getAbsolutePath().replace(file.getName(), ""));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
             bw.write(text);
             bw.close();
         } catch (IOException e) {

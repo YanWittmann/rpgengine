@@ -42,6 +42,7 @@ public class FileManager {
     public static void writeToFile(String filename, String[] text) {
         try {
             File file = new File(filename);
+            makeDirectory(file.getAbsolutePath().replace(file.getName(), ""));
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
             for (int i = 0; i < text.length - 1; i++) {
                 bw.write(text[i]);
@@ -56,6 +57,7 @@ public class FileManager {
     public static void writeToFile(String filename, String text) {
         try {
             File file = new File(filename);
+            makeDirectory(file.getAbsolutePath().replace(file.getName(), ""));
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
             bw.write(text);
             bw.close();

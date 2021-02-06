@@ -12,10 +12,10 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.11.1";
+    private final String version = "1.11.2";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
-    //public Configuration cfg;
+    //public Configuration cfg; //there are no cfg entries at the moment so this is unnecessary
     public int amountPopupsOpen = 0;
     public GuiPlayerStats playerStatus;
     final GuiLoading loading = new GuiLoading();

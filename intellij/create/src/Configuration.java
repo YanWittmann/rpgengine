@@ -2,7 +2,8 @@
 import java.io.*;
 
 public class Configuration {
-    String config[][], filename;
+    String[][] config;
+    String filename;
     boolean ready = false;
 
     public Configuration(String pFilename) {
@@ -12,33 +13,30 @@ public class Configuration {
 
     public String get(String option) {
         if (ready) {
-            for (int i = 0; i < config.length; i++) {
-                if (config[i][0].equals(option)) return config[i][1];
+            for (String[] strings : config) {
+                if (strings[0].equals(option))
+                    if (strings.length >= 2)
+                        return strings[1];
+                    else return "";
             }
         }
         return "";
     }
 
-    public int getInt(String option) {
-        if (ready) {
-            for (int i = 0; i < config.length; i++) {
-                if (config[i][0].equals(option)) return Integer.parseInt(config[i][1]);
-            }
-        }
-        return -1;
-    }
-
     public void set(String option, String value) {
         if (ready) {
-            String output = "";
-            for (int i = 0; i < config.length; i++) {
-                output = output + config[i][0] + ":" + config[i][1] + "\n";
+            addIfNotExist(option, value);
+            StringBuilder output = new StringBuilder();
+            for (String[] strings : config) {
+                if (strings.length >= 2)
+                    output.append(strings[0]).append(":").append(strings[1]).append("\n");
+                else
+                    output.append(strings[0]).append(":").append("\n");
             }
-            output = output.substring(0, output.length() - 1).replace(option + ":" + get(option), option + ":" + value);
+            output = new StringBuilder(output.substring(0, output.length() - 1).replace(option + ":" + get(option), option + ":" + value));
             try {
-                writeToFile(filename, output.replaceAll("(?m)^[ \t]*\r?\n", ""));
-            } catch (Exception e) {
-                ;
+                writeToFile(filename, output.toString().replaceAll("(?m)^[ \t]*\r?\n", ""));
+            } catch (Exception ignored) {
             }
             readConfig(filename);
         }
@@ -46,31 +44,36 @@ public class Configuration {
 
     public void set(String option, int value) {
         if (ready) {
-            String output = "";
-            for (int i = 0; i < config.length; i++) {
-                output = output + config[i][0] + ":" + config[i][1] + "\n";
+            StringBuilder output = new StringBuilder();
+            for (String[] strings : config) {
+                output.append(strings[0]).append(":").append(strings[1]).append("\n");
             }
-            output = output.substring(0, output.length() - 1).replace(option + ":" + get(option), option + ":" + value);
+            output = new StringBuilder(output.substring(0, output.length() - 1).replace(option + ":" + get(option), option + ":" + value));
             try {
-                writeToFile(filename, output.replaceAll("(?m)^[ \t]*\r?\n", ""));
-            } catch (Exception e) {
-                ;
+                writeToFile(filename, output.toString().replaceAll("(?m)^[ \t]*\r?\n", ""));
+            } catch (Exception ignored) {
             }
             readConfig(filename);
         }
     }
 
+    public void addIfNotExist(String option, String value) {
+        if (!optionExists(option)) {
+            addOption(option);
+            set(option, value);
+        }
+    }
+
     public void addOption(String option) {
         if (ready && !optionExists(option)) {
-            String output = "";
-            for (int i = 0; i < config.length; i++) {
-                output = output + config[i][0] + ":" + config[i][1] + "\n";
+            StringBuilder output = new StringBuilder();
+            for (String[] strings : config) {
+                output.append(strings[0]).append(":").append(strings[1]).append("\n");
             }
-            output = (output + "\n" + option + ":null");
+            output.append("\n").append(option).append(":null");
             try {
-                writeToFile(filename, output.replaceAll("(?m)^[ \t]*\r?\n", ""));
-            } catch (Exception e) {
-                ;
+                writeToFile(filename, output.toString().replaceAll("(?m)^[ \t]*\r?\n", ""));
+            } catch (Exception ignored) {
             }
             readConfig(filename);
         }
@@ -78,16 +81,15 @@ public class Configuration {
 
     public void removeOption(String option) {
         if (ready && optionExists(option)) {
-            String output = "";
-            for (int i = 0; i < config.length; i++) {
-                if (!config[i][0].equals(option))
-                    output = output + config[i][0] + ":" + config[i][1] + "\n";
+            StringBuilder output = new StringBuilder();
+            for (String[] strings : config) {
+                if (!strings[0].equals(option))
+                    output.append(strings[0]).append(":").append(strings[1]).append("\n");
             }
-            output = output.substring(0, output.length() - 1);
+            output = new StringBuilder(output.substring(0, output.length() - 1));
             try {
-                writeToFile(filename, output.replaceAll("(?m)^[ \t]*\r?\n", ""));
-            } catch (Exception e) {
-                ;
+                writeToFile(filename, output.toString().replaceAll("(?m)^[ \t]*\r?\n", ""));
+            } catch (Exception ignored) {
             }
             readConfig(filename);
         }
@@ -95,8 +97,8 @@ public class Configuration {
 
     public boolean optionExists(String option) {
         if (ready) {
-            for (int i = 0; i < config.length; i++) {
-                if (option.equals(config[i][0])) return true;
+            for (String[] strings : config) {
+                if (option.equals(strings[0])) return true;
             }
         }
         return false;
