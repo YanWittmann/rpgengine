@@ -7,7 +7,7 @@ import java.util.Collections;
 public class Main {
 
     private static FTPTools ftp = null;
-    private final static String launcherVersion = "8", playVersion = "1.11.2", createVersion = "1.11.2";
+    private final static String launcherVersion = "8", playVersion = "1.11.3", createVersion = "1.11.3";
 
     public static void main(String[] args) {
 

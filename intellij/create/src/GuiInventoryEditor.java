@@ -144,12 +144,12 @@ public class GuiInventoryEditor extends JFrame {
     }
 
     private void add() {
-        inv.addItem(Popup.dropDown(StaticStuff.projectName, "Select an item UID", Manager.getStringArrayItems()).split(" - ")[1]);
+        inv.addItem(Popup.dropDown(StaticStuff.projectName, "Select an item UID", Manager.getStringArrayItems()).replaceAll(".+ - ([^-]+)", "$1"));
         ta_items.setText(inv.getInventoryString());
     }
 
     private void remove() {
-        inv.removeItem(Popup.dropDown(StaticStuff.projectName, "Select an item UID", Manager.getStringArrayItems()).split(" - ")[1]);
+        inv.removeItem(Popup.dropDown(StaticStuff.projectName, "Select an item UID", Manager.getStringArrayItems()).replaceAll(".+ - ([^-]+)", "$1"));
         ta_items.setText(inv.getInventoryString());
     }
 

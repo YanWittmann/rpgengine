@@ -178,13 +178,13 @@ public class NPC extends Entity {
                             getEntity().openVariable(StaticStuff.autoDetectUID("Variable uid:"), true);
                         break;
                     case 7:
-                        ((NPC) getEntity()).setLocation(Popup.dropDown(StaticStuff.projectName, "Select a location UID", Manager.getStringArrayLocations()).split(" - ")[1]);
+                        ((NPC) getEntity()).setLocation(Popup.dropDown(StaticStuff.projectName, "Select a location UID", Manager.getStringArrayLocations()).replaceAll(".+ - ([^-]+)", "$1"));
                         break;
                     case 8:
-                        ((NPC) getEntity()).setInventory(Popup.dropDown(StaticStuff.projectName, "Select an inventory UID", Manager.getStringArrayInventories()).split(" - ")[1]);
+                        ((NPC) getEntity()).setInventory(Popup.dropDown(StaticStuff.projectName, "Select an inventory UID", Manager.getStringArrayInventories()).replaceAll(".+ - ([^-]+)", "$1"));
                         break;
                     case 9:
-                        setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).split(" - ")[1]);
+                        setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
                         break;
                     default:
                         Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");

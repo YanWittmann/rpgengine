@@ -142,7 +142,7 @@ public class Item extends Entity {
                             getEntity().openVariable(StaticStuff.autoDetectUID("Variable uid:"), true);
                         break;
                     case 7:
-                        setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).split(" - ")[1]);
+                        setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
                         break;
                     default:
                         Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");

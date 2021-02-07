@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Manager {
-    public static String pathExtension = "../../", filename = "", version = "1.11.2";
+    public static String pathExtension = "../../", filename = "", version = "1.11.3";
     public static ArrayList<Location> locations = new ArrayList<>();
     public static ArrayList<NPC> npcs = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();

@@ -228,14 +228,14 @@ public class BattleMap extends Entity {
         Log.add((attackerUID.equals("") ? "Player" : attackerUID) + " attacks " + (victimUID.equals("") ? "player" : victimUID) + " using " + itemUID);
         int damageDealt;
         if (itemUID.equals("player hands"))
-            damageDealt = StaticStuff.evaluateRoll(manager.player.getValue("dmgNoWeapon"), true, false);
-        else if (itemUID.equals("npc hands"))
-            damageDealt = StaticStuff.evaluateRoll(manager.getEntity(attackerUID).getVariableValue("dmgNoWeapon"), true, true);
+            damageDealt = StaticStuff.evaluateRoll(Manager.player.getValue("dmgNoWeapon"), true, false);
+        else if (itemUID.equals("npc hands") || itemUID.length() == 0)
+            damageDealt = StaticStuff.evaluateRoll(Manager.getEntity(attackerUID).getVariableValue("dmgNoWeapon"), true, true);
         else
-            damageDealt = StaticStuff.evaluateRoll(manager.getEntity(itemUID).getVariableValue("damage"), true, !attackerIsPlayer);
+            damageDealt = StaticStuff.evaluateRoll(Manager.getEntity(itemUID).getVariableValue("damage"), true, !attackerIsPlayer);
         damageDealt = Math.max(0, damageDealt);
         try {
-            gui.attackAnimation(getLocationByUID(attackerUID), getLocationByUID(victimUID), manager.getEntity(itemUID).image);
+            gui.attackAnimation(getLocationByUID(attackerUID), getLocationByUID(victimUID), Manager.getEntity(itemUID).image);
         } catch (Exception e) {
         }
         if (victimIsPlayer) { //player is beeing attacked

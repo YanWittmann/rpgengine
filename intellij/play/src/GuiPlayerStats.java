@@ -426,124 +426,118 @@ public class GuiPlayerStats extends JFrame {
             }
         }).start();
 
-        new Thread() {
-            public void run() {
-                for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
-                    l_inventorySlots[i].setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                }
-                for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
-                    l_inventorySlots[i].setVisible(false);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                }
-                for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
-                    l_inventorySlots[i].setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                }
-                for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
-                    l_inventorySlots[i].setVisible(false);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                }
-                for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
-                    l_inventorySlots[i].setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                }
-                for (int i = 0; i < amountItems; i++) {
-                    l_inventorySlots[i].setVisible(true);
-                }
+        new Thread(() -> {
+            for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
+                l_inventorySlots[i].setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
             }
-        }.start();
+            for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
+                l_inventorySlots[i].setVisible(false);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+            }
+            for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
+                l_inventorySlots[i].setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+            }
+            for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
+                l_inventorySlots[i].setVisible(false);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+            }
+            for (int i = 0; i < amountItems && i < inventoryItems.length; i++) {
+                l_inventorySlots[i].setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+            }
+            for (int i = 0; i < amountItems; i++) {
+                l_inventorySlots[i].setVisible(true);
+            }
+        }).start();
 
-        new Thread() {
-            public void run() {
-                for (int i = 0; i < 7; i++) {
-                    l_attr[i].setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                    l_img[i].setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
-                }
-                for (int i = 0; i < 7; i++) {
-                    l_attr[i].setVisible(false);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 20));
-                    l_img[i].setVisible(false);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 20));
-                }
-                for (int i = 0; i < 7; i++) {
-                    l_attr[i].setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 40));
-                    l_img[i].setVisible(true);
-                    Sleep.milliseconds(StaticStuff.randomNumber(10, 40));
-                }
+        new Thread(() -> {
+            for (int i = 0; i < 7; i++) {
+                l_attr[i].setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
+                l_img[i].setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 60));
             }
-        }.start();
+            for (int i = 0; i < 7; i++) {
+                l_attr[i].setVisible(false);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 20));
+                l_img[i].setVisible(false);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 20));
+            }
+            for (int i = 0; i < 7; i++) {
+                l_attr[i].setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 40));
+                l_img[i].setVisible(true);
+                Sleep.milliseconds(StaticStuff.randomNumber(10, 40));
+            }
+        }).start();
     }
 
     private void clickInventorySlot(int id) {
-        new Thread() {
-            public void run() {
-                Log.add("Clicked on item slot with id: " + id);
-                if (!BattleMap.isPlayerTurn && battleMode) {
-                    Log.add("It's not the players turn.");
-                    return;
-                }
-                if (scrollIndex + id >= inventoryItemsUIDs.length) {
-                    Log.add("There is no item at that slot.");
-                    return;
-                }
-                String clickedUID = inventoryItemsUIDs[scrollIndex + id];
-                Log.add("Clicked item UID: " + clickedUID);
-                int amountOptions = 3, current = 0;
-                boolean isHoldingClickedItem = (player.getValue("holdingMain").equals(clickedUID) || player.getValue("holdingSecond").equals(clickedUID) || player.getValue("holdingArmor").equals(clickedUID));
-                String[] options = new String[amountOptions];
-                options[current] = Interpreter.lang("playerStatsItemClickExamine");
-                current++;
-                options[current] = Interpreter.lang("playerStatsItemClickUse");
-                current++;
-                if (!isHoldingClickedItem) {
-                    options[current] = Interpreter.lang("playerStatsItemClickEquip");
-                } else {
-                    options[current] = Interpreter.lang("playerStatsItemClickUnequip");
-                }
-                //int choice = StaticStuff.openPopup(Interpreter.lang("popupItemClicked", Manager.getName(clickedUID)), options); //large frame
-                int choice = StaticStuff.openPopup(options, true);
-                if (choice == 0) {
-                    GuiObjectDisplay.create(Manager.getEntity(clickedUID), Interpreter.lang("playerStatsItemOpenItem"));
-                } else if (choice == 1) {
-                    interpreter.executePlayerCommand("useWithUID " + clickedUID);
-                } else if ((choice == 2) && !isHoldingClickedItem) {
-                    Item toEquip = (Item) Manager.getEntity(clickedUID);
-                    assert toEquip != null;
-                    String slot = toEquip.getVariableValue("hands");
-                    boolean current1 = false, current2 = false;
-                    if (player.getValue("holdingMain").equals("")) current1 = true;
-                    if (player.getValue("holdingSecond").equals("")) current2 = true;
-                    switch (slot) {
-                        case "1":
-                            if (current1) player.setValue("holdingMain", clickedUID);
-                            else if (current2) player.setValue("holdingSecond", clickedUID);
-                            else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
-                            break;
-                        case "2":
-                            if (current1 && current2) {
-                                player.setValue("holdingMain", clickedUID);
-                                player.setValue("holdingSecond", clickedUID);
-                            } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
-                            break;
-                        case "armor":
-                            if (player.getValue("holdingArmor").equals("")) {
-                                player.setValue("holdingArmor", clickedUID);
-                            } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
-                            break;
-                    }
-                    updateInventory();
-                } else if (choice == 2) {
-                    if (player.getValue("holdingArmor").equals(clickedUID)) player.setValue("holdingArmor", "");
-                    if (player.getValue("holdingMain").equals(clickedUID)) player.setValue("holdingMain", "");
-                    if (player.getValue("holdingSecond").equals(clickedUID)) player.setValue("holdingSecond", "");
-                    updateInventory();
-                }
+        new Thread(() -> {
+            Log.add("Clicked on item slot with id: " + id);
+            if (!BattleMap.isPlayerTurn && battleMode) {
+                Log.add("It's not the players turn.");
+                return;
             }
-        }.start();
+            if (scrollIndex + id >= inventoryItemsUIDs.length) {
+                Log.add("There is no item at that slot.");
+                return;
+            }
+            String clickedUID = inventoryItemsUIDs[scrollIndex + id];
+            Log.add("Clicked item UID: " + clickedUID);
+            int amountOptions = 3, current = 0;
+            boolean isHoldingClickedItem = (player.getValue("holdingMain").equals(clickedUID) || player.getValue("holdingSecond").equals(clickedUID) || player.getValue("holdingArmor").equals(clickedUID));
+            String[] options = new String[amountOptions];
+            options[current] = Interpreter.lang("playerStatsItemClickExamine");
+            current++;
+            options[current] = Interpreter.lang("playerStatsItemClickUse");
+            current++;
+            if (!isHoldingClickedItem) {
+                options[current] = Interpreter.lang("playerStatsItemClickEquip");
+            } else {
+                options[current] = Interpreter.lang("playerStatsItemClickUnequip");
+            }
+            //int choice = StaticStuff.openPopup(Interpreter.lang("popupItemClicked", Manager.getName(clickedUID)), options); //large frame
+            int choice = StaticStuff.openPopup(options, true);
+            if (choice == 0) {
+                GuiObjectDisplay.create(Manager.getEntity(clickedUID), Interpreter.lang("playerStatsItemOpenItem"));
+            } else if (choice == 1) {
+                interpreter.executePlayerCommand("useWithUID " + clickedUID);
+            } else if ((choice == 2) && !isHoldingClickedItem) {
+                Item toEquip = (Item) Manager.getEntity(clickedUID);
+                assert toEquip != null;
+                String slot = toEquip.getVariableValue("hands");
+                boolean current1 = false, current2 = false;
+                if (player.getValue("holdingMain").equals("")) current1 = true;
+                if (player.getValue("holdingSecond").equals("")) current2 = true;
+                switch (slot) {
+                    case "1":
+                        if (current1) player.setValue("holdingMain", clickedUID);
+                        else if (current2) player.setValue("holdingSecond", clickedUID);
+                        else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
+                        break;
+                    case "2":
+                        if (current1 && current2) {
+                            player.setValue("holdingMain", clickedUID);
+                            player.setValue("holdingSecond", clickedUID);
+                        } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
+                        break;
+                    case "armor":
+                        if (player.getValue("holdingArmor").equals("")) {
+                            player.setValue("holdingArmor", clickedUID);
+                        } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
+                        break;
+                }
+                updateInventory();
+            } else if (choice == 2) {
+                if (player.getValue("holdingArmor").equals(clickedUID)) player.setValue("holdingArmor", "");
+                if (player.getValue("holdingMain").equals(clickedUID)) player.setValue("holdingMain", "");
+                if (player.getValue("holdingSecond").equals(clickedUID)) player.setValue("holdingSecond", "");
+                updateInventory();
+            }
+        }).start();
     }
 
     public void battleMode(boolean active) {

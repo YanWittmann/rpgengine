@@ -12,7 +12,7 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.11.2";
+    private final String version = "1.11.3";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg; //there are no cfg entries at the moment so this is unnecessary
@@ -40,6 +40,7 @@ public class Interpreter {
         else
             lang = new Language(selectedArgsLang, "res/lang");
         //cfg = new Configuration("res/config/main.cfg");
+        System.out.println(argsFilename);
         if (argsFilename.equals("")) {
             String[] files = FileManager.getFilesWithEnding(extraFilePath + "adventures/", StaticStuff.adventureFileEndingNoDot);
             if (files.length == 0) {
@@ -574,6 +575,7 @@ public class Interpreter {
                 player.setValue("location", codeWords[1]);
                 executeEventFromObject(codeWords[1], "entry", new String[]{"comeFromLocation:" + comeFrom, "gotoLocation:" + codeWords[1]});
             }
+            new Thread(GuiPlayerStats::updateOutput).start();
         } else if (codeWords[0].equals("print")) {
             print(prepareStringReplaceVar(code.replace("print ", "")));
         } else if (codeWords[0].equals("printwait")) {
@@ -592,12 +594,13 @@ public class Interpreter {
             execute(code.replaceAll("execute (event|code) .+ as .+ \\{(?:.+)?\\}", "$1"), code.replaceAll("execute (?:event|code) (.+) as .+ \\{(?:.+)?\\}", "$1"),
                     code.replaceAll("execute (?:event|code) .+ as (.+) \\{(?:.+)?\\}", "$1"), code.replaceAll("execute (?:event|code) .+ as .+ \\{(.+)?\\}", "$1").split(", "));
         } else if (codeWords[0].equals("jumpto")) {
-            if (codeWords[1].equals("first")) {
-                return "jumpfirst:" + codeWords[2];
-            } else if (codeWords[1].equals("last")) {
-                return "jumplast:" + codeWords[2];
-            } else if (codeWords[1].equals("next")) {
-                return "jumpnext:" + codeWords[2];
+            switch (codeWords[1]) {
+                case "first":
+                    return "jumpfirst:" + codeWords[2];
+                case "last":
+                    return "jumplast:" + codeWords[2];
+                case "next":
+                    return "jumpnext:" + codeWords[2];
             }
         } else if (codeWords[0].equals("alert")) {
             StaticStuff.openPopup(prepareStringReplaceVar(code.replace("alert ", "")));
@@ -691,15 +694,14 @@ public class Interpreter {
             String visible = condition.replaceAll("talent (.+) DC (.+) (true|false) (true|false) (.+)", "$3");
             String autoRoll = condition.replaceAll("talent (.+) DC (.+) (true|false) (true|false) (.+)", "$4");
             String text = condition.replaceAll("talent (.+) DC (.+) (true|false) (true|false) (.+)", "$5");
-            if (!rollTalent(name, dc, visible, autoRoll, text))
-                return false;
+            return rollTalent(name, dc, visible, autoRoll, text);
         } else if (codeWords[0].equals("selector") || codeWords[1].charAt(0) == '#') {
-            if (evaluateSelector(codeWords[1]).length == 0) //check for selector
-                return false;
+            //check for selector
+            return evaluateSelector(codeWords[1]).length != 0;
         } else if (codeWords[0].equals("expression") || !condition.contains("selector") || !condition.contains("talent")) {
-            String p1 = prepareStringReplaceVar(condition.replaceAll("(?:expression )?(.+) ([=><!contaismhequl]+) (.+)", "$1"));
-            String p2 = prepareStringReplaceVar(condition.replaceAll("(?:expression )?(.+) ([=><!contaismhequl]+) (.+)", "$3"));
-            String method = condition.replaceAll("(?:expression )?(.+) ([=><!contaismhequl]+) (.+)", "$2");
+            String p1 = prepareStringReplaceVar(condition.replaceAll("\"?([^\"]+)\"? ([=><!contaismhequl]+) \"?([^\"]+)\"?", "$1"));
+            String p2 = prepareStringReplaceVar(condition.replaceAll("\"?([^\"]+)\"? ([=><!contaismhequl]+) \"?([^\"]+)\"?", "$3"));
+            String method = condition.replaceAll("\"?([^\"]+)\"? ([=><!contaismhequl]+) \"?([^\"]+)\"?", "$2");
             switch (method) {
                 case "==":
                 case "=":
@@ -723,7 +725,7 @@ public class Interpreter {
                     if (!(Integer.parseInt(p1) >= Integer.parseInt(p2))) return false;
                     break;
                 case "<=":
-                    if (!(Integer.parseInt(p1) >= Integer.parseInt(p2))) return false;
+                    if (!(Integer.parseInt(p1) <= Integer.parseInt(p2))) return false;
                     break;
                 case "!=":
                 case "<>":
@@ -967,7 +969,7 @@ public class Interpreter {
     }
 
     public void sleepTime(String time) {
-        Pattern patt = Pattern.compile("(?:.+ )?((?:[0-9]+)|(?:\\{[a-zA-Z0-9]+\\})) ?(ms|s|m|h])");
+        Pattern patt = Pattern.compile("(?:.+ )?((?:[0-9]+)|(?:\\{[a-zA-Z0-9]+})) ?(ms|s|m|h])");
         Matcher m = patt.matcher(time);
         if (m.find()) {
             int duration = Integer.parseInt(prepareStringReplaceVar(m.group(1)));
@@ -1011,33 +1013,33 @@ public class Interpreter {
         try {
             Log.add("trying to set variable '" + variable + "' to" + (values.length > 1 ? "" : " '" + values[0] + "'"));
             Log.addIndent();
-            String valueToSet = "";
+            StringBuilder valueToSet = new StringBuilder();
             if (values.length > 1) {
                 for (String s : values) {
-                    valueToSet += "LINEBREAK" + s;
+                    valueToSet.append("LINEBREAK").append(s);
                     Log.add(s);
                 }
-                valueToSet = valueToSet.replaceFirst("LINEBREAK", "");
-            } else valueToSet = values[0];
+                valueToSet = new StringBuilder(valueToSet.toString().replaceFirst("LINEBREAK", ""));
+            } else valueToSet = new StringBuilder(values[0]);
 
-            String[] variableParts = variable.replaceAll("\\{([^\\{]+)\\}.*", "$1").split("\\|");
+            String[] variableParts = variable.replaceAll("\\{([^{]+)}.*", "$1").split("\\|");
             if (Manager.variableExists(variableParts[0])) {
-                manager.setVariableByUIDorName(variableParts[0], valueToSet);
+                manager.setVariableByUIDorName(variableParts[0], valueToSet.toString());
             } else if (manager.hasLocalVariableByVarUID(variableParts[0])) {
-                manager.setLocalVariableByVarUID(variableParts[0], valueToSet);
+                manager.setLocalVariableByVarUID(variableParts[0], valueToSet.toString());
             } else if (variableParts[0].equals("selector") || variableParts[0].equals("value")) {
                 String[] selector = evaluateSelector(variableParts[1]);
                 if (variable.contains(".name()")) {
-                    for (String s : selector) manager.setName(s, valueToSet);
+                    for (String s : selector) manager.setName(s, valueToSet.toString());
                 } else if (variable.contains(".description()")) {
-                    for (String s : selector) manager.setDescription(s, valueToSet);
+                    for (String s : selector) manager.setDescription(s, valueToSet.toString());
                 } else if (variable.contains(".image()")) {
-                    for (String s : selector) manager.setImage(s, valueToSet);
+                    for (String s : selector) manager.setImage(s, valueToSet.toString());
                 } else if (variable.contains(".location()")) {
-                    for (String s : selector) manager.setLocationFromNPC(s, valueToSet);
+                    for (String s : selector) manager.setLocationFromNPC(s, valueToSet.toString());
                 } else if (variable.contains(".variable")) {
-                    String variableName = variable.replaceAll("\\{[^\\{]+\\}\\.[^\\(]+\\(([^\\(]*)\\)", "$1");
-                    for (String s : selector) manager.setLocalVariableByVarNameObjectUID(s, variableName, valueToSet);
+                    String variableName = variable.replaceAll("\\{[^{]+}\\.[^(]+\\(([^(]*)\\)", "$1");
+                    for (String s : selector) manager.setLocalVariableByVarNameObjectUID(s, variableName, valueToSet.toString());
                 }
             } else if (variableParts[0].equals("file")) {
                 if (!permissionFileWrite && !permissionFileWriteAnywhere) {
@@ -1048,17 +1050,17 @@ public class Interpreter {
                     Log.add("Missing permission 'filewriteanywhere'");
                     return;
                 }
-                FileManager.writeToFile("res/advfiles/" + variableParts[1], valueToSet.split("LINEBREAK"));
+                FileManager.writeToFile("res/advfiles/" + variableParts[1], valueToSet.toString().split("LINEBREAK"));
             } else if (variableParts[0].equals("player")) {
-                player.setValue(variableParts[1], valueToSet);
+                player.setValue(variableParts[1], valueToSet.toString());
             } else if (variableParts[0].equals("project")) {
-                settings.setValue(variableParts[1], valueToSet);
+                settings.setValue(variableParts[1], valueToSet.toString());
             } else if (variableParts[0].equals("lastInput")) {
-                StaticStuff.lastInput = valueToSet;
+                StaticStuff.lastInput = valueToSet.toString();
             } else if (variableParts[0].equals("amount")) {
                 String[] itemObjects = evaluateSelector(prepareStringReplaceVar(variableParts[1]));
                 String[] inventoryObjects = evaluateSelector(prepareStringReplaceVar(variableParts[2]));
-                int amount = Integer.parseInt(valueToSet);
+                int amount = Integer.parseInt(valueToSet.toString());
                 for (String itemObject : itemObjects)
                     for (String inventoryObject : inventoryObjects)
                         manager.inventorySetItem(itemObject, inventoryObject, amount);
@@ -1305,10 +1307,10 @@ public class Interpreter {
     public String prepareStringReplaceVar(String s) {
         String currentMatch, recMatch, result[];
         s = s.replace("\\{", "ESCAPEDCURVEDBRACKETSOPEN").replace("\\}", "ESCAPEDCURVEDBRACKETSCLOSED");
-        while (s.matches("(.*\\{[^\\{]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*.*)*") && s.length() > 0) {
-            currentMatch = s.replaceAll(".*(\\{[^\\{\\}]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*).*", "$1"); //.*(\\{[^\\{]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*).*
-            while (currentMatch.substring(1).replaceAll(".*(\\{[^\\{\\}]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*)?.*", "$1").length() > 0) { //.*(\\{[^\\{]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*)?.*
-                recMatch = currentMatch.substring(1).replaceAll(".*(\\{[^\\{\\}]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*)?.*", "$1"); //.*(\\{[^\\{]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*)?.*
+        while (s.matches("(.*\\{[^{]+}(?:\\.[a-zA-Z]+\\([^)]*\\))*.*)*") && s.length() > 0) {
+            currentMatch = s.replaceAll(".*(\\{[^{}]+}(?:\\.[a-zA-Z]+\\([^)]*\\))*).*", "$1"); //.*(\\{[^\\{]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*).*
+            while (currentMatch.substring(1).replaceAll(".*(\\{[^{}]+}(?:\\.[a-zA-Z]+\\([^)]*\\))*)?.*", "$1").length() > 0) { //.*(\\{[^\\{]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*)?.*
+                recMatch = currentMatch.substring(1).replaceAll(".*(\\{[^{}]+}(?:\\.[a-zA-Z]+\\([^)]*\\))*)?.*", "$1"); //.*(\\{[^\\{]+\\}(?:\\.[a-zA-Z]+\\([^)]*\\))*)?.*
                 currentMatch = currentMatch.replace(recMatch, prepareStringReplaceVar(recMatch));
             }
             result = evaluateVariable(currentMatch);
@@ -1322,14 +1324,14 @@ public class Interpreter {
         try {
             String[] results = null;
 
-            String base = s.replaceAll("\\{([^\\{]+)\\}.*", "$1").replaceAll("\\\\\\|", "ESCAPEDSPLITTER").replace("\\{", "ESCAPEDCURVEDBRACKETSOPEN").replace("\\}", "ESCAPEDCURVEDBRACKETSCLOSED");
+            String base = s.replaceAll("\\{([^{]+)}.*", "$1").replaceAll("\\\\\\|", "ESCAPEDSPLITTER").replace("\\{", "ESCAPEDCURVEDBRACKETSOPEN").replace("\\}", "ESCAPEDCURVEDBRACKETSCLOSED");
             String[] baseParam = base.split("\\|");
             for (int i = 0; i < baseParam.length; i++)
                 baseParam[i] = baseParam[i].replace("ESCAPEDSPLITTER", "|");
 
             String modif = "", modifiers[] = null;
-            if (s.matches("\\{[^\\{]+\\}.+")) {
-                modif = s.replaceAll("\\{[^\\{]+\\}(.*)", "$1").replaceAll("\\\\\\|", "ESCAPEDSPLITTER").replaceFirst("\\.", "");
+            if (s.matches("\\{[^{]+}.+")) {
+                modif = s.replaceAll("\\{[^{]+}(.*)", "$1").replaceAll("\\\\\\|", "ESCAPEDSPLITTER").replaceFirst("\\.", "");
                 modifiers = modif.split("\\.");
             }
 

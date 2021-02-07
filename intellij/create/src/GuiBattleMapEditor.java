@@ -548,7 +548,7 @@ public class GuiBattleMapEditor extends JFrame {
 
     private void addGroundTile() {
         if (currentMode != 1) {
-            String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).split(" - ")[1];
+            String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
             if (StaticStuff.isValidUID(uid)) {
                 if (Manager.imageExists(uid)) {
                     setUid = uid;
@@ -575,7 +575,7 @@ public class GuiBattleMapEditor extends JFrame {
 
     private void addObstacle() {
         if (currentMode != 2) {
-            String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).split(" - ")[1];
+            String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
             if (StaticStuff.isValidUID(uid)) {
                 if (Manager.imageExists(uid)) {
                     setUid = uid;
@@ -623,7 +623,7 @@ public class GuiBattleMapEditor extends JFrame {
     }
 
     private void setGroundTiles() {
-        String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).split(" - ")[1];
+        String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
         if (StaticStuff.isValidUID(uid)) {
             if (Manager.imageExists(uid)) {
                 removeBoard();
@@ -653,11 +653,9 @@ public class GuiBattleMapEditor extends JFrame {
                 contentPane.remove(l_obstacles[i][j]);
             }
         }
-        for (int i = 0; i < l_npcs.size(); i++)
-            contentPane.remove(l_npcs.get(i));
+        for (JLabel l_npc : l_npcs) contentPane.remove(l_npc);
         l_npcs.clear();
-        for (int i = 0; i < l_items.size(); i++)
-            contentPane.remove(l_items.get(i));
+        for (JLabel l_item : l_items) contentPane.remove(l_item);
         l_items.clear();
         contentPane.remove(l_playerStartingPos);
     }

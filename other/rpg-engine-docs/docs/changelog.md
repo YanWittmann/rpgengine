@@ -1,6 +1,19 @@
 # Changelog
 ___
 
+## 07.02.2020 - RELEASE `1.11.3`
+#### Bugfixes:
+
+ * math expressions are now calculated correctly again
+ * enemies would not attack player when they had no item in their inventory / no inventory
+ * in the creator, you could not select an object from a dorp down when the object name contained a `-`
+
+#### New / Modification:
+
+ * you can now compare strings that contain whitespaces by using `""`; for example: `if {text} equals "Hello there" (`
+ * removed old math expression solver (js) and replaced it with a solution by [https://stackoverflow.com/users/964243/boann](https://stackoverflow.com/users/964243/boann)
+
+
 ## 06.02.2020 - RELEASE `1.11.2`
 #### Bugfixes:
 

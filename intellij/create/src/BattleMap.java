@@ -157,10 +157,10 @@ public class BattleMap extends Entity {
 
     public boolean addNPC(int x, int y) {
         if (!hasNPC(x, y)) {
-            String npc = Popup.dropDown(StaticStuff.projectName, "Select an NPC UID", Manager.getStringArrayNPCs()).split(" - ")[1];
+            String npc = Popup.dropDown(StaticStuff.projectName, "Select an NPC UID", Manager.getStringArrayNPCs()).replaceAll(".+ - ([^-]+)", "$1");
             if (StaticStuff.isValidUID(npc)) {
                 if (Manager.npcExists(npc)) {
-                    String image = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).split(" - ")[1];
+                    String image = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
                     if (StaticStuff.isValidUID(image)) {
                         if (Manager.npcExists(npc)) {
                             npcs.add(npc + "AAA" + x + "AAA" + y + "AAA" + image);
@@ -175,7 +175,7 @@ public class BattleMap extends Entity {
 
     public boolean addItem(int x, int y) {
         if (!hasItem(x, y)) {
-            String item = Popup.dropDown(StaticStuff.projectName, "Select an item UID", Manager.getStringArrayItems()).split(" - ")[1];
+            String item = Popup.dropDown(StaticStuff.projectName, "Select an item UID", Manager.getStringArrayItems()).replaceAll(".+ - ([^-]+)", "$1");
             if (StaticStuff.isValidUID(item)) {
                 if (Manager.itemTypeExists(item)) {
                     items.add(item + "AAA" + x + "AAA" + y);
