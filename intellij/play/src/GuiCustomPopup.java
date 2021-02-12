@@ -307,7 +307,8 @@ public class GuiCustomPopup extends JFrame {
                         }
                         setOpacity(currentOpacity * 0.01f);
                     }
-                    dispose();
+                    Manager.closeCustomPopupStatic(customPopup.uid);
+                    //dispose();
                 }
                 dragActive = true;
                 pX = me.getX();

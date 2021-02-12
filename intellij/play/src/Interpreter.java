@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,7 +13,7 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.11.3";
+    private final String version = "1.11.4";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg; //there are no cfg entries at the moment so this is unnecessary
@@ -501,7 +502,8 @@ public class Interpreter {
                 code = code.replace("{" + arg.replaceAll(":.+", "") + "}", arg.replaceAll(".+:", ""));
         }
         codeWords = code.split(" ");
-        Log.add("Line " + lineIndex + " as " + uid + ": " + code);
+        if (!code.contains("log add "))
+            Log.add("Line " + lineIndex + " as " + uid + ": " + code);
         if (codeWords[0].matches("i[sf]")) {
             boolean res = false;
             if (code.matches("i[sf] (.+ [=><!contaismhequl]+ .+(?: \\|\\| )?)* \\("))
@@ -579,9 +581,10 @@ public class Interpreter {
         } else if (codeWords[0].equals("print")) {
             print(prepareStringReplaceVar(code.replace("print ", "")));
         } else if (codeWords[0].equals("printwait")) {
-            code = code.replace("printwait ", "");
-            print(prepareStringReplaceVar(code));
-            int duration = (int) ((Float.parseFloat(StaticStuff.removeTextFormatting(code).length() + "") * 1000f) / 15f);
+            code = prepareStringReplaceVar(code.replace("printwait ", ""));
+            print(code);
+            code = StaticStuff.removeTextFormatting(StaticStuff.prepareString(code));
+            int duration = (int) ((Float.parseFloat(code.replaceAll("\\[[^]]+]", "").length() + "") * 1000f) / 15f);
             duration = (int) ((Float.parseFloat(duration + "") / 100f) * textSpeedFactor) + 800;
             Log.add("Sleeping for " + duration + " milliseconds");
             Sleep.milliseconds(duration);
@@ -591,8 +594,8 @@ public class Interpreter {
             sleepTime(code);
         } else if (codeWords[0].equals("execute") && codeWords.length > 3) {
             //code = prepareStringReplaceVar(code); //EXECUTE STUFF
-            execute(code.replaceAll("execute (event|code) .+ as .+ \\{(?:.+)?\\}", "$1"), code.replaceAll("execute (?:event|code) (.+) as .+ \\{(?:.+)?\\}", "$1"),
-                    code.replaceAll("execute (?:event|code) .+ as (.+) \\{(?:.+)?\\}", "$1"), code.replaceAll("execute (?:event|code) .+ as .+ \\{(.+)?\\}", "$1").split(", "));
+            execute(code.replaceAll("execute (event|code) .+ as .+ \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) (.+) as .+ \\{(?:.+)?}", "$1"),
+                    code.replaceAll("execute (?:event|code) .+ as (.+) \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) .+ as .+ \\{(.+)?}", "$1").split(", "));
         } else if (codeWords[0].equals("jumpto")) {
             switch (codeWords[1]) {
                 case "first":
@@ -602,9 +605,11 @@ public class Interpreter {
                 case "next":
                     return "jumpnext:" + codeWords[2];
             }
-        } else if (codeWords[0].equals("alert")) {
+        } else if (code.startsWith("alert small")) {
+            new GuiHoverText(StaticStuff.prepareString(prepareStringReplaceVar(code.replace("alert small ", ""))));
+        }  else if (codeWords[0].equals("alert")) {
             StaticStuff.openPopup(prepareStringReplaceVar(code.replace("alert ", "")));
-        } else if (codeWords[0].equals("tag")) {
+        }else if (codeWords[0].equals("tag")) {
             tagModify(codeWords[1], code.replaceAll("tag #(.+)?# (add|remove) ", ""), codeWords[2]);
         } else if (codeWords[0].equals("audio") && codeWords[1].equals("play")) {
             playAudio(code.replace("audio play ", ""));
@@ -867,7 +872,7 @@ public class Interpreter {
                 Matcher m = patt.matcher(text);
                 if (m.find()) {
                     String item = m.group(1), inventory = m.group(2);
-                    int amount = Integer.parseInt(m.group(3));
+                    int amount = Integer.parseInt(prepareStringReplaceVar(m.group(3)));
                     String[] itemObjects = evaluateSelector(item);
                     String[] inventoryObjects = evaluateSelector(inventory);
                     for (String itemObject : itemObjects)
@@ -882,7 +887,7 @@ public class Interpreter {
                 Matcher m = patt.matcher(text);
                 if (m.find()) {
                     String item = m.group(1), inventory = m.group(2);
-                    int amount = Integer.parseInt(m.group(3)) * -1;
+                    int amount = Integer.parseInt(prepareStringReplaceVar(m.group(3))) * -1;
                     String[] itemObjects = evaluateSelector(item);
                     String[] inventoryObjects = evaluateSelector(inventory);
                     for (String itemObject : itemObjects)
@@ -918,7 +923,7 @@ public class Interpreter {
                 Matcher m = patt.matcher(text);
                 if (m.find()) {
                     String item = m.group(1), inventory = m.group(2);
-                    int amount = Integer.parseInt(m.group(3));
+                    int amount = Integer.parseInt(prepareStringReplaceVar(m.group(3)));
                     String[] itemObjects = evaluateSelector(item);
                     String[] inventoryObjects = evaluateSelector(inventory);
                     for (String itemObject : itemObjects)
@@ -1011,6 +1016,7 @@ public class Interpreter {
 
     private void setValue(String variable, String[] values) {
         try {
+            if(values[0].equals("{empty}") || values[0].equals("{null}")) values[0] = "";
             Log.add("trying to set variable '" + variable + "' to" + (values.length > 1 ? "" : " '" + values[0] + "'"));
             Log.addIndent();
             StringBuilder valueToSet = new StringBuilder();
@@ -1039,7 +1045,8 @@ public class Interpreter {
                     for (String s : selector) manager.setLocationFromNPC(s, valueToSet.toString());
                 } else if (variable.contains(".variable")) {
                     String variableName = variable.replaceAll("\\{[^{]+}\\.[^(]+\\(([^(]*)\\)", "$1");
-                    for (String s : selector) manager.setLocalVariableByVarNameObjectUID(s, variableName, valueToSet.toString());
+                    for (String s : selector)
+                        manager.setLocalVariableByVarNameObjectUID(s, variableName, valueToSet.toString());
                 }
             } else if (variableParts[0].equals("file")) {
                 if (!permissionFileWrite && !permissionFileWriteAnywhere) {
@@ -1361,15 +1368,22 @@ public class Interpreter {
                 else if (baseParam[1].equals("dropDown"))
                     results = new String[]{StaticStuff.openPopup(baseParam[2], baseParam[3].split(";"), "")};
                 else if (baseParam[1].equals("button")) {
-                    if (baseParam.length == 4)
+                    if (baseParam.length == 4) {
                         results = new String[]{"" + StaticStuff.openPopup(baseParam[2], baseParam[3].split(";"))};
-                    else if (baseParam.length == 3)
+                    } else if (baseParam.length == 3) {
                         results = new String[]{"" + StaticStuff.openPopup(baseParam[2].split(";"), false)};
+                    }
+                } else if (baseParam[1].equals("buttonlist")) {
+                    if (baseParam.length == 4) {
+                        results = new String[]{"" + StaticStuff.openPopup(baseParam[2], evaluateVariable("{" + baseParam[3] + "}"))};
+                    } else if (baseParam.length == 3) {
+                        results = new String[]{"" + StaticStuff.openPopup(evaluateVariableWithVariablesInside("{" + baseParam[2] + "}"), false)};
+                    }
                 } else if (baseParam[1].equals("dice"))
                     results = new String[]{"" + StaticStuff.rollDice(baseParam[2], Integer.parseInt(baseParam[3]), Integer.parseInt(baseParam[4]), Boolean.parseBoolean(baseParam[5]))};
                 else if (baseParam[1].equals("line")) results = StaticStuff.waitForLineInput().split("LINEBREAK");
             } else if (baseParam[0].equals("value")) {
-                results = new String[]{baseParam[1]};
+                results = baseParam[1].split(";");
             } else if (baseParam[0].equals("web")) {
                 if (permissionWeb) results = FileManager.getStringArrayFromURL(baseParam[1]);
                 else results = new String[]{"Missing permission 'web'"};
@@ -1410,8 +1424,8 @@ public class Interpreter {
 
             if (modifiers != null)
                 for (String modifier : modifiers) {
-                    String modifierName = modifier.replaceAll("([a-zA-Z]+)\\([^\\)]*\\)", "$1");
-                    String[] modifierParam = modifier.replaceAll("[a-zA-Z]+\\(([^\\)]*)\\)", "$1").split("\\|");
+                    String modifierName = modifier.replaceAll("([a-zA-Z]+)\\([^)]*\\)", "$1");
+                    String[] modifierParam = modifier.replaceAll("[a-zA-Z]+\\(([^)]*)\\)", "$1").split("\\|");
                     for (int j = 0; j < modifierParam.length; j++)
                         modifierParam[j] = modifierParam[j].replace("ESCAPEDSPLITTER", "|");
 
@@ -1602,7 +1616,7 @@ public class Interpreter {
                         }
                     } else if (modifierName.equals("remove")) {
                         try {
-                            int count = results.length, count2 = 0, unpick = 0, origCount = count;
+                            int count = results.length, count2 = 0, unpick, origCount = count;
                             String[] picked = new String[results.length];
                             if (modifierParam[0].equals("index")) {
                                 unpick = Integer.parseInt(modifierParam[1]);
@@ -1648,7 +1662,7 @@ public class Interpreter {
                     } else if (modifierName.equals("append")) {
                         try {
                             String[] appendValues;
-                            String modifierList = modifier.replaceAll("[a-zA-Z]+\\(([^\\)]*)\\)", "$1");//.replaceAll("[^\\|]+\\|(.+)","$1");
+                            String modifierList = modifier.replaceAll("[a-zA-Z]+\\(([^)]*)\\)", "$1");//.replaceAll("[^\\|]+\\|(.+)","$1");
                             appendValues = evaluateVariable("{" + modifierList + "}");
                             if (appendValues.length == 0) appendValues = new String[]{modifierList};
                             String[] oldResults = new String[results.length];

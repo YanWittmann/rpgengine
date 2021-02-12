@@ -106,6 +106,28 @@ public class StaticStuff {
         return str.substring(minIndex, maxIndex);
     }
 
+    public static String getLineAtIndex(String str, int index) {
+        if (index == -1 || index > str.length()) return "";
+        int minIndex = index;
+        while (true) {
+            minIndex--;
+            if (minIndex <= -1) break;
+            if (str.charAt(minIndex) == '\n') break;
+        }
+        minIndex++;
+        int maxIndex = index;
+        while (true) {
+            maxIndex++;
+            if (maxIndex >= str.length()) break;
+            if (str.charAt(maxIndex) == '\n') break;
+        }
+
+        str = str.substring(minIndex, maxIndex);
+        if (str.split("\n").length > 1)
+            return str.split("\n")[0];
+        else return str;
+    }
+
     public static int countOccurrences(String text, String find) {
         int count = 0, lastIndex = 0;
         while (lastIndex != -1) {
@@ -119,6 +141,7 @@ public class StaticStuff {
     }
 
     private static String lastCreatedUID = "";
+
     public static void setLastCreatedUID(String uid) {
         lastCreatedUID = uid;
     }

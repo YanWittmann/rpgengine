@@ -72,7 +72,9 @@ public class Variables {
     }
 
     public String getValueByUID(String uid) {
-        return this.value.get(this.uids.indexOf(uid));
+        int index = this.uids.indexOf(uid);
+        if(index == -1) return "";
+        return this.value.get(index);
     }
 
     public String getValueByName(String name) {
@@ -104,7 +106,7 @@ public class Variables {
     }
 
     public String[] getUIDs() {
-        String ret[] = new String[uids.size()];
+        String[] ret = new String[uids.size()];
         for (int i = 0; i < uids.size(); i++) ret[i] = uids.get(i);
         return ret;
     }

@@ -22,8 +22,22 @@ public abstract class Entity {
         return str.replace(",,,", "\n");
     }
 
+    public String generateNotepadEventEditorString(String str, String eventName) {
+        String code = str.replace(",,,", "\n");
+        if (code.matches("^#[^-]+ - [^\\n]+\\n(?:.|\\n)*")) {
+            code = code.replaceAll("^#[^-]+ - [^\\n]+\\n", "#" + name + " - " + eventName + "\n");
+        } else {
+            code = "#" + name + " - " + eventName + "\n\n" + code;
+        }
+        return code;
+    }
+
     public void setEventsFromEditor(int eventIndex, String code) {
+        System.out.println(eventIndex + " " + code);
         if (code.equals("")) code = "none";
+        if (code.split("\n")[0].matches("^#[^-]+ - .+")) {
+            code = code.replaceAll("^#[^-]+ - [^\\n]+\\n{1,2}", "");
+        }
         eventCode.set(eventIndex, code.replace("\n", ",,,"));
     }
 
@@ -31,7 +45,7 @@ public abstract class Entity {
         if (name == null) return;
         if (!eventName.contains(name)) {
             eventName.add(name);
-            eventCode.add("Code for event '" + name + "' in " + uid);
+            eventCode.add("log add event: " + uid + " - " + this.name + " - " + name);
             if (Manager.openActionEditor) new GuiActionEditor(this, eventName.size() - 1);
         } else Popup.error(StaticStuff.projectName + " - Error", "This event already exists");
     }
@@ -64,7 +78,7 @@ public abstract class Entity {
         localVarValue.add("Hello world");
         if (open) {
             openVariable(localVarUids.get(localVarUids.size() - 1), false);
-            StaticStuff.copyString(localVarUids.get(localVarUids.size() - 1));
+            StaticStuff.setLastCreatedUID(localVarUids.get(localVarUids.size() - 1));
         }
     }
 
@@ -134,6 +148,15 @@ public abstract class Entity {
 
     public String getUID() {
         return uid;
+    }
+
+    public void setImage(String uid) {
+    }
+
+    public void setLocation(String uid) {
+    }
+
+    public void setInventory(String uid) {
     }
 
     public int refactor(String find, String replace) {

@@ -99,7 +99,7 @@ public class GuiEntityEditor extends JFrame {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "REFRESH");
         getRootPane().getActionMap().put("REFRESH", refreshAction);
 
-        Action triggerButtonAction[] = new Action[buttons.length];
+        Action[] triggerButtonAction = new Action[buttons.length];
         for (int i = 0; i < buttons.length; i++) {
             final int ii = i;
             triggerButtonAction[i] = new AbstractAction() {
@@ -120,11 +120,91 @@ public class GuiEntityEditor extends JFrame {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_8, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "TRIGGER_BUTTON_8");
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "TRIGGER_BUTTON_9");
 
+        Action editLine = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                editAction(EDIT);
+            }
+        };
+        getRootPane().getActionMap().put("EDIT", editLine);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "EDIT");
+
+        Action editLineClose = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                editAction(EDIT_CLOSE);
+            }
+        };
+        getRootPane().getActionMap().put("EDIT_CLOSE", editLineClose);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "EDIT_CLOSE");
+
+        Action editLineStayInForeground = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                editAction(EDIT_STAY_IN_FOREGROUND);
+            }
+        };
+        getRootPane().getActionMap().put("EDIT_STAY_IN_FOREGROUND", editLineStayInForeground);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "EDIT_STAY_IN_FOREGROUND");
+
         try {
+            assert firstButton != null;
             firstButton.requestFocus();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         extraSetup();
+    }
+
+    private static final int EDIT = 0;
+    private static final int EDIT_CLOSE = 1;
+    private static final int EDIT_STAY_IN_FOREGROUND = 2;
+    private void editAction(int intention) {
+        String text = ta_entityData.getText();
+        //if (ta_entityData.getSelectedText() != null) text = ta_entityData.getSelectedText();
+
+        text = StaticStuff.getLineAtIndex(text, ta_entityData.getCaretPosition());
+
+        text = text.trim();
+        if(text.startsWith("Name: ")) {
+            String str = Popup.input("New name:", entity.name);
+            if (str == null) return;
+            if (str.equals("")) return;
+            entity.name = str;
+        } else if(text.startsWith("Description: ")) {
+            String str = Popup.input("New description:", entity.description);
+            if (str == null) return;
+            if (str.equals("")) return;
+            entity.description = str;
+        } else if(text.startsWith("Location: ")) {
+            getEntity().setLocation(Popup.dropDown(StaticStuff.projectName, "Select a location UID", Manager.getStringArrayLocations()).replaceAll(".+ - ([^-]+)", "$1"));
+        } else if(text.startsWith("Inventory: ")) {
+            getEntity().setInventory(Popup.dropDown(StaticStuff.projectName, "Select an inventory UID", Manager.getStringArrayInventories()).replaceAll(".+ - ([^-]+)", "$1"));
+        } else if(text.startsWith("Image: ")) {
+            getEntity().setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
+        } else if(text.equals("Tags:")) {
+            String str = Popup.input("Tag name:", "");
+            if (str == null) return;
+            if (str.equals("")) return;
+            getEntity().addTag(str);
+        } else if(text.equals("Events:")) {
+            String str = Popup.input("Event name:", "");
+            if (str == null) return;
+            if (str.equals("")) return;
+            entity.addEvent(str);
+        } else if(text.matches("\\d+: .+")) { //event
+            new GuiActionEditor(getEntity(), Integer.parseInt(text.replaceAll("(\\d+): .+", "$1")));
+        } else if(text.equals("Local variables:")) {
+            String str = Popup.input("Variable name:", "");
+            if (str == null) return;
+            if (str.equals("")) return;
+            getEntity().addVariable(str, true);
+        }  else if(StaticStuff.countOccurrences(text, " - ") == 3 && text.split(" - ")[0].matches("[\\da-zA-Z]{16}")) { //variable
+            getEntity().openVariable(text.split(" - ")[0], true);
+        }
+        if(intention == EDIT_CLOSE) dispose();
+        if(intention == EDIT_STAY_IN_FOREGROUND) {
+            setAlwaysOnTop(true);
+            Sleep.milliseconds(500);
+            setAlwaysOnTop(false);
+        }
+        else updateTextArea();
     }
 
     public void setBackgroundColor(Color color) {
@@ -146,7 +226,7 @@ public class GuiEntityEditor extends JFrame {
     }
 
     private void updateTextArea() {
-        String toDisplay[] = entity.generateInformation().split("\n");
+        String[] toDisplay = entity.generateInformation().split("\n");
         ta_entityData.setText("");
         for (int i = scrollIndex; i < toDisplay.length; i++) ta_entityData.append(toDisplay[i] + "\n");
     }
@@ -161,9 +241,7 @@ public class GuiEntityEditor extends JFrame {
         updateTextArea();
     }
 
-    public void extraSetup() {
-
-    }
+    public void extraSetup() {}
 
     public void buttonPressed(int index) {
         System.out.println("pressed button with index " + index + ". Overwrite 'private void buttonPressed(int index)' with your own method.");

@@ -27,12 +27,14 @@ public class Manager {
     public static ProjectSettings project;
     private Event generalEventCollection;
     private final Interpreter interpreter;
+    private static Manager self;
 
     public static boolean ready = false;
 
     public Manager(Interpreter interpreter, String filename, String extraFilePath) {
+        self = this;
         this.interpreter = interpreter;
-        this.extraFilePath = extraFilePath;
+        Manager.extraFilePath = extraFilePath;
         FileManager.clearTmp();
         openFile(filename);
     }
@@ -409,7 +411,7 @@ public class Manager {
         for (CustomCommand customCommand : customCommands) if (customCommand.uid.equals(uid)) return "customCommand";
         for (ColorObject color : colors) if (color.uid.equals(uid)) return "color";
         for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return "fileObject";
-        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return "fileObject";
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return "popup";
         if (audioExists(uid)) return "audio";
         if (imageExists(uid)) return "image";
         if (variableExists(uid)) return "variable";
@@ -1062,6 +1064,10 @@ public class Manager {
                 customPopupsMap.put(asName, popup.openPopup(asName));
             }
         }
+    }
+
+    public static void closeCustomPopupStatic(String uidOrName) {
+        self.closeCustomPopup(uidOrName);
     }
 
     public void closeCustomPopup(String uidOrName) {

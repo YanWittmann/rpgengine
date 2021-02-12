@@ -7,7 +7,6 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -316,6 +315,14 @@ public class GuiHub extends JFrame {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "OPENFILE");
         getRootPane().getActionMap().put("OPENFILE", openFileAction);
 
+        Action toggleFullscreenAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                toggleFullscreen();
+            }
+        };
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0, false), "FULLSCREEN");
+        getRootPane().getActionMap().put("FULLSCREEN", toggleFullscreenAction);
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -378,7 +385,6 @@ public class GuiHub extends JFrame {
     }
 
     private void resizeWindow(ComponentEvent e) {
-        //get width and height (original: 1494,891)
         int width;
         int height;
         if (e == null) {
@@ -388,6 +394,11 @@ public class GuiHub extends JFrame {
             width = e.getComponent().getWidth();
             height = e.getComponent().getHeight();
         }
+        resizeWindow(width, height);
+    }
+
+    private void resizeWindow(int width, int height) {
+        //get width and height (original: 1494,891)
 
         //initialise variables
         int mainPanelDist = 11, mainPanelMinWidth = 280, mainPanelWidth, mainPanelHeight = height - 132, mainPanelAmount, middle = width / 2;
@@ -429,6 +440,24 @@ public class GuiHub extends JFrame {
         setPanelVisible(mainPanelAmount);
 
         updateScreen();
+    }
+
+    private boolean isFullscreen = false;
+
+    private void toggleFullscreen() {
+        dispose();
+        if (isFullscreen) {
+            setExtendedState(JFrame.NORMAL);
+            setUndecorated(false);
+            setBounds(0,0,1494, 891);
+            setLocationRelativeTo(null);
+            resizeWindow(1494, 891);
+        } else {
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
+            setUndecorated(true);
+        }
+        isFullscreen = !isFullscreen;
+        setVisible(true);
     }
 
     private final HashMap<JTextArea, Boolean> isTextAreaFocused = new HashMap<>();
@@ -474,7 +503,7 @@ public class GuiHub extends JFrame {
 
     private JLabel createAJLabel() {
         JLabel l_pane = new JLabel();
-        l_pane.setBounds(18, 8, 120, 20);
+        l_pane.setBounds(18, 8, 140, 20);
         l_pane.setBackground(StaticStuff.getColor("buttons"));
         l_pane.setForeground(StaticStuff.getColor("text_color"));
         l_pane.setEnabled(true);
@@ -625,7 +654,7 @@ public class GuiHub extends JFrame {
     }
 
     private void addEntity() {
-        if(Manager.filename.equals("")) return;
+        if (Manager.filename.equals("")) return;
         String type = Popup.dropDown(StaticStuff.projectName, "Choose an entity to add:", boxNames);
         if (type == null) return;
         if (type.equals("")) return;
@@ -671,15 +700,16 @@ public class GuiHub extends JFrame {
     }
 
     private String lastTimeVersionUsed = "";
+
     private void openAdventureInPlayer() {
-        if(Manager.filename.equals("")) return;
-        if(!FileManager.fileExists("../../play/versions.txt")) {
+        if (Manager.filename.equals("")) return;
+        if (!FileManager.fileExists("../../play/versions.txt")) {
             Popup.error("Error", "Cannot find versions folder.");
             return;
         }
         String[] availableVersions = FileManager.getDirs("../../play");
         lastTimeVersionUsed = Popup.dropDown("Version selection", "What version do you want to use to open the adventure?\nThis is a 1.11.1+ feature!", availableVersions, lastTimeVersionUsed);
-        if(!FileManager.fileExists("../../play/" + lastTimeVersionUsed + "/play.jar")) {
+        if (!FileManager.fileExists("../../play/" + lastTimeVersionUsed + "/play.jar")) {
             Popup.error("Error", "Cannot find version jar.");
             return;
         }
@@ -688,17 +718,17 @@ public class GuiHub extends JFrame {
     }
 
     private void deleteEntity() {
-        if(Manager.filename.equals("")) return;
+        if (Manager.filename.equals("")) return;
         manager.deleteEntity(getSelectedUID("Enter the UID to delete:"));
     }
 
     private void editEntity() {
-        if(Manager.filename.equals("")) return;
+        if (Manager.filename.equals("")) return;
         manager.openEntity(getSelectedUID("Enter the UID to open:"));
     }
 
     private void cloneEntity() {
-        if(Manager.filename.equals("")) return;
+        if (Manager.filename.equals("")) return;
         manager.cloneEntity(getSelectedUID("Enter the UID to clone:"));
     }
 
@@ -801,7 +831,7 @@ public class GuiHub extends JFrame {
 
         delete.addActionListener(evt -> deleteAdventure());
 
-        shortcuts.addActionListener(evt -> Popup.message(StaticStuff.projectName, "These are the shortcuts you can use on the main menu:\nctrl+shift+n: New adventure\nctrl+n: New entity\nctrl+e: Edit entity\nctrl+k: Clone entity\nctrl+d: Delete entity\nctrl+r: Reload\nctrl+q: Scroll left\nctrl+w: Scroll right\nctrl+shift+q: Scroll up\nctrl+shift+w: Scroll down\nctrl+s: Save\nctrl+shift+s: Save as\nctrl+o: Open File\nctrl+shift+o: Open Adventure in player\nUse drag and drop to add adventures, images or audio files"));
+        shortcuts.addActionListener(evt -> Popup.message(StaticStuff.projectName, "These are the shortcuts you can use on the main menu:\nctrl+shift+n: New adventure\nctrl+n: New entity\nctrl+e: Edit entity\nctrl+k: Clone entity\nctrl+d: Delete entity\nctrl+r: Reload\nctrl+q: Scroll left\nctrl+w: Scroll right\nctrl+shift+q: Scroll up\nctrl+shift+w: Scroll down\nctrl+s: Save\nctrl+shift+s: Save as\nctrl+o: Open File\nctrl+shift+o: Open Adventure in player\nF11: Toggle fullscreen\nUse drag and drop to add adventures, images or audio files"));
 
         documentation.addActionListener(evt -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/documentation/"));
 

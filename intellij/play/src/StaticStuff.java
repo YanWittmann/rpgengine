@@ -380,7 +380,6 @@ public class StaticStuff {
         try {
             return (int) eval(expr);
         } catch (Exception e) {
-            e.printStackTrace();
             return -969657;
         }
     }

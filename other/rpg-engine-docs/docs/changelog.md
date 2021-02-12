@@ -1,6 +1,53 @@
 # Changelog
 ___
 
+## 09.02.2020 - RELEASE `1.11.5`
+#### New / Modification:
+
+ * you can now use `ctrl+w` in the object editor text area to keep the frame in foregound while editing / opening the selected line. this is primarily useful when opening multiple events in a text editor
+
+
+## 09.02.2020 - RELEASE `1.11.4`
+#### Bugfixes:
+
+ * the top labels of the creator were too short for the object type `eventCollections` (the `s` was always cut off), width has been increased (`120` > `140` pixels)
+ * a user closing a `customPopup` using `mouse wheel click` was not registered as closing the popup and when using the variable `{popup|[uids;names]}` it would still be listed as opened
+ * getting objects from type `popup` in player was not possible since they were interpreted as `fileObject`s
+ * fixed an issue where saving events would not work due to an error in the regex parser
+ * the automatically added `customCommand` `UseItemWithUID` would use the old `if` syntax and therefore not work. You will need to replace the code in the event `commandExecuted` in `UseItemWithUID` with this:
+ 
+		if {amount|#uid:{itemUID}#|#uid:{player|inventory}#} > 0 (
+			execute event {event|#uid:{itemUID}#|use} as #uid:{itemUID}# {}
+		)
+
+ * the `customCommand` `Talk` also contains an error: it has to be `execute event {event|#location:{player|location}#|talkTo} as self {name:{personName}}`
+ * the command `printwait` would miscalculate the wait duration by not removing the formatting characters from the print string
+ * invetory operations would not support variables in the `amount` parameter
+
+#### New / Modification:
+
+ * new command `alert small [VALUE]` that opens a small hover menu with the given text
+ * you can now fullscreen the creator by using the shortcut `F11`
+ * the `printwait` command will now ignore any `[text]` for the calculation of the duration. (`[player] hello!` == ` hello!`)
+
+
+## 08.02.2020
+#### Bugfixes:
+
+ * the `log` command was not included in the documentation
+ * setting a variable to `{empty}` did not work
+
+#### New / Modification:
+
+ * the action editor will now add a comment with the object name and the envent name to the first line when editing an event and remove it when saving it
+ * the new default string for events is `log add event: [UID] - [NAME] - [EVENT NAME]`
+ * you can now click on a line in the object editor and use `ctrl+e` to edit the selected line
+ * using `ctrl+q` will dothe same but close the object editor after performing the edit operation
+ * `log add` will now no longer print the command execution into the log but only what the `log add` parameter says
+ * the variable `{value|[VALUE 1];[VALUE 2]; ...}` now accepts multiple parameters and builds a list
+ * added new parameter `buttonlist` to the `{input}` variable: takes a variable (without `{}`) and opens a popup based on the list entries (`{input|buttonlist|tmp}`)
+
+
 ## 07.02.2020 - RELEASE `1.11.3`
 #### Bugfixes:
 

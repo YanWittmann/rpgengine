@@ -14,14 +14,15 @@ Let's start with the shortcuts you can use. These are the ones you can use on th
 * `ctrl+s` - Save
 * `ctrl+shift+s` - Save as
 * `ctrl+n` - New object
-* `ctrl+e` - Edit object (Select a UID and use shortcut to instantly open edit frame)
-* `ctrl+k` - Clone object (Select a UID and use shortcut to clone object)
-* `ctrl+d` - Delete object (Select a UID and use shortcut to instantly delete it)
+* `ctrl+e` - Edit object (Click on a UID and use shortcut to instantly open edit frame), also works in object frames
+* `ctrl+k` - Clone object (Click on a UID and use shortcut to clone object)
+* `ctrl+d` - Delete object (Click on a UID and use shortcut to instantly delete it)
 * `ctrl+r` - Reload
 * `ctrl+q` `ctrl+scroll up` - Scroll left
 * `ctrl+w` `ctrl+scroll down` - Scroll right
 * `ctrl+shift+q` `scroll up` - Scroll up
 * `ctrl+shift+w` `scroll down` - Scroll down
+* `F11` - Toggle fullscreen
 * `Drag and drop` - Open adventures, add images or audio files
 
 These are the ones you can use on the **object frames** and most other frames as well:

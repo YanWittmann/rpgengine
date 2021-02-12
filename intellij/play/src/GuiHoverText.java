@@ -7,10 +7,10 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 
 public class GuiHoverText extends JFrame {
-    private JLabel l_message;
     int currentOpacity = 100;
 
     public GuiHoverText(String text) {
+        text = "<html>" + text.replace("<html>", "");
         setAlwaysOnTop(true);
         setFocusableWindowState(false);
         setUndecorated(true);
@@ -20,7 +20,7 @@ public class GuiHoverText extends JFrame {
         FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
         int textwidth = StaticStuff.getTextWidthWithFontRemoveFormatting(text, StaticStuff.getPixelatedFont());
         int textheight = (int) (StaticStuff.getPixelatedFont().getStringBounds(text, frc).getHeight());
-        int sizeX = textwidth + 16, sizeY = textheight;//-10;
+        int sizeX = textwidth + 16, sizeY = textheight;
         this.setSize(sizeX, sizeY);
 
         JPanel contentPane = new JPanel(null) {
@@ -36,7 +36,7 @@ public class GuiHoverText extends JFrame {
         contentPane.setPreferredSize(new Dimension(sizeX, sizeY));
         contentPane.setBackground(new Color(20, 20, 20));
 
-        l_message = new JLabel(text, SwingConstants.CENTER);
+        JLabel l_message = new JLabel(text, SwingConstants.CENTER);
         l_message.setBounds(2, -7, sizeX, sizeY + 5);
         l_message.setBackground(new Color(214, 217, 223));
         l_message.setForeground(new Color(255, 255, 255));
@@ -67,12 +67,12 @@ public class GuiHoverText extends JFrame {
             public void run() {
                 try {
                     Thread.sleep(1000);
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
                 for (currentOpacity = currentOpacity; currentOpacity > 0; currentOpacity--) {
                     try {
                         Thread.sleep(5);
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                     }
                     setOpacity(currentOpacity * 0.01f);
                 }
@@ -86,7 +86,7 @@ public class GuiHoverText extends JFrame {
         for (currentOpacity = currentOpacity; currentOpacity > 0; currentOpacity--) {
             try {
                 Thread.sleep(3);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             setOpacity(currentOpacity * 0.01f);
         }

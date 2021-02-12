@@ -35,6 +35,12 @@ Here's a list of all of the commands and actions that you can use:
    
 		execute code {ifnot {value|{this}}.name() matches [0-9a-z]\{16\} ( && print {value|{this}}.name() && )} as ## {}
    
+ * ##### `log add [VALUE]`
+   Adds a custom string to the log.
+   
+ * ##### `log dump <[VALUE]>`
+   Saves the contents to a file with the option to specify the filename.
+   
  * ##### `print [VALUE]`
    Prints a string onto the main frame. When using a variable, only the first entry will be printed so make sure to only return the entry you want to print. You can join variables with text and format them with `[[color:[VALUE]]]`. Examples:  
    `print {selector|#type:npc;sort:random;limit:1#}.name() is [[gold:cool]]!` --> NPCName is <span style="color:gold">cool</span>!  
@@ -146,6 +152,9 @@ Here's a list of all of the commands and actions that you can use:
    
  * ##### `alert [VALUE]`
    Opens a popup with only text.
+   
+ * ##### `alert small [VALUE]`
+   Opens the small hover popup with the given text.
    
  * ##### `battle start [SELECTOR(battleMap)]`
    Switches to battle mode:

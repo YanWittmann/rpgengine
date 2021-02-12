@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Manager {
-    public static String pathExtension = "../../", filename = "", version = "1.11.3";
+    public static String pathExtension = "../../", filename = "", version = "1.11.5";
     public static ArrayList<Location> locations = new ArrayList<>();
     public static ArrayList<NPC> npcs = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();
@@ -114,7 +114,7 @@ public class Manager {
         openActionEditor = true;
     }
 
-    public void createNew(String filename) { //UNUSED SINCE THERE IS A NEW 'CREATE NEW FILE' DIALOGUE
+    /*public void createNew(String filename) { //UNUSED SINCE THERE IS A NEW 'CREATE NEW FILE' DIALOGUE
         openActionEditor = false;
         int result = 1;
         if (!Manager.filename.equals(""))
@@ -148,7 +148,7 @@ public class Manager {
         unsavedChanges = true;
         updateGui();
         openActionEditor = true;
-    }
+    }*/
 
     public void setFilename(String filename) {
         Manager.filename = filename;
