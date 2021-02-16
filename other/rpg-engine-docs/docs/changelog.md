@@ -1,7 +1,33 @@
 # Changelog
 ___
 
-## 09.02.2020 - RELEASE `1.11.5`
+## 16.02.2020 - RELEASE `1.11.6` (player)
+#### New / Modification:
+
+ * `globalTalentModifier` - new player setting that modifies the DC of every talent roll by the given value
+ * added variable `{inventory|[VALUE(inventory]}` that returns the contents (uids) of an inventory
+ * added modifier `.size()` that returns the amount of entries in the variable
+ * added new parameter `dropDownList` to the `{input}` variable: takes a variable (without `{}`) and opens a popup based on the list entries (`{input|dropDownList|choose one:|tmp}`)
+ * the console icon on the main player frame now grays out a bit if `player input` is set to `false` (is still usable, only to show that input is disabled)
+ * the small button input popup now supports formatted text
+ * added new command `exit` that will stop the current thread
+
+
+## 15.02.2020 - RELEASE `1.11.5` (player)
+#### New / Modification:
+
+ * equipping items that you can't hold any more will now lead to unequipping other items
+ * the engine will now ask if the player wants to save if player input is set to `false` to prevent the creation of invalid savestates
+ * if you leave the savestate name field empty, the engine will now cancle the savestate creation
+
+
+## 13.02.2020
+#### Bugfixes:
+
+ * the `ifnot` command would not be skipped correctly by a previous `if` that would take the `else` branch 
+
+
+## 09.02.2020 - RELEASE `1.11.5` (creator)
 #### New / Modification:
 
  * you can now use `ctrl+w` in the object editor text area to keep the frame in foregound while editing / opening the selected line. this is primarily useful when opening multiple events in a text editor

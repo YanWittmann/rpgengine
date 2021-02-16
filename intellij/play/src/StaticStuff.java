@@ -43,6 +43,7 @@ public class StaticStuff {
             commandYellow.add("log");
             commandYellow.add("clear");
             commandYellow.add("if");
+            commandYellow.add("exit");
             commandYellow.add("return");
             commandYellow.add("break");
             commandYellow.add("continue");

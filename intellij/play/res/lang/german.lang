@@ -113,14 +113,16 @@ loadAdventureFileEncrWrongPassword:[[red:Kann Abenteuer nicht entpacken!<br>Entw
 mainFramePlayerInputDisabled:[[red:Die Eingabe ist derzeit deaktiviert]]
 mainFramePlayerInputNoCommand:[[red:Das kannst du nicht machen]]
 
-savestateEnterName:Gib einen Namen fuer den [[gold:Speicherstand]] an
-savestateInvalidName:Gib einen validen Namen fuer den [[gold:Speicherstand]] an
+savestateEnterName:Gib einen Namen fuer den [[gold:Speicherstand]] an.<br>Leer lassen um den Vorgang abzubrechen.
+savestateInvalidName:Gib einen validen Namen fuer den [[gold:Speicherstand]] an.<br>Leer lassen um den Vorgang abzubrechen.
 savestateSavestateAvailable:Es ist ein [[gold:Speicherstand]] fuer dieses Abenteuer verfuegbar.
 savestateSavestatesAvailable:Es sind [[gold:Speicherstaende]] fuer dieses Abenteuer verfuegbar.
 savestateSelectSavestate:Welchen [[gold:Speicherstand]] moechtest du laden?
 savestateStartNewGame:Ein neues Abenteuer beginnen
 savestateCreatedSuccess:[[gold:Speicherstand]] [[green:{1}]] erstellt
 savestateCreatedFailed:red:Konnte [[gold:Speicherstand]] [[red:{1}]] nicht erstellen
+savestateCreateWarningPlayerInputDisabled:[[red:Achtung: im Moment wird hoechstwarscheinlich Code ausgefuehrt.<br>Wenn du jetzt abspeicherst, wird dieser Code beim naechsten<br>Laden nicht mehr fortgesetzt.]]
+savestateCancle:Abbrechen
 
 mainFrameActionHover1:[[green:Speicherstand erstellen]]
 mainFrameActionHover2:Befehle anzeigen

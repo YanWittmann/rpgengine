@@ -19,6 +19,7 @@ public class PlayerSettings {
         addIfNotContain("holdingMain", "50");
         addIfNotContain("holdingSecond", "50");
         addIfNotContain("holdingArmor", "50");
+        addIfNotContain("globalTalentModifier", "0");
     }
 
     public boolean addIfNotContain(String option, String value) {
@@ -30,6 +31,17 @@ public class PlayerSettings {
     public String getValue(String name) {
         for (String setting : settings) if (setting.contains(name + ":")) return setting.replaceAll(".+:", "");
         return "";
+    }
+
+    public int getValueInt(String name) {
+        for (String setting : settings) if (setting.contains(name + ":")) {
+            try {
+                return Integer.parseInt(setting.replaceAll(".+:", ""));
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        return 0;
     }
 
     public void setValue(String name, String value) {

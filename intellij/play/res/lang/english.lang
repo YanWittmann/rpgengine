@@ -113,14 +113,16 @@ loadAdventureFileEncrWrongPassword:[[red:Unable to unpack adventure!<br>This cou
 mainFramePlayerInputDisabled:[[red:Input is currently disabled]]
 mainFramePlayerInputNoCommand:[[red:You cannot do that]]
 
-savestateEnterName:Enter a name for the [[gold:savestate]]
-savestateInvalidName:Enter a valid name for the [[gold:savestate]]
+savestateEnterName:Enter a name for the [[gold:savestate]].<br>Leave empty to cancel.
+savestateInvalidName:Enter a valid name for the [[gold:savestate]].<br>Leave empty to cancel.
 savestateSavestateAvailable:There is a [[gold:savestate]] available for this adventure.
 savestateSavestatesAvailable:There are [[gold:savestates]] available for this adventure.
 savestateSelectSavestate:Which [[gold:savestate]] do you want to select?
 savestateStartNewGame:Start a new game
 savestateCreatedSuccess:Created [[gold:savestate]] [[green:{1}]]
 savestateCreatedFailed:Could not create [[gold:savestate]] [[red:{1}]]
+savestateCreateWarningPlayerInputDisabled:[[red:Warning: there might be events running right now.<br>If you save the game now, the events will not resume<br>when reopening the savestate.]]
+savestateCancle:Cancle
 
 mainFrameActionHover1:[[green:Create savestate]]
 mainFrameActionHover2:Show commands

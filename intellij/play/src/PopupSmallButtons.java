@@ -38,7 +38,7 @@ public class PopupSmallButtons extends JFrame {
 
             JLabel[] l_button = new JLabel[options.length];
             for (int i = 0; i < options.length; i++) {
-                l_button[i] = new JLabel(options[i]);
+                l_button[i] = new JLabel(options[i].replaceAll("\\[\\[[^:]+:", "").replace("]]", ""));
                 l_button[i].setBounds(Interpreter.getScaledValue(18), (Interpreter.getScaledValue(7) + (i * textHeight)), x_size, textHeight);
                 l_button[i].setBackground(StaticStuff.getColor("def_text_color_main"));
                 l_button[i].setForeground(StaticStuff.getColor("def_text_color_main"));
@@ -51,15 +51,15 @@ public class PopupSmallButtons extends JFrame {
                         click(finalI);
                     }
 
-                    String before;
+                    final String withFormatting = "<html>" + StaticStuff.prepareString("[[aqua:" + options[finalI] + "]]");
+                    final String withoutFormatting = options[finalI].replaceAll("\\[\\[[^:]+:", "").replace("]]", "");
 
                     public void mouseEntered(MouseEvent e) {
-                        before = l_button[finalI].getText();
-                        l_button[finalI].setText("<html>" + StaticStuff.prepareString("[[aqua:" + before.replaceAll("<[^>]+>", "") + "]]"));
+                        l_button[finalI].setText(withFormatting);
                     }
 
                     public void mouseExited(MouseEvent e) {
-                        l_button[finalI].setText(before);
+                        l_button[finalI].setText(withoutFormatting);
                     }
                 });
                 contentPane.add(l_button[i]);

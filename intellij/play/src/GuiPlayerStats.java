@@ -103,7 +103,7 @@ public class GuiPlayerStats extends JFrame {
         l_inventoryHeader.setVisible(false);
 
         int invSlotsApart = Interpreter.getScaledValue(26);
-        amountItems = (int) (270 / invSlotsApart);
+        amountItems = 270 / invSlotsApart;
         l_inventorySlots = new JLabel[amountItems];
         for (int i = 0; i < amountItems; i++) {
             l_inventorySlots[i] = new JLabel();
@@ -115,11 +115,7 @@ public class GuiPlayerStats extends JFrame {
             l_inventorySlots[i].setText("Item " + (i + 1));
             l_inventorySlots[i].setVisible(false);
             final int ii = i;
-            l_inventorySlots[i].addMouseWheelListener(new MouseWheelListener() {
-                public void mouseWheelMoved(MouseWheelEvent evt) {
-                    scroll(evt);
-                }
-            });
+            l_inventorySlots[i].addMouseWheelListener(this::scroll);
             l_inventorySlots[i].addMouseListener(new MouseListener() {
                 public void mouseReleased(MouseEvent e) {
                 }
@@ -322,7 +318,7 @@ public class GuiPlayerStats extends JFrame {
         l_attr[6].setText("<html>" + StaticStuff.prepareString(player.getValue("strength")));
         l_playername.setText("<html>" + StaticStuff.prepareString("[[gold:" + player.getValue("name") + "]]"));
         l_playerClass.setText("<html>" + StaticStuff.prepareString("[[gray:" + player.getValue("class") + "]]"));
-        l_stats.setText("<html>" + StaticStuff.prepareString(Interpreter.lang("playerStatsInsertValues", player.getValue("health") + " [[white:/]] " + player.getValue("maxHealth"), player.getValue("gold"), manager.getName(player.getValue("location")))));
+        l_stats.setText("<html>" + StaticStuff.prepareString(Interpreter.lang("playerStatsInsertValues", player.getValue("health") + " [[white:/]] " + player.getValue("maxHealth"), player.getValue("gold"), Manager.getName(player.getValue("location")))));
         inventoryItems = playerInventory.getItemsAsStringArray();
         inventoryItemsUIDs = playerInventory.getItemUIDsAsStringArray();
         if (!(inventoryItems.length > scrollIndex + 2)) scrollIndex = Math.max(0, inventoryItems.length - 2);
@@ -499,20 +495,20 @@ public class GuiPlayerStats extends JFrame {
             } else {
                 options[current] = Interpreter.lang("playerStatsItemClickUnequip");
             }
-            //int choice = StaticStuff.openPopup(Interpreter.lang("popupItemClicked", Manager.getName(clickedUID)), options); //large frame
+            //choose what to do with clicked item
             int choice = StaticStuff.openPopup(options, true);
-            if (choice == 0) {
+            if (choice == 0) { //open/examine
                 GuiObjectDisplay.create(Manager.getEntity(clickedUID), Interpreter.lang("playerStatsItemOpenItem"));
-            } else if (choice == 1) {
+            } else if (choice == 1) { //use
                 interpreter.executePlayerCommand("useWithUID " + clickedUID);
-            } else if ((choice == 2) && !isHoldingClickedItem) {
+            } else if ((choice == 2) && !isHoldingClickedItem) { //equip item
                 Item toEquip = (Item) Manager.getEntity(clickedUID);
                 assert toEquip != null;
                 String slot = toEquip.getVariableValue("hands");
                 boolean current1 = false, current2 = false;
                 if (player.getValue("holdingMain").equals("")) current1 = true;
                 if (player.getValue("holdingSecond").equals("")) current2 = true;
-                switch (slot) {
+                /*switch (slot) {
                     case "1":
                         if (current1) player.setValue("holdingMain", clickedUID);
                         else if (current2) player.setValue("holdingSecond", clickedUID);
@@ -529,9 +525,33 @@ public class GuiPlayerStats extends JFrame {
                             player.setValue("holdingArmor", clickedUID);
                         } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
                         break;
+                }*/
+                switch (slot) {
+                    case "1":
+                        if (current1 || !current2) {
+                            String changeSlots = player.getValue("holdingMain");
+                            try {
+                                Item changeItem = (Item) Manager.getEntity(changeSlots);
+                                if (changeItem != null)
+                                    changeSlots = changeItem.getVariableValue("hands");
+                            } catch(Exception ignored) {}
+                            if (changeSlots.equals("1"))
+                                player.setValue("holdingSecond", player.getValue("holdingMain"));
+                            else
+                                player.setValue("holdingSecond", "");
+                            player.setValue("holdingMain", clickedUID);
+                        } else player.setValue("holdingSecond", clickedUID);
+                        break;
+                    case "2":
+                        player.setValue("holdingMain", clickedUID);
+                        player.setValue("holdingSecond", clickedUID);
+                        break;
+                    case "armor":
+                        player.setValue("holdingArmor", clickedUID);
+                        break;
                 }
                 updateInventory();
-            } else if (choice == 2) {
+            } else if (choice == 2) { //unequip item
                 if (player.getValue("holdingArmor").equals(clickedUID)) player.setValue("holdingArmor", "");
                 if (player.getValue("holdingMain").equals(clickedUID)) player.setValue("holdingMain", "");
                 if (player.getValue("holdingSecond").equals(clickedUID)) player.setValue("holdingSecond", "");

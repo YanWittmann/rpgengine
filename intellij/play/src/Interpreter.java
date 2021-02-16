@@ -1,6 +1,5 @@
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +12,7 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.11.4";
+    private final String version = "1.11.6";
     private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg; //there are no cfg entries at the moment so this is unnecessary
@@ -244,9 +243,13 @@ public class Interpreter {
     }
 
     public void createSavestate() {
+        if (!userInputAllowed)
+            if (StaticStuff.openPopup(lang("savestateCreateWarningPlayerInputDisabled"), new String[]{lang("battleMapCloseCheckNotClose"), lang("savestateCancle")}) == 1)
+                return;
         String saveName = StaticStuff.openPopup(lang("savestateEnterName"), "");
-        while (saveName.equals("") || saveName.contains(".") || saveName.contains("/") || saveName.contains("-")) {
-            saveName = StaticStuff.openPopup(lang("savestateInvalidName"), "");
+        if (saveName.equals("") || saveName.contains(".") || saveName.contains("/") || saveName.contains("-")) {
+            //saveName = StaticStuff.openPopup(lang("savestateInvalidName"), "");
+            return;
         }
         manager.createSavestate(saveName + "---");
     }
@@ -282,16 +285,7 @@ public class Interpreter {
         return FileManager.getFiles(Manager.SAVESTATES_DIRECTORY);
     }
 
-    private void playerWalk(String newLocation) {
-        if (newLocation.length() == 0) {
-            print(lang("errorChatNoNewLocation"));
-            return;
-        }
-        executeEventFromObject(player.getValue("location"), "walk", new String[]{"newLocation:" + newLocation});
-        GuiPlayerStats.updateOutput();
-    }
-
-    public void execute(String type, String commandOrEvent, String as, String[] args) {
+    public boolean execute(String type, String commandOrEvent, String as, String[] args) {
         String[] asUID;
         if (as.equals("self"))
             asUID = null;
@@ -300,26 +294,34 @@ public class Interpreter {
 
         if (type.equals("event")) { //execute an event
             commandOrEvent = "{" + prepareStringReplaceVar(commandOrEvent.substring(1));
-            String selector = prepareStringReplaceVar(commandOrEvent.replaceAll("\\{event\\|(.+)\\|.+\\}", "$1")); //\\{event\\|(.+)\\|.+\\}
-            String eventName = prepareStringReplaceVar(commandOrEvent.replaceAll("\\{event\\|.+\\|(.+)\\}", "$1"));
+            String selector = prepareStringReplaceVar(commandOrEvent.replaceAll("\\{event\\|(.+)\\|.+}", "$1")); //\\{event\\|(.+)\\|.+\\}
+            String eventName = prepareStringReplaceVar(commandOrEvent.replaceAll("\\{event\\|.+\\|(.+)}", "$1"));
             String[] objectUID = evaluateSelector(selector);
             if (!eventName.equals("all")) { //execute only one event
                 if (asUID == null)
-                    for (String s : objectUID) executeEventFromObjectAs(s, s, eventName, args);
+                    for (String s : objectUID) {
+                        if (executeEventFromObjectAs(s, s, eventName, args)) return true;
+                    }
                 else
                     for (String s : asUID)
-                        for (String value : objectUID) executeEventFromObjectAs(s, value, eventName, args);
+                        for (String value : objectUID) {
+                            if (executeEventFromObjectAs(s, value, eventName, args)) return true;
+                        }
             } else { //execute all events of the object
                 if (asUID == null)
                     for (String s : objectUID) {
                         ArrayList<String> events = manager.getAllEventNames(s);
-                        for (String event : events) executeEventFromObjectAs(s, s, event, args);
+                        for (String event : events) {
+                            if (executeEventFromObjectAs(s, s, event, args)) return true;
+                        }
                     }
                 else
                     for (String s : asUID)
                         for (String value : objectUID) {
                             ArrayList<String> events = manager.getAllEventNames(value);
-                            for (String event : events) executeEventFromObjectAs(s, value, event, args);
+                            for (String event : events) {
+                                if (executeEventFromObjectAs(s, value, event, args)) return true;
+                            }
                         }
             }
         } else { //execute code
@@ -328,6 +330,7 @@ public class Interpreter {
             else
                 for (String s : asUID) executeEvent(s, codeToExecute, args);
         }
+        return false;
     }
 
     public static void executeEventFromObjectStatic(String uid, String event, String[] args) {
@@ -346,11 +349,11 @@ public class Interpreter {
         executeEvent(uid, manager.getEventCode(uid, event), args);
     }
 
-    public void executeEventFromObjectAs(String as, String uid, String event, String[] args) {
-        executeEvent(as, manager.getEventCode(uid, event), args);
+    public boolean executeEventFromObjectAs(String as, String uid, String event, String[] args) {
+        return executeEvent(as, manager.getEventCode(uid, event), args);
     }
 
-    public void executeEvent(String uid, String[] pCode, String[] args) {
+    public boolean executeEvent(String uid, String[] pCode, String[] args) {
         Log.addIndent();
         //for each stuff
         ArrayList<String> bracketsHierarchy = new ArrayList<>();
@@ -379,10 +382,14 @@ public class Interpreter {
                                                 endI = i;
                                                 i = beforeI;
                                                 break label;
+                                            case "exit":
+                                                Log.add("Exiting from events");
+                                                Log.removeIndent();
+                                                return true;
                                             case "return":
                                                 Log.add("Leaving event and returning");
                                                 Log.removeIndent();
-                                                return;
+                                                return false;
                                             case "break":
                                                 Log.add("Exiting 'for each' via break");
                                                 break label;
@@ -404,7 +411,7 @@ public class Interpreter {
                                                         skipBrackets--;
                                                     } else if (testString.matches("\\)( ?else ?\\()?") && !lastIfSuccessful.get(lastIfSuccessful.size() - 1) && skipBrackets == 0) {
                                                         skipBrackets--;
-                                                    } else if (testString.matches("if (.+) \\(") || testString.matches("is (.+) \\("))
+                                                    } else if (testString.matches("if(?:not)? (.+) \\(") || testString.matches("is(?:not)? (.+) \\("))
                                                         skipBrackets++;
                                                     if (skipBrackets == -1) {
                                                         lastIfSuccessful.remove(lastIfSuccessful.size() - 1);
@@ -430,7 +437,7 @@ public class Interpreter {
                                     break;
                                 }
                             }
-                        else //execute line normally
+                        else //execute line normally and not in for each
                             lineResult = executeLine(i, uid, pCode[i], args, bracketsHierarchy, forEachUIDs, lastIfSuccessful);
                         if (lineResult.length() > 0) Log.add("Return value from code line: " + lineResult);
                         if (lineResult.equals("")) ;
@@ -451,7 +458,7 @@ public class Interpreter {
                                 }
                             }
                         } else if (lineResult.equals("forskip")) {
-                            for (; i < pCode.length - 1; ) {
+                            while (i < pCode.length - 1) {
                                 i++;
                                 String testString = pCode[i].trim();
                                 if (testString.equals("}"))
@@ -475,7 +482,11 @@ public class Interpreter {
                         } else if (lineResult.equals("return")) {
                             Log.add("Leaving event and returning");
                             Log.removeIndent();
-                            return;
+                            return false;
+                        } else if (lineResult.equals("exit")) {
+                            Log.add("Exiting from events");
+                            Log.removeIndent();
+                            return true;
                         }
                     }
                 }
@@ -490,6 +501,7 @@ public class Interpreter {
         } catch (Exception e) {
             Log.add("Unable to update player GUI (has it opened yet?)");
         }
+        return false;
     }
 
     private String executeLine(int lineIndex, String uid, String line, String[] args, ArrayList<String> bracketsHierarchy, ArrayList<String[]> forEachUIDs, ArrayList<Boolean> lastIfSuccessful) {
@@ -540,6 +552,8 @@ public class Interpreter {
             } else if (code.matches("\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))* == .+")) { //"\\{[^\\}]+\\}(?:\\.[^\\(]+\\([^\\)]*\\))* == .+"
                 setValueEvaluate(code.replaceAll("(\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))*) == .+", "$1"), code.replaceAll("\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))* == (.+)", "$1"), false);
             }
+        } else if (code.equals("exit")) {
+            return "exit";
         } else if (code.equals("return")) {
             return "return";
         } else if (code.equals("continue")) {
@@ -594,8 +608,9 @@ public class Interpreter {
             sleepTime(code);
         } else if (codeWords[0].equals("execute") && codeWords.length > 3) {
             //code = prepareStringReplaceVar(code); //EXECUTE STUFF
-            execute(code.replaceAll("execute (event|code) .+ as .+ \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) (.+) as .+ \\{(?:.+)?}", "$1"),
-                    code.replaceAll("execute (?:event|code) .+ as (.+) \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) .+ as .+ \\{(.+)?}", "$1").split(", "));
+            if(execute(code.replaceAll("execute (event|code) .+ as .+ \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) (.+) as .+ \\{(?:.+)?}", "$1"),
+                    code.replaceAll("execute (?:event|code) .+ as (.+) \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) .+ as .+ \\{(.+)?}", "$1").split(", ")))
+                return "exit";
         } else if (codeWords[0].equals("jumpto")) {
             switch (codeWords[1]) {
                 case "first":
@@ -607,9 +622,9 @@ public class Interpreter {
             }
         } else if (code.startsWith("alert small")) {
             new GuiHoverText(StaticStuff.prepareString(prepareStringReplaceVar(code.replace("alert small ", ""))));
-        }  else if (codeWords[0].equals("alert")) {
+        } else if (codeWords[0].equals("alert")) {
             StaticStuff.openPopup(prepareStringReplaceVar(code.replace("alert ", "")));
-        }else if (codeWords[0].equals("tag")) {
+        } else if (codeWords[0].equals("tag")) {
             tagModify(codeWords[1], code.replaceAll("tag #(.+)?# (add|remove) ", ""), codeWords[2]);
         } else if (codeWords[0].equals("audio") && codeWords[1].equals("play")) {
             playAudio(code.replace("audio play ", ""));
@@ -1016,7 +1031,7 @@ public class Interpreter {
 
     private void setValue(String variable, String[] values) {
         try {
-            if(values[0].equals("{empty}") || values[0].equals("{null}")) values[0] = "";
+            if (values[0].equals("{empty}") || values[0].equals("{null}")) values[0] = "";
             Log.add("trying to set variable '" + variable + "' to" + (values.length > 1 ? "" : " '" + values[0] + "'"));
             Log.addIndent();
             StringBuilder valueToSet = new StringBuilder();
@@ -1080,6 +1095,7 @@ public class Interpreter {
     }
 
     public boolean rollTalent(String talent, String dc, String visible, String autoRoll, String message) {
+        int dcModifier = player.getValueInt("globalTalentModifier");
         talent = prepareStringReplaceVar(talent.replace("-", " "));
         String talentUID = manager.getUID(talent);
         String[] attributes = manager.getTalentAttributes(talentUID);
@@ -1087,9 +1103,10 @@ public class Interpreter {
         dc = prepareStringReplaceVar(dc);
         int diffClass = 0;
         if (dc.matches("-?\\d+")) diffClass = Integer.parseInt(dc);
-        else Log.add("Invalid DC value (does not match -?\\d+): " + dc);
+        else Log.add("Invalid DC value (does not match '-?\\d+'): " + dc);
 
-        Log.add("Rolling talent " + talent + " with DC " + dc);
+        Log.add("Rolling talent " + talent + " with DC " + dc + (dcModifier != 0 ? " plus global modifier " + dcModifier : ""));
+        diffClass += dcModifier;
         if (attributes.length > 0)
             if (!rollAttributeWithDC(attributes, 0, diffClass, visible.equals("true"), autoRoll.equals("true"), talent, message)) {
                 if (visible.equals("true")) StaticStuff.openPopup(lang("popupTalentRollFail"));
@@ -1336,7 +1353,8 @@ public class Interpreter {
             for (int i = 0; i < baseParam.length; i++)
                 baseParam[i] = baseParam[i].replace("ESCAPEDSPLITTER", "|");
 
-            String modif = "", modifiers[] = null;
+            String modif = "";
+            String[] modifiers = null;
             if (s.matches("\\{[^{]+}.+")) {
                 modif = s.replaceAll("\\{[^{]+}(.*)", "$1").replaceAll("\\\\\\|", "ESCAPEDSPLITTER").replaceFirst("\\.", "");
                 modifiers = modif.split("\\.");
@@ -1367,6 +1385,8 @@ public class Interpreter {
                     results = new String[]{StaticStuff.openPopup(baseParam[2], "")};
                 else if (baseParam[1].equals("dropDown"))
                     results = new String[]{StaticStuff.openPopup(baseParam[2], baseParam[3].split(";"), "")};
+                else if (baseParam[1].equals("dropDownList"))
+                    results = new String[]{StaticStuff.openPopup(baseParam[2], evaluateVariable("{" + baseParam[3] + "}"), "")};
                 else if (baseParam[1].equals("button")) {
                     if (baseParam.length == 4) {
                         results = new String[]{"" + StaticStuff.openPopup(baseParam[2], baseParam[3].split(";"))};
@@ -1420,6 +1440,8 @@ public class Interpreter {
                 } else if (baseParam[1].equals("uids")) {
                     results = manager.getCurrentCustomPopupUIDs();
                 }
+            } else if (baseParam[0].equals("inventory")) {
+                results = manager.getInventoryContents(evaluateSelector(baseParam[1])[0]);
             }
 
             if (modifiers != null)
@@ -1503,6 +1525,8 @@ public class Interpreter {
                                 results[j] = "" + results[j].length();
                             } catch (Exception ignored) {
                             }
+                    } else if (modifierName.equals("size")) {
+                        results = new String[]{results.length + ""};
                     } else if (modifierName.equals("substring")) {
                         int from = Integer.parseInt(modifierParam[0]), to = Integer.parseInt(modifierParam[1]);
                         for (int j = 0; j < results.length; j++)

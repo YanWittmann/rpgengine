@@ -1,0 +1,5 @@
+#wow - commandExecuted
+
+print 0
+execute event {event|9dc26c94653a41a9|hmm} as self {}
+print 2

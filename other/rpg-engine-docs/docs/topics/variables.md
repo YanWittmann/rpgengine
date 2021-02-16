@@ -36,7 +36,7 @@ Time for a list of all possible variable bases:
 | `{input|dice|[VALUE(text)]|[VALUE(sides)]|[VALUE(duration)]|[VALUE(autoroll;boolean)]} 						` | Opens a popup with a dice and returns the value rolled                                                                                                                                  |
 | `{input|button|[VALUE(text)]|[VALUE(button1)];[VALUE(button2)];...}                    						` | Opens a popup with a text and multiple buttons and returns the ID of the one selected                                                                                                   |
 | `{input|button|[VALUE(button1)];[VALUE(button2)];...}                    										` | Opens a smaller popup with multiple buttons and returns the ID of the one selected                                                                                                      |
-| `{input|buttonlist|[VARIABLE(without `{}`)]}           									  					` | Opens a popup with a text and multiple buttons based on the entries of the given variable (without `{}`, cannot have modifiers) and returns the ID of the one selected                  |
+| `{input|buttonlist|[VALUE(text)]|[VARIABLE(without `{}`)]}           						 					` | Opens a popup with a text and multiple buttons based on the entries of the given variable (without `{}`, cannot have modifiers) and returns the ID of the one selected                  |
 | `{input|buttonlist|[VARIABLE(without `{}`)]}                    												` | Opens a smaller popup with multiple buttons based on the entries of the given variable (without `{}`, cannot have modifiers) and returns the ID of the one selected                     |
 | `{input|dropDown|[VALUE(text)]|[VALUE(option1)];[VALUE(option2)];...}                  						` | Opens a popup with a drop down menu and returns the value of the selected option                                                                                                        |
 | `{input|text|[VALUE(text)]|[VALUE(pretext)]}                                           						` | Opens a popup with a text input and returns what the player typed                                                                                                                       |
@@ -49,6 +49,7 @@ Time for a list of all possible variable bases:
 | `{file|[VALUE(path)]}                                                                  						` | Returns the selected file in the `res/advfiles/` folder with each line being a new entry in the variable (requires `fileread`/`filereadanywhere` permission)                            |
 | `{file|[SELECTOR(fileObject)]}                                                             					` | Reads content of `fileObject` as if it was text with each line being a new entry in the variable                            															|
 | `{popup|[uids;names]}                                                             							` | Returns all of the currently open popup uids or the individually defined names																											|
+| `{inventory|[VALUE(inventory]}                                                       							` | Returns the uids of the items contained inside of the given inventory																													|
 
 There are also object specific variables:  
 
@@ -133,6 +134,7 @@ These modifiers create a new results-list:
 | `max([round;float])                                  ` | Returns the largest value of the entire list                                                                         |
 | `count()                                             ` | Returns the amount of entries                                                                                        |
 | `split([VALUE])                                      ` | Splits first entry at given value and creates for each element a new emtry in the new result list                    |
+| `size()		                                       ` | Returns the amount of entries in the variable													                    |
 
 ## Using variable values in modifiers
 Using the strings `%1` and `%2` inside of the modifier parameters will replace them with:

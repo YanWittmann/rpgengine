@@ -10,7 +10,7 @@ public class Item extends Entity {
         addEvent("drop");
         addEvent("examine");
         addVariable("weight", "Integer", "50", false);
-        addVariable("damage", "String", "0W6", false);
+        addVariable("damage", "String", "0", false);
         addVariable("range", "Integer", "1", false);
         addVariable("value", "Integer", "1", false);
         addVariable("hands", "String", "1", false);
@@ -43,33 +43,32 @@ public class Item extends Entity {
     }
 
     public String generateSaveString() {
-        String str = "" + name + "\n" + description + "\n" + uid + "\n" + image;
+        StringBuilder str = new StringBuilder("" + name + "\n" + description + "\n" + uid + "\n" + image);
         for (int i = 0; i < eventName.size(); i++)
-            str = str + "\n++ev++" + eventName.get(i) + "---" + eventCode.get(i);
-        for (int i = 0; i < tags.size(); i++)
-            str = str + "\n++tag++" + tags.get(i);
+            str.append("\n++ev++").append(eventName.get(i)).append("---").append(eventCode.get(i));
+        for (String tag : tags) str.append("\n++tag++").append(tag);
         for (int i = 0; i < localVarName.size(); i++)
-            str = str + "\n++variable++" + localVarUids.get(i) + "---" + localVarName.get(i) + "---" + localVarType.get(i) + "---" + localVarValue.get(i) + "\n";
-        return str;
+            str.append("\n++variable++").append(localVarUids.get(i)).append("---").append(localVarName.get(i)).append("---").append(localVarType.get(i)).append("---").append(localVarValue.get(i)).append("\n");
+        return str.toString();
     }
 
     public String generateInformation() {
-        String str = "Name: " + name + "\nDescription: " + description + "\nImage: " + image + "; " + Manager.getImageName(image) + "\nEvents:";
+        StringBuilder str = new StringBuilder("Name: " + name + "\nDescription: " + description + "\nImage: " + image + "; " + Manager.getImageName(image) + "\nEvents:");
         for (int i = 0; i < eventName.size(); i++)
-            str = str + "\n   " + i + ": " + eventName.get(i);
-        str = str + "\nTags:\n";
+            str.append("\n   ").append(i).append(": ").append(eventName.get(i));
+        str.append("\nTags:\n");
         for (int i = 0; i < tags.size(); i++)
-            str = str + " " + i + ": " + tags.get(i) + ";";
-        str = str + "\nLocal variables:\n";
+            str.append(" ").append(i).append(": ").append(tags.get(i)).append(";");
+        str.append("\nLocal variables:\n");
         for (int i = 0; i < localVarName.size(); i++)
-            str = str + " " + localVarUids.get(i) + " - " + localVarName.get(i) + " - " + localVarType.get(i) + " - " + localVarValue.get(i) + "\n";
-        return str;
+            str.append(" ").append(localVarUids.get(i)).append(" - ").append(localVarName.get(i)).append(" - ").append(localVarType.get(i)).append(" - ").append(localVarValue.get(i)).append("\n");
+        return str.toString();
     }
 
     public void setImage(String uid) {
         try {
             if (uid.equals("")) image = uid;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         if (!StaticStuff.isValidUID(uid)) return;
         if (!Manager.imageExists(uid)) {

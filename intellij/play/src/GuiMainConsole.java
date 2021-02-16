@@ -7,6 +7,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GuiMainConsole extends JFrame {
@@ -122,7 +123,7 @@ public class GuiMainConsole extends JFrame {
 
         ta_input.setBounds(4, height - 78 + (35 - iconsActionSize), width - 24 - 10 - iconsActionSize, iconsActionSize);
 
-        if(!init) {
+        if (!init) {
             int currentAmountLines = (height - 78 - ((height - 78) % heightFactor)) / heightFactor;
             setAmountMainLabels(currentAmountLines + 3);
             distributeMainLabels(height - 78 + (35 - Interpreter.getScaledValue(35)));
@@ -242,7 +243,6 @@ public class GuiMainConsole extends JFrame {
             l_mainLabels.get(counter).setForeground(new Color(255, 255, 255));
             l_mainLabels.get(counter).setEnabled(true);
             l_mainLabels.get(counter).setFont(StaticStuff.getPixelatedFont());
-            ;
             l_mainLabels.get(counter).setHorizontalAlignment(JLabel.LEFT);
             l_mainLabels.get(counter).setVerticalAlignment(JLabel.TOP);
             l_mainLabels.get(counter).setVisible(true);
@@ -271,8 +271,8 @@ public class GuiMainConsole extends JFrame {
     }
 
     private static void clearAllMainLabels() {
-        for (int i = 0; i < l_mainLabels.size(); i++) {
-            l_mainLabels.get(i).setText("");
+        for (JLabel l_mainLabel : l_mainLabels) {
+            l_mainLabel.setText("");
         }
     }
 
@@ -312,10 +312,6 @@ public class GuiMainConsole extends JFrame {
         }
     }
 
-    public void visible(boolean show) {
-        setVisible(show);
-    }
-
     static int scrollIndex = 0;
 
     private static void scroll(MouseWheelEvent evt) {
@@ -347,7 +343,7 @@ public class GuiMainConsole extends JFrame {
             if (getIndex == -1) ownText = ta_input.getText();
             if (getIndex < textBuffer.size() - 1)
                 do getIndex++;
-                while (getIndex < textBuffer.size() - 1 && !(textBuffer.get(getIndex).toString().charAt(0) == ' ') && !(textBuffer.get(getIndex).toString().charAt(1) == '-'));
+                while (getIndex < textBuffer.size() - 1 && !(textBuffer.get(getIndex).charAt(0) == ' ') && !(textBuffer.get(getIndex).charAt(1) == '-'));
             ta_input.setText(StaticStuff.removePrepareString(textBuffer.get(getIndex).replaceAll(" - (.+)", "$1")));
         } else if (evt.getKeyCode() == 40) { //down
             if (getIndex == 0) {
@@ -355,8 +351,8 @@ public class GuiMainConsole extends JFrame {
                 ta_input.setText(StaticStuff.removePrepareString(ownText));
             } else if (getIndex > 0) {
                 do getIndex--;
-                while (getIndex > 0 && !(textBuffer.get(getIndex).toString().charAt(0) == ' ') && !(textBuffer.get(getIndex).toString().charAt(1) == '-'));
-                if (getIndex == 0 && !(textBuffer.get(getIndex).toString().charAt(0) == ' ') && !(textBuffer.get(getIndex).toString().charAt(1) == '-')) {
+                while (getIndex > 0 && !(textBuffer.get(getIndex).charAt(0) == ' ') && !(textBuffer.get(getIndex).charAt(1) == '-'));
+                if (getIndex == 0 && !(textBuffer.get(getIndex).charAt(0) == ' ') && !(textBuffer.get(getIndex).charAt(1) == '-')) {
                     ta_input.setText(StaticStuff.removePrepareString(ownText));
                     getIndex--;
                 } else {
@@ -366,18 +362,18 @@ public class GuiMainConsole extends JFrame {
         }
     }
 
-    private ArrayList<String> autoCompleteWords = new ArrayList<>();
+    private final ArrayList<String> autoCompleteWords = new ArrayList<>();
 
     public void addAutoCompleteWords(String[] words) {
-        for (String s : words) autoCompleteWords.add(s);
+        Collections.addAll(autoCompleteWords, words);
     }
 
     private void autoComplete() {
         if (ta_input.getText().length() <= 0) return;
         int curorPos = ta_input.getCaretPosition();
         String text = ta_input.getText();
-        String beforeCursor = text.substring(0, curorPos), afterCursor = text.substring(curorPos, text.length());
-        String words[] = beforeCursor.split(" ");
+        String beforeCursor = text.substring(0, curorPos), afterCursor = text.substring(curorPos);
+        String[] words = beforeCursor.split(" ");
         String completeWord = words[words.length - 1];
         for (String s : autoCompleteWords) {
             if (s.matches(completeWord + ".+")) {
@@ -417,64 +413,32 @@ public class GuiMainConsole extends JFrame {
         textBuffer.add(0, text);
     }
 
-    private static int lineLength = 90, amountLines = 15;
-
     private static void updateOutput() {
         clearAllMainLabels();
-        amountLines = l_mainLabels.size();
+        int amountLines = l_mainLabels.size();
         int width = self.getWidth();
         int startHeight = self.getHeight() - 78 + (35 - Interpreter.getScaledValue(35));
         for (int i = 0; i < amountLines && textBuffer.size() > scrollIndex + i; i++) {
             String lineText = "<html><font color=\"" + StaticStuff.colorToHex(Manager.getColorByName("white")) + "\">" + textBuffer.get(scrollIndex + i) + "</font>";
             setMainLabelText(i, lineText);
-            int lineTextWidth = StaticStuff.getTextWidthWithFont(StaticStuff.removePrepareString(lineText.replaceAll("\\[\\[[^:]+:([^\\]]+)\\]\\]", "$1")), StaticStuff.getPixelatedFont());
+            int lineTextWidth = StaticStuff.getTextWidthWithFont(StaticStuff.removePrepareString(lineText.replaceAll("\\[\\[[^:]+:([^]]+)]]", "$1")), StaticStuff.getPixelatedFont());
             int amountLinesRequired = (int) Math.ceil(Double.parseDouble(lineTextWidth + "") / Double.parseDouble(width + ""));
             startHeight -= changeMainLabelHeightPerStep * amountLinesRequired;
             l_mainLabels.get(i).setBounds(4, startHeight, self.getWidth(), (changeMainLabelHeightPerStep + 2) * amountLinesRequired);
-            //startHeight -= changeMainLabelHeightPerStep;
         }
-
-        /*for(int i=0;i<amountLines && textBuffer.size() > scrollIndex+i;i++) {
-        String line = textBuffer.get(scrollIndex+i);
-        System.out.println("line " + line);
-        System.out.println("line.length() " + line.length() + " ? " + maxPerLine);
-        if(line.length() > maxPerLine) {
-        String current;
-        System.out.println("in here");
-        do {
-        current = line.substring(0, maxPerLine);
-        line = line.replace(current, "");
-        linesBuffer.add(current);
-        } while (line.length() > maxPerLine);
-        if(line.length() > 0) {
-        linesBuffer.add(line);
-        }
-        for(int j=linesBuffer.size()-1;j<=0;j--) {
-        setMainLabelText(i + linebreakModifier,"<html><font color=\""+StaticStuff.colorToHex(Manager.getColorByName("white"))+"\">" + linesBuffer.get(j) +"</font>");
-        linebreakModifier++;
-        System.out.println("linesBuffer.get(j) " + linesBuffer.get(j));
-        }
-        linesBuffer.clear();
-        } else {
-        setMainLabelText(i + linebreakModifier,"<html><font color=\""+StaticStuff.colorToHex(Manager.getColorByName("white"))+"\">" + line +"</font>");
-        }
-        }*/
-
-        /*String display = "";
-        try{
-        display = textBuffer.get(scrollIndex);
-        for(int i=1;i<amountLines && i<textBuffer.size();i++) display += "<br>"+textBuffer.get(scrollIndex+i);
-        }catch(Exception e){}
-        String splitted[] = display.split("<br>"); display = splitted[splitted.length-1];
-        for(int i=splitted.length-2;i>=0;i--) display += "<br><font color=\""+StaticStuff.colorToHex(Manager.getColorByName("white"))+"\">"+splitted[i]+"</font>";
-        for(int i=0;i<amountLines-splitted.length;i++) display = "<br>"+display;
-        l_main.setText("<html><p style=\"line-height: 70%;\">"+display+"</p></html>");*/
     }
 
     private boolean playerInputActive = true;
 
     public void setPlayerInputActive(boolean active) {
         playerInputActive = active;
+        if (active) {
+            ImageIcon img = new ImageIcon("res/img/consoleIcon0.png");
+            l_iconActions[0].setIcon(PopupImage.getScaledImage(img, Interpreter.getScaledValue(35), Interpreter.getScaledValue(35)));
+        } else {
+            ImageIcon img = new ImageIcon("res/img/consoleIcon0_disabled.png");
+            l_iconActions[0].setIcon(PopupImage.getScaledImage(img, Interpreter.getScaledValue(35), Interpreter.getScaledValue(35)));
+        }
     }
 
     private void executePlayerCommand(String cmd) {

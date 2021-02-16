@@ -99,7 +99,7 @@ public class Inventory extends Entity {
     }
 
     public String[] getItemsAsStringArray() {
-        String itemsString[] = new String[items.size()];
+        String[] itemsString = new String[items.size()];
         for (int i = 0; i < itemsString.length; i++) {
             String colorValue = Manager.getEntity(items.get(i)).getVariableValueSilent("color");
             if (colorValue.equals("-1"))
@@ -111,7 +111,7 @@ public class Inventory extends Entity {
     }
 
     public String[] getItemUIDsAsStringArray() {
-        String uids[] = new String[items.size()];
+        String[] uids = new String[items.size()];
         for (int i = 0; i < uids.length; i++)
             uids[i] = items.get(i);
         return uids;

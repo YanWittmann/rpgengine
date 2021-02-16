@@ -914,6 +914,12 @@ public class Manager {
         return -1;
     }
 
+    public String[] getInventoryContents(String inventoryUid) {
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(inventoryUid)) return inventory.getItemUIDsAsStringArray();
+        return new String[]{};
+    }
+
     public boolean inventoryContains(String itemUid, String inventoryUid) {
         for (Inventory inventory : inventories)
             if (inventory.uid.equals(inventoryUid))

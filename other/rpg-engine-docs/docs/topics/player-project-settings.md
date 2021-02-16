@@ -16,6 +16,7 @@ Most of them are self explanatory, but here's a short explanation of what they d
  * `location` - the current location UID of the player
  * `inventory` - the player inventory UID
  * `battleMapImage` - the image UID that is being used on the battleMap as player image
+ * `globalTalentModifier` - modifies the DC of every talent roll by the given value
  * `courage` - this and the following values are being overwritten when the player creates his character
  * `wisdom`
  * `intuition`

@@ -305,3 +305,6 @@ Here's a list of all of the commands and actions that you can use:
  * ##### `continue`
    Begins the next loop of the `for each`. If no entries remain, it acts just like a `break`.
    
+ * ##### `exit`
+   Stops the current thread from running. Like a `return` but it will also leave all above events.
+   
