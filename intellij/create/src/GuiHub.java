@@ -449,7 +449,7 @@ public class GuiHub extends JFrame {
         if (isFullscreen) {
             setExtendedState(JFrame.NORMAL);
             setUndecorated(false);
-            setBounds(0,0,1494, 891);
+            setBounds(0, 0, 1494, 891);
             setLocationRelativeTo(null);
             resizeWindow(1494, 891);
         } else {
@@ -820,6 +820,7 @@ public class GuiHub extends JFrame {
         JMenuItem project = new JMenuItem("Project   ");
         JMenuItem player = new JMenuItem("Player   ");
         JMenuItem refactor = new JMenuItem("Refactor   ");
+        JMenuItem renameUIDs = new JMenuItem("Auto-rename UIDs   ");
 
         createNew.addActionListener(evt -> createNew());
 
@@ -847,6 +848,8 @@ public class GuiHub extends JFrame {
 
         refactor.addActionListener(evt -> refactor());
 
+        renameUIDs.addActionListener(evt -> autoRenameUIDs());
+
         openAdventureInPlayer.addActionListener(evt -> openAdventureInPlayer());
 
         file.add(createNew);
@@ -859,6 +862,7 @@ public class GuiHub extends JFrame {
         properties.add(player);
         properties.add(project);
         properties.add(refactor);
+        properties.add(renameUIDs);
         menuBar.add(properties);
 
         other.add(selectStylesheet);
@@ -905,6 +909,18 @@ public class GuiHub extends JFrame {
         int occ = manager.refactor(find, replace);
         updateScreen();
         Popup.message(StaticStuff.projectName, "Replaced " + occ + " occurrences");
+    }
+
+    private static final String AUTO_RENAME_UIDS_WARNING_MESSAGE = "The UIDs in this adventure will be renamed using this format:\n" +
+            "Example: house00000000loc\n" +
+            "Do NOT perform this action if your adventure has multiple objects with the same type and name!\n" +
+            "Type 'rename' to confirm this action:";
+
+    private void autoRenameUIDs() {
+        String confirm = Popup.input(AUTO_RENAME_UIDS_WARNING_MESSAGE, "");
+        if (confirm == null || !confirm.equals("rename")) return;
+        manager.autoRenameUIDs();
+        manager.updateGui();
     }
 
     private void createNew() {

@@ -1,6 +1,12 @@
 # Changelog
 ___
 
+## 16.02.2020 - RELEASE `1.11.6` (creator)
+#### New / Modification:
+
+ * added drop down option `Adventure > Auto-rename UIDs` that will automatically rename all uids in your project according to their name and type
+
+
 ## 16.02.2020 - RELEASE `1.11.6` (player)
 #### New / Modification:
 
@@ -11,6 +17,7 @@ ___
  * the console icon on the main player frame now grays out a bit if `player input` is set to `false` (is still usable, only to show that input is disabled)
  * the small button input popup now supports formatted text
  * added new command `exit` that will stop the current thread
+ * added `invert` modifier that reverses the entries in a variable
 
 
 ## 15.02.2020 - RELEASE `1.11.5` (player)

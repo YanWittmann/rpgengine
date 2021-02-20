@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Manager {
-    public static String pathExtension = "../../", filename = "", version = "1.11.5";
+    public static String pathExtension = "../../", filename = "", version = "1.11.6";
     public static ArrayList<Location> locations = new ArrayList<>();
     public static ArrayList<NPC> npcs = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();
@@ -379,6 +379,49 @@ public class Manager {
         System.exit(code);
     }
 
+    public void autoRenameUIDs() {
+        for (Location location : locations)
+            refactor(location.uid, generateAutoRenameUID("loc", location.name, location.uid));
+        for (NPC npc : npcs) refactor(npc.uid, generateAutoRenameUID("npc", npc.name, npc.uid));
+        for (Item item : items) refactor(item.uid, generateAutoRenameUID("itm", item.name, item.uid));
+        for (Inventory inventory : inventories)
+            refactor(inventory.uid, generateAutoRenameUID("inv", inventory.name, inventory.uid));
+        for (BattleMap battleMap : battleMaps)
+            refactor(battleMap.uid, generateAutoRenameUID("btm", battleMap.name, battleMap.uid));
+        for (Talent talent : talents) refactor(talent.uid, generateAutoRenameUID("tln", talent.name, talent.uid));
+        for (Event event : events) refactor(event.uid, generateAutoRenameUID("evt", event.name, event.uid));
+        for (LootTable table : lootTable) refactor(table.uid, generateAutoRenameUID("ltb", table.name, table.uid));
+        for (CustomCommand customCommand : customCommands)
+            refactor(customCommand.uid, generateAutoRenameUID("ccd", customCommand.name, customCommand.uid));
+        for (ColorObject color : colors) refactor(color.uid, generateAutoRenameUID("col", color.name, color.uid));
+        for (FileObject fileObject : fileObjects)
+            refactor(fileObject.uid, generateAutoRenameUID("flo", fileObject.name, fileObject.uid));
+        for (CustomPopup popup : popups) refactor(popup.uid, generateAutoRenameUID("pop", popup.name, popup.uid));
+    }
+
+    private String generateAutoRenameUID(String type, String name, String oldUID) {
+        name = name.toLowerCase().replace(" ", "0").replaceAll("[^a-z\\d]", "");
+        StringBuilder newUID = new StringBuilder();
+        if (name.length() > 12) newUID.append(name, 0, 12);
+        else newUID.append(name);
+        while (newUID.length() < 13) {
+            newUID.append("0");
+        }
+        newUID.append(type);
+        String ret = newUID.toString().replaceAll("[^a-z\\d]", "");
+        if (ret.equals(oldUID)) return oldUID;
+        if (ret.length() == 16)
+            if (!entityExists(ret))
+                return ret;
+            else {
+                ret = ret.replaceAll("0", "1");
+                if (ret.equals(oldUID)) return oldUID;
+                if (!entityExists(ret))
+                    return ret;
+            }
+        return oldUID;
+    }
+
     public int refactor(String find, String replace) {
         int occ = 0;
         for (Location location : locations) occ += location.refactor(find, replace);
@@ -563,6 +606,39 @@ public class Manager {
         if (audios.playAudio(uid)) found = true;
         if (!found) Popup.error(StaticStuff.projectName, "UID '" + uid + "' not found");
         else unsavedChanges = true;
+    }
+
+    public boolean entityExists(String uid) {
+        if (!StaticStuff.isValidUID(uid))
+            return false;
+        for (Location location : locations)
+            if (location.uid.equals(uid)) return true;
+        for (NPC npc : npcs)
+            if (npc.uid.equals(uid)) return true;
+        for (Item item : items)
+            if (item.uid.equals(uid)) return true;
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid)) return true;
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.uid.equals(uid)) return true;
+        for (Talent talent : talents)
+            if (talent.uid.equals(uid)) return true;
+        for (Event event : events)
+            if (event.uid.equals(uid)) return true;
+        for (LootTable table : lootTable)
+            if (table.uid.equals(uid)) return true;
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.uid.equals(uid)) return true;
+        for (ColorObject color : colors)
+            if (color.uid.equals(uid)) return true;
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.uid.equals(uid)) return true;
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) return true;
+        if (variables.variableExists(uid)) return true;
+        if (images.imageExists(uid)) return true;
+        if (audios.audioExists(uid)) return true;
+        return false;
     }
 
     private boolean openNextEntity = true;

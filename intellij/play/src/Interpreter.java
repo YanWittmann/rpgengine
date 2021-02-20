@@ -608,7 +608,7 @@ public class Interpreter {
             sleepTime(code);
         } else if (codeWords[0].equals("execute") && codeWords.length > 3) {
             //code = prepareStringReplaceVar(code); //EXECUTE STUFF
-            if(execute(code.replaceAll("execute (event|code) .+ as .+ \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) (.+) as .+ \\{(?:.+)?}", "$1"),
+            if (execute(code.replaceAll("execute (event|code) .+ as .+ \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) (.+) as .+ \\{(?:.+)?}", "$1"),
                     code.replaceAll("execute (?:event|code) .+ as (.+) \\{(?:.+)?}", "$1"), code.replaceAll("execute (?:event|code) .+ as .+ \\{(.+)?}", "$1").split(", ")))
                 return "exit";
         } else if (codeWords[0].equals("jumpto")) {
@@ -1700,6 +1700,10 @@ public class Interpreter {
                             }
                         } catch (Exception ignored) {
                         }
+                    } else if (modifierName.equals("invert")) {
+                        String[] inverted = new String[results.length];
+                        for (int i = 0; i < results.length; i++) inverted[i] = results[results.length - 1 - i];
+                        results = inverted;
                     } else if (modifierName.equals("count")) {
                         results = new String[]{"" + results.length};
                     } else if (modifierName.equals("average")) {

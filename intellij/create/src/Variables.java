@@ -78,6 +78,10 @@ public class Variables {
         return true;
     }
 
+    public boolean variableExists(String uid) {
+        return uids.contains(uid);
+    }
+
     public boolean deleteVariable(String uid) {
         int index = uids.indexOf(uid);
         if (index == -1) return false;
