@@ -2,6 +2,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class GuiPlayerStats extends JFrame {
@@ -331,16 +332,16 @@ public class GuiPlayerStats extends JFrame {
 
     private static void updateInventory() {
         int j = 0;
-        for (int i = scrollIndex; i < amountItems; i++) { //<font color="#24f0e2">
+        for (int i = scrollIndex; i < amountItems + scrollIndex; i++) {
             if (i >= inventoryItems.length) l_inventorySlots[j].setText("");
             else if (player.getValue("holdingMain").equals(inventoryItemsUIDs[i]) && player.getValue("holdingSecond").equals(inventoryItemsUIDs[i]))
-                l_inventorySlots[j].setText(inventoryItems[i].replaceAll("x <font color=\"#([0-9a-z]{6})\">", "x <font color=\"c6fa1b\">")); //set HTML color to green / yellow
+                l_inventorySlots[j].setText(inventoryItems[i].replaceAll("x <font color=\"#([0-9a-z]{6})\">", "x <font color=\"c6fa1b\">")); //set color to green / yellow
             else if (player.getValue("holdingMain").equals(inventoryItemsUIDs[i]))
-                l_inventorySlots[j].setText(inventoryItems[i].replaceAll("x <font color=\"#([0-9a-z]{6})\">", "x <font color=\"72e31b\">")); //set HTML color to green
+                l_inventorySlots[j].setText(inventoryItems[i].replaceAll("x <font color=\"#([0-9a-z]{6})\">", "x <font color=\"72e31b\">")); //set color to green
             else if (player.getValue("holdingSecond").equals(inventoryItemsUIDs[i]))
-                l_inventorySlots[j].setText(inventoryItems[i].replaceAll("x <font color=\"#([0-9a-z]{6})\">", "x <font color=\"298f44\">")); //set HTML color to dark green
+                l_inventorySlots[j].setText(inventoryItems[i].replaceAll("x <font color=\"#([0-9a-z]{6})\">", "x <font color=\"298f44\">")); //set color to dark green
             else if (player.getValue("holdingArmor").equals(inventoryItemsUIDs[i]))
-                l_inventorySlots[j].setText(inventoryItems[i].replaceAll("x <font color=\"#([0-9a-z]{6})\">", "x <font color=\"4548e6\">")); //set HTML color to blue
+                l_inventorySlots[j].setText(inventoryItems[i].replaceAll("x <font color=\"#([0-9a-z]{6})\">", "x <font color=\"4548e6\">")); //set color to blue
             else l_inventorySlots[j].setText(inventoryItems[i]);
             j++;
         }
@@ -508,24 +509,6 @@ public class GuiPlayerStats extends JFrame {
                 boolean current1 = false, current2 = false;
                 if (player.getValue("holdingMain").equals("")) current1 = true;
                 if (player.getValue("holdingSecond").equals("")) current2 = true;
-                /*switch (slot) {
-                    case "1":
-                        if (current1) player.setValue("holdingMain", clickedUID);
-                        else if (current2) player.setValue("holdingSecond", clickedUID);
-                        else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
-                        break;
-                    case "2":
-                        if (current1 && current2) {
-                            player.setValue("holdingMain", clickedUID);
-                            player.setValue("holdingSecond", clickedUID);
-                        } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
-                        break;
-                    case "armor":
-                        if (player.getValue("holdingArmor").equals("")) {
-                            player.setValue("holdingArmor", clickedUID);
-                        } else StaticStuff.openPopup(Interpreter.lang("popupItemCanNotEquip"));
-                        break;
-                }*/
                 switch (slot) {
                     case "1":
                         if (current1 || !current2) {

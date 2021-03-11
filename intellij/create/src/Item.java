@@ -38,7 +38,7 @@ public class Item extends Entity {
                 }
             }
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "ItemType '" + name + "' contains invalid data.");
+            Popup.error(StaticStuff.PROJECT_NAME, "ItemType '" + name + "' contains invalid data.");
         }
     }
 
@@ -72,7 +72,7 @@ public class Item extends Entity {
         }
         if (!StaticStuff.isValidUID(uid)) return;
         if (!Manager.imageExists(uid)) {
-            Popup.error(StaticStuff.projectName, "Invalid UID: '" + uid + "'\nThis image does not exist.");
+            Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '" + uid + "'\nThis image does not exist.");
             return;
         }
         image = uid;
@@ -123,7 +123,7 @@ public class Item extends Entity {
                         deleteEvent(Integer.parseInt(str));
                         break;
                     case 5:
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
                         if (choice == 0)
                             getEntity().addTag(Popup.input("Tag name:", ""));
                         else if (choice == 1)
@@ -132,7 +132,7 @@ public class Item extends Entity {
                             getEntity().editTag(Integer.parseInt(Popup.input("Tag index:", "")), Popup.input("Tag name:", ""));
                         break;
                     case 6:
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
                         if (choice == 0) {
                             getEntity().addVariable(Popup.input("Variable name:", ""), true);
                         } else if (choice == 1)
@@ -141,10 +141,10 @@ public class Item extends Entity {
                             getEntity().openVariable(StaticStuff.autoDetectUID("Variable uid:"), true);
                         break;
                     case 7:
-                        setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
+                        setImage(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
                         break;
                     default:
-                        Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");
+                        Popup.error(StaticStuff.PROJECT_NAME, "Invalid action\nButton " + index + " does not exist.");
                 }
                 update();
             }

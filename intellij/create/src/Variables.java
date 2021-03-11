@@ -24,9 +24,9 @@ public class Variables {
             }
         } catch (Exception e) {
             try {
-                Popup.error(StaticStuff.projectName, "Variable '" + name.get(name.size() - 1) + "' contains invalid data.");
+                Popup.error(StaticStuff.PROJECT_NAME, "Variable '" + name.get(name.size() - 1) + "' contains invalid data.");
             } catch (Exception e2) {
-                Popup.error(StaticStuff.projectName, "A variable contains invalid data.");
+                Popup.error(StaticStuff.PROJECT_NAME, "A variable contains invalid data.");
             }
         }
     }
@@ -71,6 +71,16 @@ public class Variables {
         return value.get(index);
     }
 
+    public String getVariableName(String uid) {
+        if (this.uids.contains(uid))
+            return name.get(this.uids.indexOf(uid));
+        return "";
+    }
+
+    public ArrayList<String> getUids() {
+        return uids;
+    }
+
     public boolean openVariable(String uid) {
         int index = uids.indexOf(uid);
         if (index == -1) return false;
@@ -99,5 +109,12 @@ public class Variables {
         occ += StaticStuff.refactorArrayList(find, replace, value);
         occ += StaticStuff.refactorArrayList(find, replace, uids);
         return occ;
+    }
+
+    public void find(String find, ArrayList<String> found) {
+        if (StaticStuff.findInArrayList(find, name)) found.add("Variables: Names");
+        if (StaticStuff.findInArrayList(find, type)) found.add("Variables: Types");
+        if (StaticStuff.findInArrayList(find, value)) found.add("Variables: Values");
+        if (StaticStuff.findInArrayList(find, uids)) found.add("Variables: UIDs");
     }
 }

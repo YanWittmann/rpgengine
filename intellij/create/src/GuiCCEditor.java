@@ -141,7 +141,7 @@ public class GuiCCEditor extends JFrame {
             cc.parameters = tf_parameters.getText();
             dispose();
         } else {
-            Popup.error(StaticStuff.projectName, "Unable to save.\nInvalid regular expression found:\n" + tf_syntax.getText());
+            Popup.error(StaticStuff.PROJECT_NAME, "Unable to save.\nInvalid regular expression found:\n" + tf_syntax.getText());
         }
     }
 

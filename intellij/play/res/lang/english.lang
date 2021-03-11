@@ -42,6 +42,7 @@ permissionRequestDeny:Deny
 permissionRequestRetry:The adventure cannot work without these permissions.<br>Are you sure you want to [[red:exit the adventure]]?
 permissionRequestRetryNotExit:[[green:Retry]]
 permissionRequestRetryExit:[[red:Exit adventure]]
+permissionRequestOpenFileObject:This adventure wants to [[red:open a file saved inside of the adventure]].
 
 playerAttrMU:Courage
 playerAttrKL:Wisdom
@@ -102,6 +103,7 @@ battleMapDamageEntity:Total damage: {1}
 battleMapFightOver:The battle is over!
 battleMapPlayerDefeated:You were defeated...
 battleMapPlayerWins:You have defeated all enemies!
+battleMapNPCdefeated:{1} was defeated!
 battleMapClose:[[red:Close]]
 battleMapCloseCheck:Are you sure you want to [[red:exit the adventure]]?<br>You will have to [[red:restart from the beginning]] if you want to try again later!
 battleMapCloseCheckClose:Exit

@@ -98,6 +98,10 @@ public class BattleMap extends Entity {
     }
 
     public void battleGuiIsReadyToStart() {
+        for (NPC npc : npcObjects) {
+            GuiObjectDisplay display = GuiObjectDisplay.create(npc, "");
+            if(display != null) display.minimize(false);
+        }
         manager.executeEventFromObject(uid, "start", new String[]{});
         beginNextTurn();
     }
@@ -264,7 +268,10 @@ public class BattleMap extends Entity {
             if (!alive) {
                 Log.add("NPC " + victimUID + " is no longer alive!");
                 gui.updateBoard("npc");
-                manager.executeEventFromObject(uid, "dies", new String[]{"entity:" + (victimUID.equals("") ? "player" : victimUID)});
+                String npcImage = getNPCImageViaUID(turnOrder.get(currentObjectTurn).uid);
+                if (npcImage != null) if (npcImage.length() > 0)
+                    Manager.openImage(npcImage, Interpreter.lang("battleMapNPCdefeated", turnOrder.get(currentObjectTurn).name), 200, true);
+                manager.executeEventFromObject(uid, "dies", new String[]{"entity:" + victimUID});
             }
         }
         manager.executeEventFromObject(uid, "damage", new String[]{"attacker:" + (attackerUID.equals("") ? "player" : attackerUID), "victim:" + (victimUID.equals("") ? "player" : victimUID), "damage:" + damageDealt, "item:" + itemUID});

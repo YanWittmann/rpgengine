@@ -1,6 +1,4 @@
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
@@ -407,7 +405,7 @@ public class StaticStuff {
             double parse() {
                 nextChar();
                 double x = parseExpression();
-                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char) ch);
                 return x;
             }
 
@@ -419,8 +417,8 @@ public class StaticStuff {
 
             double parseExpression() {
                 double x = parseTerm();
-                for (;;) {
-                    if      (eat('+')) x += parseTerm(); // addition
+                for (; ; ) {
+                    if (eat('+')) x += parseTerm(); // addition
                     else if (eat('-')) x -= parseTerm(); // subtraction
                     else return x;
                 }
@@ -428,8 +426,8 @@ public class StaticStuff {
 
             double parseTerm() {
                 double x = parseFactor();
-                for (;;) {
-                    if      (eat('*')) x *= parseFactor(); // multiplication
+                for (; ; ) {
+                    if (eat('*')) x *= parseFactor(); // multiplication
                     else if (eat('/')) x /= parseFactor(); // division
                     else return x;
                 }
@@ -457,7 +455,7 @@ public class StaticStuff {
                     else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
                     else throw new RuntimeException("Unknown function: " + func);
                 } else {
-                    throw new RuntimeException("Unexpected: " + (char)ch);
+                    throw new RuntimeException("Unexpected: " + (char) ch);
                 }
 
                 if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
@@ -565,6 +563,12 @@ public class StaticStuff {
     public static int getScreenHeight() {
         if (screenHeight == 0) screenHeight = screenSize.getHeight();
         return (int) screenHeight;
+    }
+
+    public static int[] getScreenDimensions() {
+        if (screenWidth == 0) screenWidth = screenSize.getWidth();
+        if (screenHeight == 0) screenHeight = screenSize.getHeight();
+        return new int[]{(int) screenWidth, (int) screenHeight};
     }
 
     public static int getRandomPopupMovement() {

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Manager {
-    public static String pathExtension = "../../", filename = "", version = "1.11.6";
+    public static String pathExtension = "../../", filename = "", version = "1.13";
     public static ArrayList<Location> locations = new ArrayList<>();
     public static ArrayList<NPC> npcs = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();
@@ -26,8 +26,9 @@ public class Manager {
     public static ProjectSettings projectSettings;
 
     private final GuiHub guiHub;
+    private GuiTip guiTip;
 
-    private boolean showLoadingScreen = true;
+    private final static boolean showLoadingScreen = true;
     public boolean unsavedChanges = false;
     public static boolean openActionEditor = false;
 
@@ -42,12 +43,20 @@ public class Manager {
                 Sleep.milliseconds(4500);
                 loading.dispose();
             }).start();
-            Sleep.milliseconds(3500);
         }
         FileManager.clearTmp();
+        initTypeStrings();
         cfg = new Configuration("res/config/main.cfg");
         StaticStuff.ee = cfg.get("ee");
         StaticStuff.setColorScheme(cfg.get("stylesheet"));
+        if (cfg.get("showTips").equals("true"))
+            new Thread(() -> {
+                guiTip = new GuiTip();
+                Sleep.milliseconds(3500);
+                guiTip.open();
+            }).start();
+        if (showLoadingScreen)
+            Sleep.milliseconds(3500);
         guiHub = new GuiHub(this);
     }
 
@@ -55,7 +64,7 @@ public class Manager {
         openActionEditor = false;
         int result = 1;
         if (!Manager.filename.equals(""))
-            result = Popup.selectButton(StaticStuff.projectName, "You have already opened a file.\nDo you want to save this first?", new String[]{"Yes!", "No"});
+            result = Popup.selectButton(StaticStuff.PROJECT_NAME, "You have already opened a file.\nDo you want to save this first?", new String[]{"Yes!", "No"});
         if (result == 0) save();
         locations.clear();
         npcs.clear();
@@ -79,7 +88,7 @@ public class Manager {
         openActionEditor = false;
         int result = 1;
         if (!Manager.filename.equals(""))
-            result = Popup.selectButton(StaticStuff.projectName, "You have already opened a file.\nDo you want to save this first?", new String[]{"Yes!", "No"});
+            result = Popup.selectButton(StaticStuff.PROJECT_NAME, "You have already opened a file.\nDo you want to save this first?", new String[]{"Yes!", "No"});
         if (result == 0) save();
         locations.clear();
         npcs.clear();
@@ -114,42 +123,6 @@ public class Manager {
         openActionEditor = true;
     }
 
-    /*public void createNew(String filename) { //UNUSED SINCE THERE IS A NEW 'CREATE NEW FILE' DIALOGUE
-        openActionEditor = false;
-        int result = 1;
-        if (!Manager.filename.equals(""))
-            result = Popup.selectButton(StaticStuff.projectName, "You have already opened a file.\nDo you want to save this first?", new String[]{"Yes!", "No"});
-        if (result == 0) save();
-        locations.clear();
-        npcs.clear();
-        items.clear();
-        battleMaps.clear();
-        talents.clear();
-        generateTalents("RPG");
-        events.clear();
-        generateEvents();
-        lootTable.clear();
-        customCommands.clear();
-        generateCommands();
-        colors.clear();
-        generateColors();
-        fileObjects.clear();
-        popups.clear();
-        variables = new Variables();
-        images = new Images(filename);
-        audios = new Audios(filename);
-        player = new PlayerSettings();
-        inventories.clear();
-        generateInventories();
-        setFilename(filename);
-        images.addImage("projectIcon", "res/img/iconyellow.png");
-        projectSettings = new ProjectSettings();
-        FileManager.deleteFilesInDirectory("res/txt/actioneditor");
-        unsavedChanges = true;
-        updateGui();
-        openActionEditor = true;
-    }*/
-
     public void setFilename(String filename) {
         Manager.filename = filename;
         try {
@@ -179,80 +152,80 @@ public class Manager {
             FileManager.makeDirectory(pathExtension + "adventures/" + filename + "/colors");
             FileManager.makeDirectory(pathExtension + "adventures/" + filename + "/fileObjects");
             FileManager.makeDirectory(pathExtension + "adventures/" + filename + "/popups");
-            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/project/player" + StaticStuff.dataFileEnding, player.generateSaveString());
-            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/project/settings" + StaticStuff.dataFileEnding, projectSettings.generateSaveString());
+            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/project/player" + StaticStuff.DATA_FILE_ENDING, player.generateSaveString());
+            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/project/settings" + StaticStuff.DATA_FILE_ENDING, projectSettings.generateSaveString());
             for (Location location : locations)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/locations/" + location.uid + "" + StaticStuff.dataFileEnding, location.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/locations/" + location.uid + "" + StaticStuff.DATA_FILE_ENDING, location.generateSaveString());
             for (NPC npc : npcs)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/npcs/" + npc.uid + "" + StaticStuff.dataFileEnding, npc.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/npcs/" + npc.uid + "" + StaticStuff.DATA_FILE_ENDING, npc.generateSaveString());
             for (Item item : items)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/itemtypes/" + item.uid + "" + StaticStuff.dataFileEnding, item.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/itemtypes/" + item.uid + "" + StaticStuff.DATA_FILE_ENDING, item.generateSaveString());
             for (Inventory inventory : inventories)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/inventories/" + inventory.uid + "" + StaticStuff.dataFileEnding, inventory.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/inventories/" + inventory.uid + "" + StaticStuff.DATA_FILE_ENDING, inventory.generateSaveString());
             for (BattleMap battleMap : battleMaps)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/battlemaps/" + battleMap.uid + "" + StaticStuff.dataFileEnding, battleMap.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/battlemaps/" + battleMap.uid + "" + StaticStuff.DATA_FILE_ENDING, battleMap.generateSaveString());
             for (Talent talent : talents)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/talents/" + talent.uid + "" + StaticStuff.dataFileEnding, talent.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/talents/" + talent.uid + "" + StaticStuff.DATA_FILE_ENDING, talent.generateSaveString());
             for (Event event : events)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/events/" + event.uid + "" + StaticStuff.dataFileEnding, event.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/events/" + event.uid + "" + StaticStuff.DATA_FILE_ENDING, event.generateSaveString());
             for (LootTable table : lootTable)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/lootTable/" + table.uid + "" + StaticStuff.dataFileEnding, table.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/lootTable/" + table.uid + "" + StaticStuff.DATA_FILE_ENDING, table.generateSaveString());
             for (CustomCommand customCommand : customCommands)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/customCommands/" + customCommand.uid + "" + StaticStuff.dataFileEnding, customCommand.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/customCommands/" + customCommand.uid + "" + StaticStuff.DATA_FILE_ENDING, customCommand.generateSaveString());
             for (ColorObject color : colors)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/colors/" + color.uid + "" + StaticStuff.dataFileEnding, color.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/colors/" + color.uid + "" + StaticStuff.DATA_FILE_ENDING, color.generateSaveString());
             for (CustomPopup popup : popups)
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/popups/" + popup.uid + "" + StaticStuff.dataFileEnding, popup.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/popups/" + popup.uid + "" + StaticStuff.DATA_FILE_ENDING, popup.generateSaveString());
             for (FileObject fileObject : fileObjects) {
-                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/fileObjects/" + fileObject.uid + "" + StaticStuff.dataFileEnding, fileObject.generateSaveString());
+                FileManager.writeToFile(pathExtension + "adventures/" + filename + "/fileObjects/" + fileObject.uid + "" + StaticStuff.DATA_FILE_ENDING, fileObject.generateSaveString());
                 FileManager.writeFileFromByteArray(pathExtension + "adventures/" + filename + "/fileObjects/" + fileObject.uid + ".file", fileObject.getByteArray());
             }
-            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/variables/vars" + StaticStuff.dataFileEnding, variables.generateSaveString());
-            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/images/imagelist" + StaticStuff.dataFileEnding, images.generateSaveString());
-            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/audio/audiolist" + StaticStuff.dataFileEnding, audios.generateSaveString());
-            FileManager.zipDirectory(pathExtension + "adventures/" + filename, pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding);
+            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/variables/vars" + StaticStuff.DATA_FILE_ENDING, variables.generateSaveString());
+            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/images/imagelist" + StaticStuff.DATA_FILE_ENDING, images.generateSaveString());
+            FileManager.writeToFile(pathExtension + "adventures/" + filename + "/audio/audiolist" + StaticStuff.DATA_FILE_ENDING, audios.generateSaveString());
+            FileManager.zipDirectory(pathExtension + "adventures/" + filename, pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING);
             FileManager.deleteDirectoryRecursively(pathExtension + "adventures/" + filename);
             if (!projectSettings.getValue("password").equals("") && projectSettings.getValue("requirePasswordToPlay").equals("true")) {
-                CryptoUtils.encrypt(CryptoUtils.prepareKey(projectSettings.getValue("password")), pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding, pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding);
+                CryptoUtils.encrypt(CryptoUtils.prepareKey(projectSettings.getValue("password")), pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING, pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING);
             }
-            Popup.message(StaticStuff.projectName, "Saved adventure under '" + filename + "'");
+            Popup.message(StaticStuff.PROJECT_NAME, "Saved adventure under '" + filename + "'");
             unsavedChanges = false;
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "Unable to save adventure.\n" + e);
+            Popup.error(StaticStuff.PROJECT_NAME, "Unable to save adventure.\n" + e);
         }
     }
 
     private void readFile() {
         if (filename.length() > 0) {
-            if (!FileManager.fileExists(pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding)) {
+            if (!FileManager.fileExists(pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING)) {
                 exitError("File does not exist.", 99);
             }
             FileManager.deleteDirectoryRecursively(pathExtension + "adventures/" + filename);
             boolean isEncr = false;
-            if (!FileManager.isArchive(pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding)) {
+            if (!FileManager.isArchive(pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING)) {
                 String key = String.valueOf(Popup.input("This project is either an encrypted adventure or a corrupted file.\nPlease enter the password:", "").hashCode());
-                CryptoUtils.decrypt(CryptoUtils.prepareKey(key), pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding, pathExtension + "adventures/" + filename + "_decr" + StaticStuff.adventureFileEnding);
+                CryptoUtils.decrypt(CryptoUtils.prepareKey(key), pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING, pathExtension + "adventures/" + filename + "_decr" + StaticStuff.ADVENTURE_FILE_ENDING);
                 setFilename(filename + "_decr");
                 isEncr = true;
             }
-            if (filename.contains("_decr") && !FileManager.isArchive(pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding)) {
-                FileManager.delete(pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding);
+            if (filename.contains("_decr") && !FileManager.isArchive(pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING)) {
+                FileManager.delete(pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING);
                 Popup.error("Unpacking", "Unable to unpack adventure!\nThis could be because the password was wrong or because the file is corrupted.");
                 return;
             }
 
-            FileManager.unzip(pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding, pathExtension + "adventures/");
+            FileManager.unzip(pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING, pathExtension + "adventures/");
             if (filename.contains("_decr")) {
-                FileManager.delete(pathExtension + "adventures/" + filename + "" + StaticStuff.adventureFileEnding);
+                FileManager.delete(pathExtension + "adventures/" + filename + "" + StaticStuff.ADVENTURE_FILE_ENDING);
                 setFilename(filename.replace("_decr", ""));
             }
             try {
-                player = new PlayerSettings(FileManager.readFile(pathExtension + "adventures/" + filename + "/project/player" + StaticStuff.dataFileEnding));
+                player = new PlayerSettings(FileManager.readFile(pathExtension + "adventures/" + filename + "/project/player" + StaticStuff.DATA_FILE_ENDING));
             } catch (Exception e) {
                 player = new PlayerSettings();
             }
             try {
-                projectSettings = new ProjectSettings(FileManager.readFile(pathExtension + "adventures/" + filename + "/project/settings" + StaticStuff.dataFileEnding));
+                projectSettings = new ProjectSettings(FileManager.readFile(pathExtension + "adventures/" + filename + "/project/settings" + StaticStuff.DATA_FILE_ENDING));
             } catch (Exception e) {
                 projectSettings = new ProjectSettings();
             }
@@ -260,7 +233,7 @@ public class Manager {
                 if (!String.valueOf(Popup.input("This project is password-protected.\nPlease enter the password:", "").hashCode()).equals(projectSettings.getValue("password"))) {
                     exitError("Wrong password.", 98);
                 }
-            String[] files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/locations", StaticStuff.dataFileEndingNoDot);
+            String[] files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/locations", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     locations.add(new Location(FileManager.readFile(pathExtension + "adventures/" + filename + "/locations/" + file)));
@@ -268,7 +241,7 @@ public class Manager {
                     exitError("Location '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 100);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/npcs", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/npcs", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     npcs.add(new NPC(FileManager.readFile(pathExtension + "adventures/" + filename + "/npcs/" + file)));
@@ -276,7 +249,7 @@ public class Manager {
                     exitError("NPC '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 101);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/itemtypes", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/itemtypes", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     items.add(new Item(FileManager.readFile(pathExtension + "adventures/" + filename + "/itemtypes/" + file)));
@@ -284,7 +257,7 @@ public class Manager {
                     exitError("ItemType '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 102);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/inventories", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/inventories", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     inventories.add(new Inventory(FileManager.readFile(pathExtension + "adventures/" + filename + "/inventories/" + file)));
@@ -292,7 +265,7 @@ public class Manager {
                     exitError("Inventory '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 104);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/battlemaps", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/battlemaps", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     battleMaps.add(new BattleMap(FileManager.readFile(pathExtension + "adventures/" + filename + "/battlemaps/" + file)));
@@ -300,7 +273,7 @@ public class Manager {
                     exitError("BattleMap '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 105);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/talents", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/talents", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     talents.add(new Talent(FileManager.readFile(pathExtension + "adventures/" + filename + "/talents/" + file)));
@@ -316,7 +289,7 @@ public class Manager {
                     exitError("Talent '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 106);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/events", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/events", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     events.add(new Event(FileManager.readFile(pathExtension + "adventures/" + filename + "/events/" + file)));
@@ -324,7 +297,7 @@ public class Manager {
                     exitError("Event '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 107);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/lootTable", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/lootTable", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     lootTable.add(new LootTable(FileManager.readFile(pathExtension + "adventures/" + filename + "/lootTable/" + file)));
@@ -332,7 +305,7 @@ public class Manager {
                     exitError("LootTable '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 107);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/customCommands", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/customCommands", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     customCommands.add(new CustomCommand(FileManager.readFile(pathExtension + "adventures/" + filename + "/customCommands/" + file)));
@@ -340,7 +313,7 @@ public class Manager {
                     exitError("CustomCommand '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 108);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/colors", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/colors", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     colors.add(new ColorObject(FileManager.readFile(pathExtension + "adventures/" + filename + "/colors/" + file)));
@@ -348,15 +321,15 @@ public class Manager {
                     exitError("Color '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/fileObjects", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/fileObjects", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
-                    fileObjects.add(new FileObject(FileManager.readFile(pathExtension + "adventures/" + filename + "/fileObjects/" + file), FileManager.readFileToByteArray(pathExtension + "adventures/" + filename + "/fileObjects/" + file.replace(StaticStuff.dataFileEnding, "") + ".file")));
+                    fileObjects.add(new FileObject(FileManager.readFile(pathExtension + "adventures/" + filename + "/fileObjects/" + file), FileManager.readFileToByteArray(pathExtension + "adventures/" + filename + "/fileObjects/" + file.replace(StaticStuff.DATA_FILE_ENDING, "") + ".file")));
                 } catch (Exception e) {
                     exitError("FileObject '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
                 }
             }
-            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/popups", StaticStuff.dataFileEndingNoDot);
+            files = FileManager.getFilesWithEnding(pathExtension + "adventures/" + filename + "/popups", StaticStuff.DATA_FILE_ENDING_NO_DOT);
             for (String file : files) {
                 try {
                     popups.add(new CustomPopup(FileManager.readFile(pathExtension + "adventures/" + filename + "/popups/" + file)));
@@ -364,9 +337,9 @@ public class Manager {
                     exitError("Popup '" + file + "' contains invalid data.\nRPG Engine will exit:\n" + e, 109);
                 }
             }
-            variables = new Variables(FileManager.readFile(pathExtension + "adventures/" + filename + "/variables/vars" + StaticStuff.dataFileEnding));
-            images = new Images(filename, FileManager.readFile(pathExtension + "adventures/" + filename + "/images/imagelist" + StaticStuff.dataFileEnding));
-            audios = new Audios(filename, FileManager.readFile(pathExtension + "adventures/" + filename + "/audio/audiolist" + StaticStuff.dataFileEnding));
+            variables = new Variables(FileManager.readFile(pathExtension + "adventures/" + filename + "/variables/vars" + StaticStuff.DATA_FILE_ENDING));
+            images = new Images(filename, FileManager.readFile(pathExtension + "adventures/" + filename + "/images/imagelist" + StaticStuff.DATA_FILE_ENDING));
+            audios = new Audios(filename, FileManager.readFile(pathExtension + "adventures/" + filename + "/audio/audiolist" + StaticStuff.DATA_FILE_ENDING));
             FileManager.deleteDirectoryRecursively(pathExtension + "adventures/" + filename);
         }
         FileManager.deleteDirectoryRecursively(pathExtension + "adventures/" + filename);
@@ -374,7 +347,7 @@ public class Manager {
     }
 
     public void exitError(String message, int code) {
-        Popup.error(StaticStuff.projectName, message);
+        Popup.error(StaticStuff.PROJECT_NAME, message);
         FileManager.deleteDirectoryRecursively(pathExtension + "adventures/" + filename);
         System.exit(code);
     }
@@ -443,6 +416,25 @@ public class Manager {
         occ += audios.refactor(find, replace);
         unsavedChanges = true;
         return occ;
+    }
+
+    public ArrayList<String> find(String find) {
+        ArrayList<String> found = new ArrayList<>();
+        for (Location location : locations) location.find(find, found);
+        for (NPC npc : npcs) npc.find(find, found);
+        for (Item item : items) item.find(find, found);
+        for (Inventory inventory : inventories) inventory.find(find, found);
+        for (BattleMap battleMap : battleMaps) battleMap.find(find, found);
+        for (Event event : events) event.find(find, found);
+        for (LootTable table : lootTable) table.find(find, found);
+        for (CustomCommand customCommand : customCommands) customCommand.find(find, found);
+        for (ColorObject color : colors) color.find(find, found);
+        for (FileObject fileObject : fileObjects) fileObject.find(find, found);
+        for (CustomPopup popup : popups) popup.find(find, found);
+        player.find(find, found);
+        projectSettings.find(find, found);
+        variables.find(find, found);
+        return found;
     }
 
     public void cloneEntity(String uid) {
@@ -525,7 +517,8 @@ public class Manager {
                 uid = colors.get(colors.size() - 1).uid;
                 break;
             }
-        if (!found) Popup.error(StaticStuff.projectName, "UID '" + uid + "' either does not exist or cannot be cloned");
+        if (!found)
+            Popup.error(StaticStuff.PROJECT_NAME, "UID '" + uid + "' either does not exist or cannot be cloned");
         else {
             unsavedChanges = true;
             updateGui();
@@ -604,8 +597,74 @@ public class Manager {
         if (variables.openVariable(uid)) found = true;
         if (images.openImage(uid)) found = true;
         if (audios.playAudio(uid)) found = true;
-        if (!found) Popup.error(StaticStuff.projectName, "UID '" + uid + "' not found");
+        if (!found) Popup.error(StaticStuff.PROJECT_NAME, "UID '" + uid + "' not found");
         else unsavedChanges = true;
+    }
+
+    public void openEntityEvent(String uid, int index) {
+        if (!openNextEntity) {
+            openNextEntity = true;
+            return;
+        }
+        if (!StaticStuff.isValidUID(uid))
+            return;
+        boolean found = false;
+        for (Location location : locations)
+            if (location.uid.equals(uid)) {
+                found = true;
+                location.openEvent(index);
+            }
+        for (NPC npc : npcs)
+            if (npc.uid.equals(uid)) {
+                found = true;
+                npc.openEvent(index);
+            }
+        for (Item item : items)
+            if (item.uid.equals(uid)) {
+                found = true;
+                item.openEvent(index);
+            }
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid)) {
+                found = true;
+                inventory.openEvent(index);
+            }
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.uid.equals(uid)) {
+                found = true;
+                battleMap.openEvent(index);
+            }
+        for (Event event : events)
+            if (event.uid.equals(uid)) {
+                found = true;
+                event.openEvent(index);
+            }
+        for (LootTable table : lootTable)
+            if (table.uid.equals(uid)) {
+                found = true;
+                table.openEvent(index);
+            }
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.uid.equals(uid)) {
+                found = true;
+                customCommand.openEvent(index);
+            }
+        for (ColorObject color : colors)
+            if (color.uid.equals(uid)) {
+                found = true;
+                color.openEvent(index);
+            }
+        for (FileObject fileObject : fileObjects)
+            if (fileObject.uid.equals(uid)) {
+                found = true;
+                fileObject.openEvent(index);
+            }
+        for (CustomPopup popup : popups)
+            if (popup.uid.equals(uid)) {
+                found = true;
+                popup.openEvent(index);
+            }
+        if (!found) Popup.error(StaticStuff.PROJECT_NAME, "UID '" + uid + "' not found");
     }
 
     public boolean entityExists(String uid) {
@@ -637,8 +696,7 @@ public class Manager {
             if (popup.uid.equals(uid)) return true;
         if (variables.variableExists(uid)) return true;
         if (images.imageExists(uid)) return true;
-        if (audios.audioExists(uid)) return true;
-        return false;
+        return audios.audioExists(uid);
     }
 
     private boolean openNextEntity = true;
@@ -828,20 +886,6 @@ public class Manager {
         return false;
     }
 
-    /*public static boolean battleMapExists(String uid) {
-        for (BattleMap battleMap : battleMaps)
-            if (battleMap.uid.equals(uid))
-                return true;
-        return false;
-    }
-
-    public static boolean talentExists(String uid) {
-        for (Talent talent : talents)
-            if (talent.uid.equals(uid))
-                return true;
-        return false;
-    }*/
-
     public static boolean locationExists(String uid) {
         for (Location location : locations)
             if (location.uid.equals(uid))
@@ -881,6 +925,48 @@ public class Manager {
         return audios.audioExists(uid);
     }
 
+    public static boolean variableExists(String uidOrName) {
+        return variables.variableExists(uidOrName);
+    }
+
+    public static String getName(String uid) {
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return npc.name;
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return inventory.name;
+        for (Location location : locations) if (location.uid.equals(uid)) return location.name;
+        for (Item item : items) if (item.uid.equals(uid)) return item.name;
+        for (Talent talent : talents) if (talent.uid.equals(uid)) return talent.name;
+        for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return battleMap.name;
+        for (Event event : events) if (event.uid.equals(uid)) return event.name;
+        for (LootTable table : lootTable) if (table.uid.equals(uid)) return table.name;
+        for (CustomCommand customCommand : customCommands) if (customCommand.uid.equals(uid)) return customCommand.name;
+        for (ColorObject color : colors) if (color.uid.equals(uid)) return color.name;
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return fileObject.name;
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return popup.name;
+        if (audioExists(uid)) return audios.getAudioName(uid);
+        if (imageExists(uid)) return images.getImageName(uid);
+        if (variableExists(uid)) return variables.getVariableName(uid);
+        return "null";
+    }
+
+    public String getTypeByUID(String uid) {
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return "npc";
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return "inventory";
+        for (Location location : locations) if (location.uid.equals(uid)) return "location";
+        for (Item item : items) if (item.uid.equals(uid)) return "item";
+        for (Talent talent : talents) if (talent.uid.equals(uid)) return "talent";
+        for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return "battleMap";
+        for (Event event : events) if (event.uid.equals(uid)) return "eventCollection";
+        for (LootTable table : lootTable) if (table.uid.equals(uid)) return "lootTable";
+        for (CustomCommand customCommand : customCommands) if (customCommand.uid.equals(uid)) return "customCommand";
+        for (ColorObject color : colors) if (color.uid.equals(uid)) return "color";
+        for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) return "fileObject";
+        for (CustomPopup popup : popups) if (popup.uid.equals(uid)) return "popup";
+        if (audioExists(uid)) return "audio";
+        if (imageExists(uid)) return "image";
+        if (variableExists(uid)) return "variable";
+        return "null";
+    }
+
     public static String getAudioName(String uid) {
         if (audioExists(uid)) return audios.getAudioName(uid);
         return "This image does not exist";
@@ -897,7 +983,7 @@ public class Manager {
         for (Item item : items)
             if (item.uid.equals(uid))
                 if (item.image.equals(""))
-                    Popup.error(StaticStuff.projectName, "This item does not have an image.");
+                    Popup.error(StaticStuff.PROJECT_NAME, "This item does not have an image.");
                 else return item.image;
         return "item does not exist";
     }
@@ -1014,12 +1100,12 @@ public class Manager {
 
     private void generateTalents(String which) {
         if (which.equals("Empty")) return;
-        String[] talentList = FileManager.readFile("res/txt/talents" + which + projectSettings.getValue("language") + "" + StaticStuff.dataFileEnding);
+        String[] talentList = FileManager.readFile("res/txt/talents" + which + projectSettings.getValue("language") + "" + StaticStuff.DATA_FILE_ENDING);
         for (String s : talentList) talents.add(new Talent(true, s.split(" {2}")));
     }
 
     private void generateCommands() {
-        String[] talentList = FileManager.readFile("res/txt/commands" + projectSettings.getValue("language") + "" + StaticStuff.dataFileEnding);
+        String[] talentList = FileManager.readFile("res/txt/commands" + projectSettings.getValue("language") + "" + StaticStuff.DATA_FILE_ENDING);
         String[] current;
         for (String s : talentList) {
             current = s.split(";;;");
@@ -1078,8 +1164,131 @@ public class Manager {
         myself.cfg.set("actionEditorOpenDirectlyInExternalEditor", !myself.cfg.get("actionEditorOpenDirectlyInExternalEditor").equals("true") + "");
     }
 
+    public static void toggleShowTips() {
+        myself.cfg.refresh();
+        myself.cfg.set("showTips", !myself.cfg.get("showTips").equals("true") + "");
+    }
+
     public void setMainCfgSetting(String name, String value) {
         cfg.set(name, value);
+    }
+
+    private final static ArrayList<String> OBJECT_TYPES = new ArrayList<>();
+
+    private void initTypeStrings() {
+        OBJECT_TYPES.add("npc");
+        OBJECT_TYPES.add("inventory");
+        OBJECT_TYPES.add("location");
+        OBJECT_TYPES.add("item");
+        OBJECT_TYPES.add("talent");
+        OBJECT_TYPES.add("battleMap");
+        OBJECT_TYPES.add("eventCollection");
+        OBJECT_TYPES.add("lootTable");
+        OBJECT_TYPES.add("customCommand");
+        OBJECT_TYPES.add("color");
+        OBJECT_TYPES.add("fileObject");
+        OBJECT_TYPES.add("popup");
+        OBJECT_TYPES.add("audio");
+        OBJECT_TYPES.add("image");
+        OBJECT_TYPES.add("variable");
+        OBJECT_TYPES.add("null");
+    }
+
+    private ArrayList<String> getAllUIDs() {
+        ArrayList<String> uids = new ArrayList<>();
+        for (Location location : locations)
+            uids.add(location.uid);
+        for (NPC npc : npcs)
+            uids.add(npc.uid);
+        for (Item item : items)
+            uids.add(item.uid);
+        for (Inventory inventory : inventories)
+            uids.add(inventory.uid);
+        for (BattleMap battleMap : battleMaps)
+            uids.add(battleMap.uid);
+        for (Talent talent : talents)
+            uids.add(talent.uid);
+        for (Event event : events)
+            uids.add(event.uid);
+        for (LootTable table : lootTable)
+            uids.add(table.uid);
+        for (CustomCommand customCommand : customCommands)
+            uids.add(customCommand.uid);
+        for (ColorObject color : colors)
+            uids.add(color.uid);
+        for (FileObject fileObject : fileObjects)
+            uids.add(fileObject.uid);
+        for (CustomPopup popup : popups)
+            uids.add(popup.uid);
+        uids.addAll(variables.getUids());
+        uids.addAll(Images.getUids());
+        uids.addAll(audios.getUids());
+        return uids;
+    }
+
+    public void generateVis(String generateType) {
+        VisJS vis = new VisJS(generateType, 1700, 900);
+
+        for (int i = 0; i < OBJECT_TYPES.size(); i++)
+            vis.addNodeType(i, new VisJS.NodeTypeBuilder().setColor(StaticStuff.generateColor(OBJECT_TYPES.get(i))));
+        vis.setOption(VisJS.EDGE_ARROW_DIRECTION, VisJS.EDGE_ARROW_TO);
+        vis.setOption(VisJS.PHYSICS_SOLVER, VisJS.PHYSICS_SOLVER_FORCE_ATLAS_2_BASED);
+        vis.setOption(VisJS.PHYSICS_SOLVER_REPULSION, 300);
+
+        switch (generateType) {
+            case "uidNameConnections" -> getAllUIDs().forEach(uid -> addEntityConnections(uid, vis));
+            case "uidNameConnectionsByType" -> {
+                String type = Popup.dropDown(StaticStuff.PROJECT_NAME, "Select the type to display the connections of:", OBJECT_TYPES.toArray(new String[0]));
+                if (type == null) return;
+                getAllUIDs().stream().filter(uid -> getTypeByUID(uid).equals(type)).forEach(uid -> addEntityConnections(uid, vis));
+            }
+            case "objectsByTypes" -> {
+                OBJECT_TYPES.forEach(objectType -> vis.addNode(objectType, OBJECT_TYPES.indexOf(objectType)));
+                getAllUIDs().forEach(uid -> {
+                    String type = getTypeByUID(uid);
+                    String name = getName(uid);
+                    vis.addNode(uid + "\\n" + name + "\\n" + type, OBJECT_TYPES.indexOf(type));
+                    vis.addEdge(type, uid + "\\n" + name + "\\n" + type);
+                });
+            }
+            default -> {
+                Popup.error(StaticStuff.PROJECT_NAME, "This type does not exist");
+                return;
+            }
+        }
+
+        if (vis.getNodeCount() == 0) {
+            Popup.warning(StaticStuff.PROJECT_NAME, "Generated graph has no nodes.\nCancelling action.");
+            return;
+        }
+
+        String filename = generateType + "_" + vis.getNodeCount() + "_nodes.html";
+        FileManager.writeToFile(filename, vis.generate().toArray(new String[0]));
+        FileManager.openFile(filename);
+    }
+
+    private void addEntityConnections(String uid, VisJS vis) {
+        String type = getTypeByUID(uid);
+        String name = getName(uid);
+
+        ArrayList<String> connections = find(uid);
+        connections.addAll(find(name));
+
+        String displayText = uid + "\\n" + name + "\\n" + type;
+        vis.addNode(displayText, OBJECT_TYPES.indexOf(type));
+
+        for (String connection : connections) {
+            if (connection.length() >= 16) {
+                String connectUID = connection.substring(0, 16);
+                if (StaticStuff.isValidUIDSilent(connectUID)) {
+                    String connectType = getTypeByUID(connectUID);
+                    connectUID = connectUID + "\\n" + getName(connectUID) + "\\n" + getTypeByUID(connectUID);
+                    if (connectUID.equals(displayText)) continue;
+                    vis.addNode(connectUID, OBJECT_TYPES.indexOf(connectType));
+                    vis.addEdge(displayText, connectUID, connection, true);
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {

@@ -509,13 +509,13 @@ public class GuiBattleMapEditor extends JFrame {
                 if (battleMap.addGroundTile(setUid, x, y)) {
                     removeBoard();
                     generateBoard();
-                } else Popup.error(StaticStuff.projectName, "Unable to add ground tile.");
+                } else Popup.error(StaticStuff.PROJECT_NAME, "Unable to add ground tile.");
                 return;
             case 2:
                 if (battleMap.addObstacle(setUid, x, y)) {
                     removeBoard();
                     generateBoard();
-                } else Popup.error(StaticStuff.projectName, "Unable to add obstacle.");
+                } else Popup.error(StaticStuff.PROJECT_NAME, "Unable to add obstacle.");
                 return;
             case 3:
                 battleMap.removeEverything(x, y);
@@ -526,7 +526,7 @@ public class GuiBattleMapEditor extends JFrame {
                 if (battleMap.addNPC(x, y)) {
                     removeBoard();
                     generateBoard();
-                } else Popup.error(StaticStuff.projectName, "Unable to add NPC.");
+                } else Popup.error(StaticStuff.PROJECT_NAME, "Unable to add NPC.");
                 return;
             case 5:
                 battleMap.playerStartingPos = x + "AAA" + y;
@@ -537,7 +537,7 @@ public class GuiBattleMapEditor extends JFrame {
                 if (battleMap.addItem(x, y)) {
                     removeBoard();
                     generateBoard();
-                } else Popup.error(StaticStuff.projectName, "Unable to add item.");
+                } else Popup.error(StaticStuff.PROJECT_NAME, "Unable to add item.");
                 return;
             default:
                 //open data
@@ -548,14 +548,14 @@ public class GuiBattleMapEditor extends JFrame {
 
     private void addGroundTile() {
         if (currentMode != 1) {
-            String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
+            String uid = Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
             if (StaticStuff.isValidUID(uid)) {
                 if (Manager.imageExists(uid)) {
                     setUid = uid;
                     currentMode = 1;
                     l_currentState.setText("<html><b>Click on a tile to set ground.");
                 } else
-                    Popup.error(StaticStuff.projectName, "Invalid UID: '" + setUid + "'\nThis image does not exist.");
+                    Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '" + setUid + "'\nThis image does not exist.");
             }
         } else {
             currentMode = 0;
@@ -575,14 +575,14 @@ public class GuiBattleMapEditor extends JFrame {
 
     private void addObstacle() {
         if (currentMode != 2) {
-            String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
+            String uid = Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
             if (StaticStuff.isValidUID(uid)) {
                 if (Manager.imageExists(uid)) {
                     setUid = uid;
                     currentMode = 2;
                     l_currentState.setText("<html><b>Click on a tile to add obstacle.");
                 } else
-                    Popup.error(StaticStuff.projectName, "Invalid UID: '" + setUid + "'\nThis image does not exist.");
+                    Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '" + setUid + "'\nThis image does not exist.");
             }
         } else {
             currentMode = 0;
@@ -623,14 +623,14 @@ public class GuiBattleMapEditor extends JFrame {
     }
 
     private void setGroundTiles() {
-        String uid = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
+        String uid = Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
         if (StaticStuff.isValidUID(uid)) {
             if (Manager.imageExists(uid)) {
                 removeBoard();
                 battleMap.groundTileUID = uid;
                 groundTile = new ImageIcon(Manager.getImage(battleMap.groundTileUID));
                 generateBoard();
-            } else Popup.error(StaticStuff.projectName, "Invalid UID: '" + uid + "'\nThis image does not exist.");
+            } else Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '" + uid + "'\nThis image does not exist.");
         }
     }
 

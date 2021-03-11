@@ -68,6 +68,9 @@ public class PopupSmallButtons extends JFrame {
             this.add(contentPane);
             this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             int[] xy = StaticStuff.getMouseLocation();
+            int[] dimensions = StaticStuff.getScreenDimensions();
+            if(xy[0] + x_size > dimensions[0]) xy[0] = dimensions[0] - x_size - 20;
+            if(xy[1] + y_size > dimensions[1]) xy[1] = dimensions[1] - y_size - 20;
             this.setLocation(xy[0], xy[1]);
             this.pack();
             this.setVisible(true);

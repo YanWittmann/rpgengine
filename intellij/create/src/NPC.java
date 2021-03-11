@@ -43,7 +43,7 @@ public class NPC extends Entity {
                 }
             }
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "Location '" + name + "' contains invalid data.");
+            Popup.error(StaticStuff.PROJECT_NAME, "Location '" + name + "' contains invalid data.");
         }
     }
 
@@ -78,7 +78,7 @@ public class NPC extends Entity {
         }
         if (!StaticStuff.isValidUID(uid)) return;
         if (!Manager.locationExists(uid)) {
-            Popup.error(StaticStuff.projectName, "Invalid UID: '" + uid + "'\nThis location does not exist.");
+            Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '" + uid + "'\nThis location does not exist.");
             return;
         }
         location = uid;
@@ -91,7 +91,7 @@ public class NPC extends Entity {
         }
         if (!StaticStuff.isValidUID(uid)) return;
         if (Manager.inventoryDoesNotExist(uid)) {
-            Popup.error(StaticStuff.projectName, "Invalid UID: '" + uid + "'\nThis inventory does not exist.");
+            Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '" + uid + "'\nThis inventory does not exist.");
             return;
         }
         inventory = uid;
@@ -104,7 +104,7 @@ public class NPC extends Entity {
         }
         if (!StaticStuff.isValidUID(uid)) return;
         if (!Manager.imageExists(uid)) {
-            Popup.error(StaticStuff.projectName, "Invalid UID: '" + uid + "'\nThis image does not exist.");
+            Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '" + uid + "'\nThis image does not exist.");
             return;
         }
         image = uid;
@@ -159,7 +159,7 @@ public class NPC extends Entity {
                         deleteEvent(Integer.parseInt(str));
                     }
                     case 5 -> {
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
                         if (choice == 0)
                             getEntity().addTag(Popup.input("Tag name:", ""));
                         else if (choice == 1)
@@ -168,7 +168,7 @@ public class NPC extends Entity {
                             getEntity().editTag(Integer.parseInt(Popup.input("Tag index:", "")), Popup.input("Tag name:", ""));
                     }
                     case 6 -> {
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
                         if (choice == 0) {
                             getEntity().addVariable(Popup.input("Variable name:", ""), true);
                         } else if (choice == 1)
@@ -176,10 +176,10 @@ public class NPC extends Entity {
                         else if (choice == 2)
                             getEntity().openVariable(StaticStuff.autoDetectUID("Variable uid:"), true);
                     }
-                    case 7 -> ((NPC) getEntity()).setLocation(Popup.dropDown(StaticStuff.projectName, "Select a location UID", Manager.getStringArrayLocations()).replaceAll(".+ - ([^-]+)", "$1"));
-                    case 8 -> ((NPC) getEntity()).setInventory(Popup.dropDown(StaticStuff.projectName, "Select an inventory UID", Manager.getStringArrayInventories()).replaceAll(".+ - ([^-]+)", "$1"));
-                    case 9 -> setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
-                    default -> Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");
+                    case 7 -> ((NPC) getEntity()).setLocation(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select a location UID", Manager.getStringArrayLocations()).replaceAll(".+ - ([^-]+)", "$1"));
+                    case 8 -> ((NPC) getEntity()).setInventory(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an inventory UID", Manager.getStringArrayInventories()).replaceAll(".+ - ([^-]+)", "$1"));
+                    case 9 -> setImage(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
+                    default -> Popup.error(StaticStuff.PROJECT_NAME, "Invalid action\nButton " + index + " does not exist.");
                 }
                 update();
             }

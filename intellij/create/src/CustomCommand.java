@@ -41,7 +41,7 @@ public class CustomCommand extends Entity {
                 }
             }
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "CustomCommand '" + name + "' contains invalid data.");
+            Popup.error(StaticStuff.PROJECT_NAME, "CustomCommand '" + name + "' contains invalid data.");
         }
     }
 
@@ -116,7 +116,7 @@ public class CustomCommand extends Entity {
                         deleteEvent(Integer.parseInt(str));
                         break;
                     case 5:
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
                         if (choice == 0)
                             getEntity().addTag(Popup.input("Tag name:", ""));
                         else if (choice == 1)
@@ -125,7 +125,7 @@ public class CustomCommand extends Entity {
                             getEntity().editTag(Integer.parseInt(Popup.input("Tag index:", "")), Popup.input("Tag name:", ""));
                         break;
                     case 6:
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
                         if (choice == 0) {
                             getEntity().addVariable(Popup.input("Variable name:", ""), true);
                         } else if (choice == 1)
@@ -137,7 +137,7 @@ public class CustomCommand extends Entity {
                         new GuiCCEditor((CustomCommand) getEntity());
                         break;
                     default:
-                        Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");
+                        Popup.error(StaticStuff.PROJECT_NAME, "Invalid action\nButton " + index + " does not exist.");
                 }
                 update();
             }

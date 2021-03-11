@@ -1,4 +1,6 @@
 
+//RPG ENGINE BY YAN WITTMANN; http://yanwittmann.de/projects/rpgengine/site/
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -12,8 +14,8 @@ public class Interpreter {
     private ProjectSettings settings;
     private String filename = "";
     private String extraFilePath = "../../";
-    private final String version = "1.11.6";
-    private boolean autoRoll = false, showLoadingScreen = true, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
+    private final String version = "1.13";
+    private boolean autoRoll = false, loadingScreenDone = false, showIntro = true, mayOpenStartPopup = false;
     private static Language lang;
     //public Configuration cfg; //there are no cfg entries at the moment so this is unnecessary
     public int amountPopupsOpen = 0;
@@ -547,10 +549,10 @@ public class Interpreter {
             if (skip) return "ifskip";
             lastIfSuccessful.remove(lastIfSuccessful.size() - 1);
         } else if (code.charAt(0) == '{') {
-            if (code.matches("\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))* = .+")) { //\\{[^\\}]+\\}(?:\\.[^\\(]+\\([^\\)]*\\))* = .+
-                setValueEvaluate(code.replaceAll("(\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))*) = .+", "$1"), code.replaceAll("\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))* = (.+)", "$1"), true);
-            } else if (code.matches("\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))* == .+")) { //"\\{[^\\}]+\\}(?:\\.[^\\(]+\\([^\\)]*\\))* == .+"
-                setValueEvaluate(code.replaceAll("(\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))*) == .+", "$1"), code.replaceAll("\\{(?:[^\\}\\{]*(?:\\{[^\\}]+\\})*[^\\}\\{]*)\\}(?:\\.[^\\(]+\\([^\\)]*\\))* == (.+)", "$1"), false);
+            if (code.matches("\\{(?:[^}{]*(?:\\{[^}]+})*[^}{]*)}(?:\\.[^(]+\\([^)]*\\))* = .+")) { //\\{[^\\}]+\\}(?:\\.[^\\(]+\\([^\\)]*\\))* = .+
+                setValueEvaluate(code.replaceAll("(\\{(?:[^}{]*(?:\\{[^}]+})*[^}{]*)}(?:\\.[^(]+\\([^)]*\\))*) = .+", "$1"), code.replaceAll("\\{(?:[^}{]*(?:\\{[^}]+})*[^}{]*)}(?:\\.[^(]+\\([^)]*\\))* = (.+)", "$1"), true);
+            } else if (code.matches("\\{(?:[^}{]*(?:\\{[^}]+})*[^}{]*)}(?:\\.[^(]+\\([^)]*\\))* == .+")) { //"\\{[^\\}]+\\}(?:\\.[^\\(]+\\([^\\)]*\\))* == .+"
+                setValueEvaluate(code.replaceAll("(\\{(?:[^}{]*(?:\\{[^}]+})*[^}{]*)}(?:\\.[^(]+\\([^)]*\\))*) == .+", "$1"), code.replaceAll("\\{(?:[^}{]*(?:\\{[^}]+})*[^}{]*)}(?:\\.[^(]+\\([^)]*\\))* == (.+)", "$1"), false);
             }
         } else if (code.equals("exit")) {
             return "exit";
@@ -592,10 +594,10 @@ public class Interpreter {
                 executeEventFromObject(codeWords[1], "entry", new String[]{"comeFromLocation:" + comeFrom, "gotoLocation:" + codeWords[1]});
             }
             new Thread(GuiPlayerStats::updateOutput).start();
-        } else if (codeWords[0].equals("print")) {
-            print(prepareStringReplaceVar(code.replace("print ", "")));
-        } else if (codeWords[0].equals("printwait")) {
-            code = prepareStringReplaceVar(code.replace("printwait ", ""));
+        } else if (codeWords[0].equals("print") || codeWords[0].equals("pr")) {
+            print(prepareStringReplaceVar(code.replace("print ", "").replace("pr ", "")));
+        } else if (codeWords[0].equals("printwait") || codeWords[0].equals("prw")) {
+            code = prepareStringReplaceVar(code.replace("printwait ", "").replace("prw ", ""));
             print(code);
             code = StaticStuff.removeTextFormatting(StaticStuff.prepareString(code));
             int duration = (int) ((Float.parseFloat(code.replaceAll("\\[[^]]+]", "").length() + "") * 1000f) / 15f);
@@ -1841,6 +1843,10 @@ public class Interpreter {
             objectFrameVariables = self.settings.getValue("objectFrameVariables").split(",");
         }
         return objectFrameVariables;
+    }
+
+    public static String getSettingsValue(String key) {
+        return self.settings.getValue(key);
     }
 
     //scale stuff

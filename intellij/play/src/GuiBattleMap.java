@@ -325,7 +325,7 @@ public class GuiBattleMap extends JFrame {
         }
         for (int i = 0; i < battleMap.obstacles.size(); i++) {
             try {
-                String splitted[] = battleMap.obstacles.get(i).split("AAA");
+                String[] splitted = battleMap.obstacles.get(i).split("AAA");
                 l_obstacles[Integer.parseInt(splitted[1])][Integer.parseInt(splitted[2])].setIcon(getScaledImage(new ImageIcon(Manager.getImage(splitted[0])), tileSize, tileSize));
             } catch (Exception e) {
                 battleMap.obstacles.remove(i);
@@ -347,7 +347,7 @@ public class GuiBattleMap extends JFrame {
         }
         for (int i = 0; i < battleMap.extraGroundTiles.size(); i++) {
             try {
-                String splitted[] = battleMap.extraGroundTiles.get(i).split("AAA");
+                String[] splitted = battleMap.extraGroundTiles.get(i).split("AAA");
                 l_extraGoundTiles[Integer.parseInt(splitted[1])][Integer.parseInt(splitted[2])].setIcon(getScaledImage(new ImageIcon(Manager.getImage(splitted[0])), tileSize, tileSize));
             } catch (Exception e) {
                 battleMap.extraGroundTiles.remove(i);
@@ -395,7 +395,6 @@ public class GuiBattleMap extends JFrame {
         contentPane.remove(dummy);
         contentPane.add(dummy);
         updateBoard("all");
-        //battleMap.beginNextTurn();
         battleMap.battleGuiIsReadyToStart();
     }
 
@@ -416,22 +415,20 @@ public class GuiBattleMap extends JFrame {
     }
 
     private void tileClicked(MouseEvent e, int x, int y) {
-        new Thread() {
-            public void run() {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    Log.add(x + " " + y + " left-clicked");
-                    battleMap.leftClickOnTile(x, y);
-                } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    Log.add(x + " " + y + " right-clicked");
-                    battleMap.rightClickOnTile(x, y);
-                    String openObjects[] = battleMap.getTileContent(x, y);
-                    for (int i = 0; i < openObjects.length; i++)
-                        GuiObjectDisplay.create(battleMap.manager.getEntity(openObjects[i]), "");
-                } else if (e.getButton() == MouseEvent.BUTTON2) {
-                    Log.add(x + " " + y + " mouse-wheel-clicked");
-                }
+        new Thread(() -> {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                Log.add(x + " " + y + " left-clicked");
+                battleMap.leftClickOnTile(x, y);
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                Log.add(x + " " + y + " right-clicked");
+                battleMap.rightClickOnTile(x, y);
+                String openObjects[] = battleMap.getTileContent(x, y);
+                for (int i = 0; i < openObjects.length; i++)
+                    GuiObjectDisplay.create(battleMap.manager.getEntity(openObjects[i]), "");
+            } else if (e.getButton() == MouseEvent.BUTTON2) {
+                Log.add(x + " " + y + " mouse-wheel-clicked");
             }
-        }.start();
+        }).start();
     }
 
     public void setOverlay(int x, int y, int n) {
@@ -457,8 +454,8 @@ public class GuiBattleMap extends JFrame {
         int destPosX = x_offset + (to.x * tileSize), destPosY = x_offset + (to.y * tileSize);
         int diffX = destPosX - origPosX, diffY = destPosY - origPosY;
         double distance = calculateDistanceBetweenPoints(origPosX, origPosY, destPosX, destPosY);
-        double deltaEachX = diffX / 100;
-        double deltaEachY = diffY / 100;
+        double deltaEachX = diffX / 100d;
+        double deltaEachY = diffY / 100d;
 
         int duration = (int) (distance / (tileSize / 2));
 
@@ -468,18 +465,6 @@ public class GuiBattleMap extends JFrame {
         }
 
         l_attackAnimation.setBounds(-1000, -1000, tileSize, tileSize);
-
-        /*int origPosX = x_offset+(from.x*tileSize), origPosY = x_offset+(from.y*tileSize);
-        int destPosX = x_offset+(to.x*tileSize), destPosY = x_offset+(to.y*tileSize);
-        int diffX = destPosX-origPosX, diffY = destPosY-origPosY;
-        float diff = (float) Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2)) / 8;
-        int duration = (int) diff;
-        l_attackAnimation.setIcon(getScaledImage(new ImageIcon(Manager.getImage(imageUID)),tileSize,tileSize));
-        for(int i=0;i<duration;i++){
-        l_attackAnimation.setBounds(origPosX+((int)((diffX/diff)*i)),origPosY+((int)((diffY/diff)*i)),tileSize,tileSize);
-        Sleep.milliseconds(duration);
-        }
-        l_attackAnimation.setBounds(-1000,-1000, tileSize, tileSize);*/
     }
 
     public double calculateDistanceBetweenPoints(double x1, double y1, double x2, double y2) {
@@ -498,10 +483,14 @@ public class GuiBattleMap extends JFrame {
             }
 
         if (what.contains("overlay") || what.contains("all")) {
-            overlayWalkable = new ImageIcon(Images.readImageFromFile("res/img/walkableTile.png"));
-            scaledOverlayWalkable = getScaledImage(overlayWalkable, tileSize, tileSize);
-            overlayCurrentNPC = new ImageIcon(Images.readImageFromFile("res/img/currentNPC.png"));
-            scaledOverlayCurrentNPC = getScaledImage(overlayCurrentNPC, tileSize, tileSize);
+            try {
+                overlayWalkable = new ImageIcon(Objects.requireNonNull(Images.readImageFromFile("res/img/walkableTile.png")));
+                scaledOverlayWalkable = getScaledImage(overlayWalkable, tileSize, tileSize);
+                overlayCurrentNPC = new ImageIcon(Objects.requireNonNull(Images.readImageFromFile("res/img/currentNPC.png")));
+                scaledOverlayCurrentNPC = getScaledImage(overlayCurrentNPC, tileSize, tileSize);
+            } catch (Exception e) {
+                StaticStuff.openPopup("[[red:Unable to get battleMap tiles from res folder]]");
+            }
             for (int i = 0; i < battleMap.size; i++) {
                 for (int j = 0; j < battleMap.size; j++) {
                     contentPane.remove(l_overlay[i][j]);

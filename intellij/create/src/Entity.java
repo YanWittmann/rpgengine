@@ -47,14 +47,14 @@ public abstract class Entity {
             eventName.add(name);
             eventCode.add("log add event: " + uid + " - " + this.name + " - " + name);
             if (Manager.openActionEditor) new GuiActionEditor(this, eventName.size() - 1);
-        } else Popup.error(StaticStuff.projectName + " - Error", "This event already exists");
+        } else Popup.error(StaticStuff.PROJECT_NAME + " - Error", "This event already exists");
     }
 
     public void deleteEvent(int index) {
         if (index != -1) {
             eventName.remove(index);
             eventCode.remove(index);
-        } else Popup.error(StaticStuff.projectName + " - Error", "This event does not exist");
+        } else Popup.error(StaticStuff.PROJECT_NAME + " - Error", "This event does not exist");
     }
 
     public abstract String generateSaveString();
@@ -100,7 +100,7 @@ public abstract class Entity {
                 localVarName.set(index, name);
                 localVarType.set(index, type);
                 localVarValue.set(index, value);
-            } else Popup.error(StaticStuff.projectName, "This variable does not exist.");
+            } else Popup.error(StaticStuff.PROJECT_NAME, "This variable does not exist.");
     }
 
     public void removeVariable(String uid) {
@@ -111,7 +111,7 @@ public abstract class Entity {
                 localVarName.remove(index);
                 localVarType.remove(index);
                 localVarValue.remove(index);
-            } else Popup.error(StaticStuff.projectName, "This variable does not exist.");
+            } else Popup.error(StaticStuff.PROJECT_NAME, "This variable does not exist.");
     }
 
     public boolean openVariable(String uid, boolean confirmationRequired) {
@@ -121,7 +121,7 @@ public abstract class Entity {
                 if (localVarUids.contains(uid)) {
                     new GuiLocalVariables(this, uid);
                     return true;
-                } else Popup.error(StaticStuff.projectName, "This variable does not exist.");
+                } else Popup.error(StaticStuff.PROJECT_NAME, "This variable does not exist.");
         }
         return false;
     }
@@ -138,7 +138,7 @@ public abstract class Entity {
                     case 2:
                         return localVarValue.get(index);
                 }
-            } else Popup.error(StaticStuff.projectName, "This variable does not exist.");
+            } else Popup.error(StaticStuff.PROJECT_NAME, "This variable does not exist.");
         return "";
     }
 
@@ -159,6 +159,10 @@ public abstract class Entity {
     public void setInventory(String uid) {
     }
 
+    public void openEvent(int index) {
+        new GuiActionEditor(this, index);
+    }
+
     public int refactor(String find, String replace) {
         int occ = 0;
         occ += StaticStuff.refactorArrayList(find, replace, tags);
@@ -176,6 +180,27 @@ public abstract class Entity {
         description = description.replace(find, replace);
         occ += additionalRefactor(find, replace);
         return occ;
+    }
+
+    public void find(String find, ArrayList<String> found) {
+        if (StaticStuff.findInArrayList(find, tags)) found.add(uid + ": Tags");
+        if (StaticStuff.findInArrayList(find, localVarName)) found.add(uid + ": Local var name");
+        if (StaticStuff.findInArrayList(find, localVarType)) found.add(uid + ": Local var type");
+        if (StaticStuff.findInArrayList(find, localVarUids)) found.add(uid + ": Local var uid");
+        if (StaticStuff.findInArrayList(find, localVarValue)) found.add(uid + ": Local var value");
+        for (int i = 0, eventNameSize = eventName.size(); i < eventNameSize; i++) {
+            if (eventName.get(i).contains(find))
+                found.add(uid + ": Event name " + i);
+        }
+        for (int i = 0, eventCodeSize = eventCode.size(); i < eventCodeSize; i++) {
+            if (eventCode.get(i).contains(find))
+                found.add(uid + ": In event code of event " + i);
+        }
+        if (name.contains(find)) found.add(uid + ": Name");
+        if (uid.contains(find)) found.add(uid + ": UID");
+        if (description.contains(find)) found.add(uid + ": Description");
+        int add = additionalRefactor(find, find);
+        if (add > 0) found.add(uid + ": unknown source found " + add);
     }
 
     public abstract int additionalRefactor(String find, String replace);

@@ -35,7 +35,7 @@ public class Audios {
                 }
             }
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "Audio contains invalid data.\n" + e);
+            Popup.error(StaticStuff.PROJECT_NAME, "Audio contains invalid data.\n" + e);
         }
     }
 
@@ -48,7 +48,7 @@ public class Audios {
             try {
                 FileManager.writeFileFromByteArray(Manager.pathExtension + "adventures/" + namespace + "/audio/" + uids.get(i) + ".wav", byteArrays.get(i));
             } catch (Exception e) {
-                Popup.error(StaticStuff.projectName, "Audio '" + filename.get(i) + "' contains invalid data.\n" + e);
+                Popup.error(StaticStuff.PROJECT_NAME, "Audio '" + filename.get(i) + "' contains invalid data.\n" + e);
             }
         }
         String str = "";
@@ -73,11 +73,11 @@ public class Audios {
                 this.uids.add(StaticStuff.getLastCreatedUID());
                 return true;
             } catch (Exception e) {
-                Popup.error(StaticStuff.projectName, "Unable to get audio file:\n" + e);
+                Popup.error(StaticStuff.PROJECT_NAME, "Unable to get audio file:\n" + e);
                 return false;
             }
         else {
-            Popup.message(StaticStuff.projectName, "Invalid format.\nOnly .wav files are accepted.");
+            Popup.message(StaticStuff.PROJECT_NAME, "Invalid format.\nOnly .wav files are accepted.");
             return false;
         }
     }
@@ -101,7 +101,7 @@ public class Audios {
             Audio.playAudioInputStream(play);
             return true;
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "Unable to play audio file:\n" + e);
+            Popup.error(StaticStuff.PROJECT_NAME, "Unable to play audio file:\n" + e);
             return true;
         }
     }
@@ -112,6 +112,10 @@ public class Audios {
 
     public String getAudioName(String uid) {
         return filename.get(uids.indexOf(uid));
+    }
+
+    public ArrayList<String> getUids() {
+        return uids;
     }
 
     public int refactor(String find, String replace) {

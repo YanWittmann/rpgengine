@@ -56,7 +56,7 @@ public class BattleMap extends Entity {
                 }
             }
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "BattleMap '" + name + "' contains invalid data:\n" + e);
+            Popup.error(StaticStuff.PROJECT_NAME, "BattleMap '" + name + "' contains invalid data:\n" + e);
         }
     }
 
@@ -157,10 +157,10 @@ public class BattleMap extends Entity {
 
     public boolean addNPC(int x, int y) {
         if (!hasNPC(x, y)) {
-            String npc = Popup.dropDown(StaticStuff.projectName, "Select an NPC UID", Manager.getStringArrayNPCs()).replaceAll(".+ - ([^-]+)", "$1");
+            String npc = Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an NPC UID", Manager.getStringArrayNPCs()).replaceAll(".+ - ([^-]+)", "$1");
             if (StaticStuff.isValidUID(npc)) {
                 if (Manager.npcExists(npc)) {
-                    String image = Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
+                    String image = Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1");
                     if (StaticStuff.isValidUID(image)) {
                         if (Manager.npcExists(npc)) {
                             npcs.add(npc + "AAA" + x + "AAA" + y + "AAA" + image);
@@ -175,7 +175,7 @@ public class BattleMap extends Entity {
 
     public boolean addItem(int x, int y) {
         if (!hasItem(x, y)) {
-            String item = Popup.dropDown(StaticStuff.projectName, "Select an item UID", Manager.getStringArrayItems()).replaceAll(".+ - ([^-]+)", "$1");
+            String item = Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an item UID", Manager.getStringArrayItems()).replaceAll(".+ - ([^-]+)", "$1");
             if (StaticStuff.isValidUID(item)) {
                 if (Manager.itemTypeExists(item)) {
                     items.add(item + "AAA" + x + "AAA" + y);
@@ -239,7 +239,7 @@ public class BattleMap extends Entity {
                         deleteEvent(Integer.parseInt(str));
                         break;
                     case 5:
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
                         if (choice == 0)
                             getEntity().addTag(Popup.input("Tag name:", ""));
                         else if (choice == 1)
@@ -248,7 +248,7 @@ public class BattleMap extends Entity {
                             getEntity().editTag(Integer.parseInt(Popup.input("Tag index:", "")), Popup.input("Tag name:", ""));
                         break;
                     case 6:
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
                         if (choice == 0) {
                             getEntity().addVariable(Popup.input("Variable name:", ""), true);
                         } else if (choice == 1)
@@ -260,7 +260,7 @@ public class BattleMap extends Entity {
                         new GuiBattleMapEditor((BattleMap) getEntity());
                         break;
                     default:
-                        Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");
+                        Popup.error(StaticStuff.PROJECT_NAME, "Invalid action\nButton " + index + " does not exist.");
                 }
                 update();
             }

@@ -23,7 +23,7 @@ public class GuiActionEditor extends JFrame {
         this.event = event;
         this.eventName = entity.eventName.get(event);
         if (event < 0) {
-            Popup.error(StaticStuff.projectName + " - Error", "This event does not exist");
+            Popup.error(StaticStuff.PROJECT_NAME + " - Error", "This event does not exist");
             dispose();
             return;
         }

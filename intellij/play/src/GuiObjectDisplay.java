@@ -263,10 +263,27 @@ public class GuiObjectDisplay extends JFrame {
         });
     }
 
-    public static void create(Entity entity, String extraText) {
-        if (!objectFrameIsOpen(entity))
-            registerObjectFrame(entity, new GuiObjectDisplay(entity, extraText));
-        else Log.add("Object frame " + entity.uid + " is already visible!");
+    public void minimize(boolean useAnimation) {
+        isMinimized = true;
+        minimized = new GuiObjectDisplayMinimized(entity);
+        if (useAnimation)
+            for (int currentOpacity = 100; currentOpacity > 0; currentOpacity -= 3) {
+                try {
+                    Thread.sleep(2);
+                } catch (Exception ignored) {
+                }
+                setOpacity(currentOpacity * 0.01f);
+            }
+        dispose();
+    }
+
+    public static GuiObjectDisplay create(Entity entity, String extraText) {
+        if (!objectFrameIsOpen(entity)) {
+            GuiObjectDisplay display = new GuiObjectDisplay(entity, extraText);
+            registerObjectFrame(entity, display);
+            return display;
+        } else Log.add("Object frame " + entity.uid + " is already visible!");
+        return null;
     }
 
     private static HashMap<Entity, GuiObjectDisplay> displays = new HashMap<>();

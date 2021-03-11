@@ -7,8 +7,11 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class GuiHub extends JFrame {
     private JMenuBar menuBar;
@@ -48,7 +51,7 @@ public class GuiHub extends JFrame {
         int size_x = Math.max(StaticStuff.getScreenWidth() - 500, 912);
         int size_y = Math.max(StaticStuff.getScreenHeight() - 200, 480);
         this.manager = manager;
-        this.setTitle(StaticStuff.projectName + " - Main menu - open or create new adventure to start" + (StaticStuff.ee.equals("true") ? " :)" : ""));
+        this.setTitle(StaticStuff.PROJECT_NAME + " - Main menu - open or create new adventure to start" + (StaticStuff.ee.equals("true") ? " :)" : ""));
         this.setSize(size_x, size_y);
         generateMenu();
         this.setJMenuBar(menuBar);
@@ -125,7 +128,7 @@ public class GuiHub extends JFrame {
         l_credits.setForeground(StaticStuff.getColor("text_color"));
         l_credits.setEnabled(true);
         l_credits.setFont(StaticStuff.getBaseFont());
-        l_credits.setText("<html><b>" + StaticStuff.projectName + " by Yan Wittmann (v. " + Manager.version + ")");
+        l_credits.setText("<html><b>" + StaticStuff.PROJECT_NAME + " by Yan Wittmann (v. " + Manager.version + ")");
         l_credits.setVisible(true);
 
         l_pane1 = createAJLabel();
@@ -315,6 +318,14 @@ public class GuiHub extends JFrame {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "OPENFILE");
         getRootPane().getActionMap().put("OPENFILE", openFileAction);
 
+        Action findAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                find();
+            }
+        };
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_DOWN_MASK, false), "FIND");
+        getRootPane().getActionMap().put("FIND", findAction);
+
         Action toggleFullscreenAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 toggleFullscreen();
@@ -327,7 +338,7 @@ public class GuiHub extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 if (manager.unsavedChanges) {
-                    int choice = Popup.selectButton(StaticStuff.projectName, "There may be unsaved changes.\nWhat do you want to do?", new String[]{"Save", "Exit", "Cancel"});
+                    int choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "There may be unsaved changes.\nWhat do you want to do?", new String[]{"Save", "Exit", "Cancel"});
                     if (choice == 0) {
                         save();
                         FileManager.clearTmp();
@@ -584,9 +595,9 @@ public class GuiHub extends JFrame {
             if (path.matches(".+\\.adv")) {
                 String filename = path.replaceAll("([^\\\\]+\\\\)*", "");
                 FileManager.copyFile(path, "../adventures/" + filename);
-                Popup.message(StaticStuff.projectName, "Copied file into the adventures-folder!");
+                Popup.message(StaticStuff.PROJECT_NAME, "Copied file into the adventures-folder!");
                 setFilename(filename);
-                manager.openFile(filename.replace("" + StaticStuff.adventureFileEnding, ""));
+                manager.openFile(filename.replace("" + StaticStuff.ADVENTURE_FILE_ENDING, ""));
             } else if (StaticStuff.isImageFile(path)) {
                 String name = Popup.input("Name of the image:", path.replaceAll("(?:.*)\\\\(?:.+\\\\)*(.+)\\.(?:.+)$", "$1"));
                 if (name == null) return;
@@ -655,7 +666,7 @@ public class GuiHub extends JFrame {
 
     private void addEntity() {
         if (Manager.filename.equals("")) return;
-        String type = Popup.dropDown(StaticStuff.projectName, "Choose an entity to add:", boxNames);
+        String type = Popup.dropDown(StaticStuff.PROJECT_NAME, "Choose an entity to add:", boxNames);
         if (type == null) return;
         if (type.equals("")) return;
         manager.newEntity(type);
@@ -787,7 +798,7 @@ public class GuiHub extends JFrame {
 
     public void setFilename(String text) {
         filename = text;
-        setTitle(StaticStuff.projectName + " - Main menu - " + text.replace("" + StaticStuff.adventureFileEnding, "") + (StaticStuff.ee.equals("true") ? " :)" : ""));
+        setTitle(StaticStuff.PROJECT_NAME + " - Main menu - " + text.replace("" + StaticStuff.ADVENTURE_FILE_ENDING, "") + (StaticStuff.ee.equals("true") ? " :)" : ""));
     }
 
     public void generateMenu() {
@@ -812,13 +823,16 @@ public class GuiHub extends JFrame {
 
         JMenuItem selectStylesheet = new JMenuItem("Set stylesheet   ");
         JMenuItem toggleActionEditor = new JMenuItem("Toggle open actions directly in editor   ");
+        JMenuItem createVis = new JMenuItem("Create a VisJs graph   ");
         JMenuItem openAdventureInPlayer = new JMenuItem("Open current adventure in player   ");
         JMenuItem shortcuts = new JMenuItem("Shortcuts   ");
         JMenuItem documentation = new JMenuItem("Documentation   ");
         JMenuItem website = new JMenuItem("Website   ");
+        JMenuItem showTips = new JMenuItem("Toggle show tips on startup   ");
 
         JMenuItem project = new JMenuItem("Project   ");
         JMenuItem player = new JMenuItem("Player   ");
+        JMenuItem find = new JMenuItem("Find   ");
         JMenuItem refactor = new JMenuItem("Refactor   ");
         JMenuItem renameUIDs = new JMenuItem("Auto-rename UIDs   ");
 
@@ -832,19 +846,25 @@ public class GuiHub extends JFrame {
 
         delete.addActionListener(evt -> deleteAdventure());
 
-        shortcuts.addActionListener(evt -> Popup.message(StaticStuff.projectName, "These are the shortcuts you can use on the main menu:\nctrl+shift+n: New adventure\nctrl+n: New entity\nctrl+e: Edit entity\nctrl+k: Clone entity\nctrl+d: Delete entity\nctrl+r: Reload\nctrl+q: Scroll left\nctrl+w: Scroll right\nctrl+shift+q: Scroll up\nctrl+shift+w: Scroll down\nctrl+s: Save\nctrl+shift+s: Save as\nctrl+o: Open File\nctrl+shift+o: Open Adventure in player\nF11: Toggle fullscreen\nUse drag and drop to add adventures, images or audio files"));
+        shortcuts.addActionListener(evt -> Popup.message(StaticStuff.PROJECT_NAME, "These are the shortcuts you can use on the main menu:\nctrl+shift+n: New adventure\nctrl+n: New entity\nctrl+e: Edit entity\nctrl+k: Clone entity\nctrl+d: Delete entity\nctrl+r: Reload\nctrl+q: Scroll left\nctrl+w: Scroll right\nctrl+shift+q: Scroll up\nctrl+shift+w: Scroll down\nctrl+s: Save\nctrl+shift+s: Save as\nctrl+o: Open File\nctrl+shift+o: Open Adventure in player\nctrl+f: Find text\nF11: Toggle fullscreen\nUse drag and drop to add adventures, images or audio files"));
 
         documentation.addActionListener(evt -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/documentation/"));
 
         website.addActionListener(evt -> StaticStuff.openURL("http://yanwittmann.de/projects/rpgengine/site/"));
 
+        showTips.addActionListener(evt -> toggleShowTips());
+
         selectStylesheet.addActionListener(evt -> selectStylesheet());
 
         toggleActionEditor.addActionListener(evt -> toggleActionEditor());
 
+        createVis.addActionListener(evt -> createVis());
+
         project.addActionListener(evt -> projectSettings());
 
         player.addActionListener(evt -> playerSettings());
+
+        find.addActionListener(evt -> find());
 
         refactor.addActionListener(evt -> refactor());
 
@@ -861,17 +881,41 @@ public class GuiHub extends JFrame {
 
         properties.add(player);
         properties.add(project);
+        properties.add(find);
         properties.add(refactor);
         properties.add(renameUIDs);
         menuBar.add(properties);
 
         other.add(selectStylesheet);
         other.add(toggleActionEditor);
+        other.add(createVis);
         other.add(openAdventureInPlayer);
         other.add(shortcuts);
         other.add(documentation);
         other.add(website);
+        other.add(showTips);
         menuBar.add(other);
+    }
+
+    private boolean isReady() {
+        return filename.length() > 0;
+    }
+
+    private final static String[] VIS_CREATE_TYPES = new String[]{
+            "Connections between objects based on UIDs and names",
+            "Connections between objects based on UIDs and names by type",
+            "Objects with their types"
+    };
+    private final static String[] VIS_CREATE_TYPES_IDENTIFIERS = new String[]{
+            "uidNameConnections",
+            "uidNameConnectionsByType",
+            "objectsByTypes"
+    };
+    private void createVis() {
+        if(!isReady()) return;
+        String type = Popup.dropDown(StaticStuff.PROJECT_NAME, "What type of graph to you want to generate?", VIS_CREATE_TYPES);
+        if(type == null || type.length() == 0) return;
+        IntStream.range(0, VIS_CREATE_TYPES.length).filter(i -> VIS_CREATE_TYPES[i].equals(type)).findFirst().ifPresent(i -> manager.generateVis(VIS_CREATE_TYPES_IDENTIFIERS[i]));
     }
 
     private void selectStylesheet() {
@@ -879,7 +923,7 @@ public class GuiHub extends JFrame {
         manager.setMainCfgSetting("stylesheet", StaticStuff.getColorScheme());
         int result = 1;
         if (!this.filename.equals(""))
-            result = Popup.selectButton(StaticStuff.projectName, "The engine will restart. Do you want to save your adventure?", new String[]{"Yes!", "No"});
+            result = Popup.selectButton(StaticStuff.PROJECT_NAME, "The engine will restart. Do you want to save your adventure?", new String[]{"Yes!", "No"});
         if (result == 0) save();
         FileManager.openFile("create.jar");
         System.exit(0);
@@ -889,12 +933,17 @@ public class GuiHub extends JFrame {
         Manager.toggleActionEditor();
     }
 
+    private void toggleShowTips() {
+        Manager.toggleShowTips();
+    }
+
     private boolean refactorUIDwarningShow = true;
     public static final String REFACTOR_UID_WARNING_MESSAGE = "It seems like you try to replace a UID with a string that does not match the pattern of a UID.\n" +
             "If you replace a UID with a string that is not a UID, you cannot adress the object any more (meaning that you can't edit or delete the object).\n" +
             "Do you know what you are doing?";
 
     private void refactor() {
+        if(!isReady()) return;
         String find = Popup.input("Find:", "");
         if (find == null) return;
         if (find.equals("")) return;
@@ -902,13 +951,13 @@ public class GuiHub extends JFrame {
         if (replace == null) return;
         if (replace.equals("")) return;
         if (StaticStuff.isValidUIDSilent(find) && !StaticStuff.isValidUIDSilent(replace) && refactorUIDwarningShow) {
-            int answer = Popup.selectButton(StaticStuff.projectName, REFACTOR_UID_WARNING_MESSAGE, new String[]{"Yes", "No", "Yes, don't ask me again"});
+            int answer = Popup.selectButton(StaticStuff.PROJECT_NAME, REFACTOR_UID_WARNING_MESSAGE, new String[]{"Yes", "No", "Yes, don't ask me again"});
             if (answer == 1 || answer == -1) return;
             else if (answer == 2) refactorUIDwarningShow = false;
         }
         int occ = manager.refactor(find, replace);
         updateScreen();
-        Popup.message(StaticStuff.projectName, "Replaced " + occ + " occurrences");
+        Popup.message(StaticStuff.PROJECT_NAME, "Replaced " + occ + " occurrences");
     }
 
     private static final String AUTO_RENAME_UIDS_WARNING_MESSAGE = "The UIDs in this adventure will be renamed using this format:\n" +
@@ -917,41 +966,47 @@ public class GuiHub extends JFrame {
             "Type 'rename' to confirm this action:";
 
     private void autoRenameUIDs() {
+        if(!isReady()) return;
         String confirm = Popup.input(AUTO_RENAME_UIDS_WARNING_MESSAGE, "");
         if (confirm == null || !confirm.equals("rename")) return;
         manager.autoRenameUIDs();
         manager.updateGui();
     }
 
+    private void find() {
+        if(!isReady()) return;
+        String find = Popup.input("Enter the string to find in the adventure:", "");
+        if (find == null) return;
+        if (find.equals("")) return;
+        ArrayList<String> found = manager.find(find);
+        new GuiShowText("Search results for '" + find + "':", found.toArray(new String[0]), manager);
+    }
+
     private void createNew() {
-        //old creation
-        /*String name = Popup.input("Enter a name for the adventure:", StaticStuff.generateRandomMessageFromFile("res/txt/filename"+StaticStuff.dataFileEnding));
-        if(name == null) return; if(name.equals("")) return;
-        manager.createNew(name);*/
         new GuiCreateNewAdventure(manager);
     }
 
     private void deleteAdventure() {
-        String[] files = FileManager.getFilesWithEnding(Manager.pathExtension + "adventures/", StaticStuff.adventureFileEndingNoDot);
+        String[] files = FileManager.getFilesWithEnding(Manager.pathExtension + "adventures/", StaticStuff.ADVENTURE_FILE_ENDING_NO_DOT);
         if (files.length > 0) {
-            String filename = Popup.dropDown(StaticStuff.projectName, "What file do you want to delete?", files);
+            String filename = Popup.dropDown(StaticStuff.PROJECT_NAME, "What file do you want to delete?", files);
             if (!(filename == null))
                 if (!(filename.length() == 0)) FileManager.deleteFile(Manager.pathExtension + "adventures/" + filename);
         } else {
-            Popup.message(StaticStuff.projectName, "There are no adventures.\nClick on 'new' to create a new adventure.");
+            Popup.message(StaticStuff.PROJECT_NAME, "There are no adventures.\nClick on 'new' to create a new adventure.");
         }
     }
 
     private void open() {
-        String[] files = FileManager.getFilesWithEnding(Manager.pathExtension + "adventures/", StaticStuff.adventureFileEndingNoDot);
+        String[] files = FileManager.getFilesWithEnding(Manager.pathExtension + "adventures/", StaticStuff.ADVENTURE_FILE_ENDING_NO_DOT);
         if (files.length > 0) {
-            String filename = Popup.dropDown(StaticStuff.projectName, "What file do you want to open?", files);
+            String filename = Popup.dropDown(StaticStuff.PROJECT_NAME, "What file do you want to open?", files);
             if (!(filename == null)) {
                 setFilename(filename);
-                manager.openFile(filename.replace("" + StaticStuff.adventureFileEnding, ""));
+                manager.openFile(filename.replace("" + StaticStuff.ADVENTURE_FILE_ENDING, ""));
             }
         } else {
-            Popup.message(StaticStuff.projectName, "There are no adventures.\nClick on 'new' to create a new adventure.");
+            Popup.message(StaticStuff.PROJECT_NAME, "There are no adventures.\nClick on 'new' to create a new adventure.");
         }
     }
 
@@ -962,9 +1017,9 @@ public class GuiHub extends JFrame {
     private void saveAs() {
         int result = 1;
         if (!this.filename.equals(""))
-            result = Popup.selectButton(StaticStuff.projectName, "You have already opened a file.\nDo you want to save this first?", new String[]{"Yes!", "No"});
+            result = Popup.selectButton(StaticStuff.PROJECT_NAME, "You have already opened a file.\nDo you want to save this first?", new String[]{"Yes!", "No"});
         if (result == 0) save();
-        String name = Popup.input("Enter a name for the adventure:", StaticStuff.generateRandomMessageFromFile("res/txt/filename" + StaticStuff.dataFileEnding));
+        String name = Popup.input("Enter a name for the adventure:", StaticStuff.generateRandomMessageFromFile("res/txt/filename" + StaticStuff.DATA_FILE_ENDING));
         if (name == null) return;
         if (name.equals("")) return;
         setFilename(name);
@@ -973,10 +1028,12 @@ public class GuiHub extends JFrame {
     }
 
     private void playerSettings() {
+        if(!isReady()) return;
         Manager.player.openSettings();
     }
 
     private void projectSettings() {
+        if(!isReady()) return;
         Manager.projectSettings.openSettings();
     }
 

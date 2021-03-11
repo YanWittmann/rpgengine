@@ -20,7 +20,7 @@ public class GuiCreateNewAdventure extends JFrame {
 
     public GuiCreateNewAdventure(Manager manager) {
         this.manager = manager;
-        this.setTitle(StaticStuff.projectName + " Create a new adventure!");
+        this.setTitle(StaticStuff.PROJECT_NAME + " Create a new adventure!");
         this.setSize(321, 264);
 
         JPanel contentPane = new JPanel(null);
@@ -109,7 +109,7 @@ public class GuiCreateNewAdventure extends JFrame {
         tf_advName.setForeground(StaticStuff.getColor("text_color"));
         tf_advName.setEnabled(true);
         tf_advName.setFont(StaticStuff.getBaseFont());
-        tf_advName.setText(StaticStuff.generateRandomMessageFromFile("res/txt/filename" + StaticStuff.dataFileEnding));
+        tf_advName.setText(StaticStuff.generateRandomMessageFromFile("res/txt/filename" + StaticStuff.DATA_FILE_ENDING));
         tf_advName.setVisible(true);
         tf_advName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {

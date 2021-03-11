@@ -62,16 +62,19 @@ public class PlayerSettings extends Frame {
     }
 
     public String generateDisplayString() {
-        String ret = "";
-        for (int i = 0; i < settings.size(); i++)
-            ret += settings.get(i) + "\n";
-        return ret;
+        StringBuilder ret = new StringBuilder();
+        for (String setting : settings) ret.append(setting).append("\n");
+        return ret.toString();
     }
 
     public int refactor(String find, String replace) {
         int occ = 0;
         occ += StaticStuff.refactorArrayList(find, replace, settings);
         return occ;
+    }
+
+    public void find(String find, ArrayList<String> found) {
+        if (StaticStuff.findInArrayList(find, settings)) found.add("Player settings: Tags");
     }
 
     private JButton b_cancle;
@@ -105,7 +108,7 @@ public class PlayerSettings extends Frame {
     }
 
     private void initComponents() {
-        this.setTitle(StaticStuff.projectName);
+        this.setTitle(StaticStuff.PROJECT_NAME);
         this.setSize(size_x, size_y);
 
         setBackground(StaticStuff.getColor("background"));

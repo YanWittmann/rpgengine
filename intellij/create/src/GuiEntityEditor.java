@@ -43,7 +43,7 @@ public class GuiEntityEditor extends JFrame {
                     try {
                         buttonPressed(ii);
                     } catch (Exception e) {
-                        Popup.error(StaticStuff.projectName, "Something did not work:\n" + e);
+                        Popup.error(StaticStuff.PROJECT_NAME, "Something did not work:\n" + e);
                     }
                 }
             });
@@ -157,8 +157,6 @@ public class GuiEntityEditor extends JFrame {
     private static final int EDIT_STAY_IN_FOREGROUND = 2;
     private void editAction(int intention) {
         String text = ta_entityData.getText();
-        //if (ta_entityData.getSelectedText() != null) text = ta_entityData.getSelectedText();
-
         text = StaticStuff.getLineAtIndex(text, ta_entityData.getCaretPosition());
 
         text = text.trim();
@@ -173,11 +171,11 @@ public class GuiEntityEditor extends JFrame {
             if (str.equals("")) return;
             entity.description = str;
         } else if(text.startsWith("Location: ")) {
-            getEntity().setLocation(Popup.dropDown(StaticStuff.projectName, "Select a location UID", Manager.getStringArrayLocations()).replaceAll(".+ - ([^-]+)", "$1"));
+            getEntity().setLocation(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select a location UID", Manager.getStringArrayLocations()).replaceAll(".+ - ([^-]+)", "$1"));
         } else if(text.startsWith("Inventory: ")) {
-            getEntity().setInventory(Popup.dropDown(StaticStuff.projectName, "Select an inventory UID", Manager.getStringArrayInventories()).replaceAll(".+ - ([^-]+)", "$1"));
+            getEntity().setInventory(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an inventory UID", Manager.getStringArrayInventories()).replaceAll(".+ - ([^-]+)", "$1"));
         } else if(text.startsWith("Image: ")) {
-            getEntity().setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
+            getEntity().setImage(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
         } else if(text.equals("Tags:")) {
             String str = Popup.input("Tag name:", "");
             if (str == null) return;

@@ -58,7 +58,7 @@ public class Talent {
             } catch (Exception e2) {
             }
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "Talent '" + name + "' contains invalid data.");
+            Popup.error(StaticStuff.PROJECT_NAME, "Talent '" + name + "' contains invalid data.");
         }
     }
 

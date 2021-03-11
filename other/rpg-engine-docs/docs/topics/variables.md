@@ -101,6 +101,7 @@ Let's start with the ones that only modify the values of the variable. They get 
 | `evalMath()                                                                                    ` | Treats entry as mathematical expression and returns result                                                                     |
 | `string([VALUE])                                                                               ` | Just like math() but does not perform any further operations on it                                                             |
 | `sort()                                                                                        ` | Sorts the variable entries based on the alphabet                                                                               |
+| `invert()                                                                                      ` | Inverts the order of the entries                                                                                               |
 | `set([VALUE(index)]|[VALUE])                                                                   ` | Sets an entry to a value                                                                                                       |
 | `battleInfo([npc; item; extragroundtiles; obstacles; player; groundtiles]<|[x; y; uid; image]>)` | Returns information on the battleMap with the UID of the variable entry. Specify what information you need with the parameters |
 

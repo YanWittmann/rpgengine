@@ -8,17 +8,19 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Random;
 
 public class StaticStuff {
     public static String ee = "false", clipboardBefore = "";
-    public static String projectName = "RPG Engine", adventureFileEnding = ".adv", adventureFileEndingNoDot = "adv", dataFileEnding = ".advdata", dataFileEndingNoDot = "advdata";
+    public final static String PROJECT_NAME = "RPG Engine", ADVENTURE_FILE_ENDING = ".adv", ADVENTURE_FILE_ENDING_NO_DOT = "adv",
+            DATA_FILE_ENDING = ".advdata", DATA_FILE_ENDING_NO_DOT = "advdata";
 
     public static boolean isValidUID(String uid) {
         if (uid == null) return false;
         if (uid.equals("")) return false;
         if (uid.matches("[\\da-z]{16}")) return true;
         if (!uid.matches("[0-9a-z]{16}") && !(uid.length() == 16)) {
-            Popup.error(StaticStuff.projectName, "Invalid UID: '" + uid + "'\nA UID has 16 alphanumberic characters.");
+            Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '" + uid + "'\nA UID has 16 alphanumberic characters.");
             return false;
         }
         if (!uid.matches("[\\da-z]{16}")) return false;
@@ -159,6 +161,12 @@ public class StaticStuff {
         return occ;
     }
 
+    public static boolean findInArrayList(String find, ArrayList<String> list) {
+        for (String s : list)
+            if (s.contains(find)) return true;
+        return false;
+    }
+
     public static int randomNumber(int min, int max) {
         return min + (int) (Math.random() * ((max - min) + 1));
     }
@@ -185,7 +193,7 @@ public class StaticStuff {
     }
 
     public static String generateRandomMessage() {
-        return generateRandomMessageFromFile("res/txt/genericMessage" + StaticStuff.dataFileEnding);
+        return generateRandomMessageFromFile("res/txt/genericMessage" + StaticStuff.DATA_FILE_ENDING);
     }
 
     public static String generateRandomMessageFromFile(String filename) {
@@ -351,7 +359,14 @@ public class StaticStuff {
         }
 
         //otherwise generate saturated color
-        int red, green, blue, main1 = randomNumber(0, 2), main0;
+
+        int rgb = Color.HSBtoRGB(Float.parseFloat(randomNumber(0, 100) + "") / 100f, Float.parseFloat(randomNumber(45, 100) + "") / 100f, 1f);
+        int red = (rgb >> 16) & 0xFF;
+        int green = (rgb >> 8) & 0xFF;
+        int blue = rgb & 0xFF;
+        return new Color(red, green, blue);
+
+        /*int red, green, blue, main1 = randomNumber(0, 2), main0;
         do {
             main0 = randomNumber(0, 2);
         } while (main0 == main1);
@@ -364,7 +379,7 @@ public class StaticStuff {
         if (main0 == 0) red = randomNumber(0, 10);
         else if (main0 == 1) green = randomNumber(0, 10);
         else if (main0 == 2) blue = randomNumber(0, 10);
-        return new Color(red, green, blue);
+        return new Color(red, green, blue);*/
     }
 
     public static Color hex2Rgb(String colorStr) {
@@ -373,6 +388,18 @@ public class StaticStuff {
                 Integer.valueOf(colorStr.substring(0, 2), 16),
                 Integer.valueOf(colorStr.substring(2, 4), 16),
                 Integer.valueOf(colorStr.substring(4, 6), 16));
+    }
+
+    public static String generateColor(String seed) {
+        Random r = new Random(seed.hashCode());
+        int rgb = Color.HSBtoRGB(Float.parseFloat(r.nextInt(100) + "") / 100f, Float.parseFloat(55 + r.nextInt(45) + "") / 100f, 1f);
+        int red = (rgb >> 16) & 0xFF;
+        int green = (rgb >> 8) & 0xFF;
+        int blue = rgb & 0xFF;
+        Color c = new Color(red, green, blue);
+        c.brighter();
+        c.brighter();
+        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
     }
 
     private static final Font baseFont = new Font("sansserif", 0, 12);
@@ -399,5 +426,11 @@ public class StaticStuff {
             screenHeight = screenSize.getHeight();
         }
         return (int) screenHeight;
+    }
+
+    public static String[] filterEmptyLines(String[] arr) {
+        ArrayList<String> list = new ArrayList<>(Arrays.asList(arr));
+        list.removeAll(Arrays.asList("", null));
+        return list.toArray(new String[0]);
     }
 }

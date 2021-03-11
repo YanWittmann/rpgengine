@@ -33,7 +33,7 @@ public class Location extends Entity{
                     localVarValue.add(fileInput[i].split("---")[3]);
                 }
             }
-        }catch(Exception e){Popup.error(StaticStuff.projectName, "Location '"+name+"' contains invalid data.");}
+        }catch(Exception e){Popup.error(StaticStuff.PROJECT_NAME, "Location '"+name+"' contains invalid data.");}
     }
 
     public String generateSaveString(){
@@ -64,7 +64,7 @@ public class Location extends Entity{
         try{if(uid.equals("")) inventory = uid;}catch(Exception ignored){}
         if(!StaticStuff.isValidUID(uid)) return;
         if(Manager.inventoryDoesNotExist(uid)){
-            Popup.error(StaticStuff.projectName, "Invalid UID: '"+uid+"'\nThis inventory does not exist."); return;
+            Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '"+uid+"'\nThis inventory does not exist."); return;
         }
         inventory = uid;
     }
@@ -73,7 +73,7 @@ public class Location extends Entity{
         try{if(uid.equals("")) image = uid;}catch(Exception ignored){}
         if(!StaticStuff.isValidUID(uid)) return;
         if(!Manager.imageExists(uid)){
-            Popup.error(StaticStuff.projectName, "Invalid UID: '"+uid+"'\nThis image does not exist."); return;
+            Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '"+uid+"'\nThis image does not exist."); return;
         }
         image = uid;
     }
@@ -122,7 +122,7 @@ public class Location extends Entity{
                         deleteEvent(Integer.parseInt(str));
                     }
                     case 5 -> {
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add tag", "Remove tag", "Edit tag"});
                         if (choice == 0)
                             getEntity().addTag(Popup.input("Tag name:", ""));
                         else if (choice == 1)
@@ -131,7 +131,7 @@ public class Location extends Entity{
                             getEntity().editTag(Integer.parseInt(Popup.input("Tag index:", "")), Popup.input("Tag name:", ""));
                     }
                     case 6 -> {
-                        choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
+                        choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add variable", "Remove variable", "Edit variable"});
                         if (choice == 0) {
                             getEntity().addVariable(Popup.input("Variable name:", ""), true);
                         } else if (choice == 1)
@@ -139,9 +139,9 @@ public class Location extends Entity{
                         else if (choice == 2)
                             getEntity().openVariable(StaticStuff.autoDetectUID("Variable uid:"), true);
                     }
-                    case 7 -> setInventory(Popup.dropDown(StaticStuff.projectName, "Select an inventory UID", Manager.getStringArrayInventories()).replaceAll(".+ - ([^-]+)", "$1"));
-                    case 8 -> setImage(Popup.dropDown(StaticStuff.projectName, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
-                    default -> Popup.error(StaticStuff.projectName, "Invalid action\nButton " + index + " does not exist.");
+                    case 7 -> setInventory(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an inventory UID", Manager.getStringArrayInventories()).replaceAll(".+ - ([^-]+)", "$1"));
+                    case 8 -> setImage(Popup.dropDown(StaticStuff.PROJECT_NAME, "Select an image UID", Manager.getStringArrayImages()).replaceAll(".+ - ([^-]+)", "$1"));
+                    default -> Popup.error(StaticStuff.PROJECT_NAME, "Invalid action\nButton " + index + " does not exist.");
                 }
                 update();
             }

@@ -1,6 +1,41 @@
 # Changelog
 ___
 
+## 11.03.2020 - RELEASE `1.13`
+#### New / Modification:
+
+ * in the creator, you were still able to open a few drop down options even without any adventure loaded
+ * added drop down option `Other > Create a VisJs graph` that lets you generate `VisJs` graphs that show connections between objects
+
+#### Bugfixes:
+
+ * `popup` objects would not be saved corretly (saved as type `color`) when creating a savestate while playing an adventure
+ * the logger would sometimes appear even with debugging disabled. this should be fixed now, but might still persist
+
+## 23.02.2020 - RELEASE `1.12`
+#### New / Modification:
+
+ * the `battleMap` will now show a popop when an enemy was defeated
+ * the `battleMap` will now automatically open a minimized object frame of all `npc`s on the `battleMap`
+ * the small button popup will now no longer be placed outside of the visible screen space
+ * you can now tab through all available autocomplete options by tapping tab multiple times
+ * the player will now ask before opening a file object's file
+ * you can now write `pr` instaed of `print` and `prw` instaed of `printwait`
+ * the credits hover label random saturated color picking now picks more interesing colors thanks to the change to the HSV color model
+ * in the find frame in the creator you can now use the shortcuts `crtl+e`, `crtl+w` and `crtl+q` to directly open the result that is currently selected
+ * added a `tips` frame that shows tips about creating adventures with the engine when opening the creator. you can disable them under `Other > Toggle show tips on startup`
+ 
+#### Bugfixes:
+
+ * the inventory on the player stats frame would only display the first 10 items in the inventory even if scrolled down
+
+
+## 16.02.2020 - RELEASE `1.11.7` (creator)
+#### New / Modification:
+
+ * you can now search for strings inside of the adventure using `ctrl+f` or `Adventure > Find`
+
+
 ## 16.02.2020 - RELEASE `1.11.6` (creator)
 #### New / Modification:
 
@@ -31,7 +66,7 @@ ___
 ## 13.02.2020
 #### Bugfixes:
 
- * the `ifnot` command would not be skipped correctly by a previous `if` that would take the `else` branch 
+ * the `ifnot` command would not be skipped correctly by a previous `if` that would take the `else` branch
 
 
 ## 09.02.2020 - RELEASE `1.11.5` (creator)

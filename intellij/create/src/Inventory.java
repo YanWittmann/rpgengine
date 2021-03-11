@@ -45,7 +45,7 @@ public class Inventory extends Entity{
                     localVarValue.add(fileInput[i].split("---")[3]);
                 }
             }
-        }catch(Exception e){Popup.error(StaticStuff.projectName, "Conversation '"+name+"' contains invalid data.");}
+        }catch(Exception e){Popup.error(StaticStuff.PROJECT_NAME, "Conversation '"+name+"' contains invalid data.");}
     }
 
     public String generateSaveString(){
@@ -91,15 +91,15 @@ public class Inventory extends Entity{
     public void addItem(String uid){
         if(!StaticStuff.isValidUID(uid)) return;
         if(!Manager.itemTypeExists(uid)){
-            Popup.error(StaticStuff.projectName, "Invalid UID: '"+uid+"'\nThis ItemType does not exist."); return;
+            Popup.error(StaticStuff.PROJECT_NAME, "Invalid UID: '"+uid+"'\nThis ItemType does not exist."); return;
         }
         if(items.contains(uid)){
-            Popup.error(StaticStuff.projectName, "Inventory already contains this ItemType: '"+uid+"'; "+Manager.getItemName(uid)); return;
+            Popup.error(StaticStuff.PROJECT_NAME, "Inventory already contains this ItemType: '"+uid+"'; "+Manager.getItemName(uid)); return;
         }
         int amount;
         try{
             amount = Integer.parseInt(Popup.input("Amount:", ""));
-        }catch(Exception e){Popup.error(StaticStuff.projectName, "Not a valid number.");return;}
+        }catch(Exception e){Popup.error(StaticStuff.PROJECT_NAME, "Not a valid number.");return;}
         items.add(uid);
         itemAmount.add(""+amount);
     }
@@ -108,7 +108,7 @@ public class Inventory extends Entity{
         if(!StaticStuff.isValidUID(uid))
             return;
         if(!items.contains(uid)){
-            Popup.error(StaticStuff.projectName, "Inventory does not contain this ItemType: '"+uid+"'"); return;
+            Popup.error(StaticStuff.PROJECT_NAME, "Inventory does not contain this ItemType: '"+uid+"'"); return;
         }
         int index = items.indexOf(uid);
         items.remove(index);
@@ -154,7 +154,7 @@ public class Inventory extends Entity{
                     deleteEvent(Integer.parseInt(str));
                     break;
                     case 5:
-                    choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add tag","Remove tag","Edit tag"});
+                    choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add tag","Remove tag","Edit tag"});
                     if(choice == 0)
                         getEntity().addTag(Popup.input("Tag name:", ""));
                     else if(choice == 1)
@@ -163,7 +163,7 @@ public class Inventory extends Entity{
                         getEntity().editTag(Integer.parseInt(Popup.input("Tag index:", "")),Popup.input("Tag name:", ""));
                     break;
                     case 6:
-                    choice = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Add variable","Remove variable","Edit variable"});
+                    choice = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Add variable","Remove variable","Edit variable"});
                     if(choice == 0){
                         getEntity().addVariable(Popup.input("Variable name:", ""),true);
                     }else if(choice == 1)
@@ -175,7 +175,7 @@ public class Inventory extends Entity{
                     new GuiInventoryEditor((Inventory)getEntity());
                     break;
                     default:
-                    Popup.error(StaticStuff.projectName, "Invalid action\nButton "+index+" does not exist.");
+                    Popup.error(StaticStuff.PROJECT_NAME, "Invalid action\nButton "+index+" does not exist.");
                 }
                 update();
             }

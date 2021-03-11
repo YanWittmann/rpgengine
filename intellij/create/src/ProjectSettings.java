@@ -84,6 +84,10 @@ public class ProjectSettings extends Frame {
         return occ;
     }
 
+    public void find(String find, ArrayList<String> found) {
+        if (StaticStuff.findInArrayList(find, settings)) found.add("Player settings: Tags");
+    }
+
     public void save(String save) {
         String oldPassword = getValue("password");
         settings.clear();

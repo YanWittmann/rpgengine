@@ -24,11 +24,9 @@ public class GuiLogger extends JFrame {
         input.setText("");
         input.setEditable(true);
         input.setPreferredSize(new Dimension(1000, 20));
-        input.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                executeCommand(input.getText());
-                input.setText("");
-            }
+        input.addActionListener(e -> {
+            executeCommand(input.getText());
+            input.setText("");
         });
         middlePanel.add(input, BorderLayout.PAGE_START);
 
@@ -36,17 +34,12 @@ public class GuiLogger extends JFrame {
         display.setPreferredSize(new Dimension(1000, 300));
         display.setText("");
         display.setEditable(false);
-        display.addMouseWheelListener(new MouseWheelListener() {
-            public void mouseWheelMoved(MouseWheelEvent evt) {
-                scroll(evt);
-            }
-        });
+        display.addMouseWheelListener(this::scroll);
         middlePanel.add(display, BorderLayout.PAGE_END);
 
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                int width = e.getComponent().getWidth();
                 int height = e.getComponent().getHeight();
                 display.setPreferredSize(new Dimension(1000, height - 60));
             }
@@ -74,27 +67,23 @@ public class GuiLogger extends JFrame {
     }
 
     private int offset = 0;
-    private ArrayList<String> text = null;
+    private ArrayList<String> text;
 
     public void updateText() {
         if (text.size() > 16) offset++;
-        StringBuilder displayString = new StringBuilder("");
-        for (int i = offset; i < text.size(); i++) displayString.append(text.get(i) + "\n");
+        StringBuilder displayString = new StringBuilder();
+        for (int i = offset; i < text.size(); i++) displayString.append(text.get(i)).append("\n");
         display.setText(StaticStuff.replaceLast(displayString.toString(), "\n", ""));
     }
 
     public void updateTextWithoutAddScroll() {
         StringBuilder displayString = new StringBuilder("");
-        for (int i = offset; i < text.size(); i++) displayString.append(text.get(i) + "\n");
+        for (int i = offset; i < text.size(); i++) displayString.append(text.get(i)).append("\n");
         display.setText(StaticStuff.replaceLast(displayString.toString(), "\n", ""));
     }
 
     public void executeCommand(String text) {
-        new Thread() {
-            public void run() {
-                Interpreter.executePlayerCommandFromLogger(text);
-            }
-        }.start();
+        new Thread(() -> Interpreter.executePlayerCommandFromLogger(text)).start();
 
     }
 }

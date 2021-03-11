@@ -1,15 +1,8 @@
 
-import javax.swing.UIManager.LookAndFeelInfo;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import javax.swing.border.Border;
 import javax.swing.*;
 
 public class GuiVariables extends JFrame{
@@ -98,12 +91,12 @@ public class GuiVariables extends JFrame{
                 Integer.parseInt(tf_value.getText());
                 vars.setVariable(index, tf_name.getText(), String.valueOf(cb_type.getSelectedItem()), tf_value.getText());
                 dispose();
-            }catch(Exception e){Popup.error(StaticStuff.projectName,"Invalid integer value: "+tf_value.getText());}
+            }catch(Exception e){Popup.error(StaticStuff.PROJECT_NAME,"Invalid integer value: "+tf_value.getText());}
         }else if(String.valueOf(cb_type.getSelectedItem()).equals("Float")){
             if(tf_value.getText().matches("-?\\d+\\.?\\d*")){
                 vars.setVariable(index, tf_name.getText(), String.valueOf(cb_type.getSelectedItem()), tf_value.getText());
                 dispose();
-            }else Popup.error(StaticStuff.projectName,"Invalid float value: "+tf_value.getText());
+            }else Popup.error(StaticStuff.PROJECT_NAME,"Invalid float value: "+tf_value.getText());
         }else{
             vars.setVariable(index, tf_name.getText(), String.valueOf(cb_type.getSelectedItem()), tf_value.getText());
             dispose();

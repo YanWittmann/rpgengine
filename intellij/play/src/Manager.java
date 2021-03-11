@@ -827,61 +827,48 @@ public class Manager {
 
     public void removeTag(String uid, String tag) {
         Log.add("Remove tag " + tag + " from " + uid);
-        for (int i = 0; i < npcs.size(); i++)
-            if (npcs.get(i).uid.equals(uid)) if (npcs.get(i).tags.contains(tag)) npcs.get(i).tags.remove(tag);
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid))
-                if (inventories.get(i).tags.contains(tag)) inventories.get(i).tags.remove(tag);
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid))
-                if (locations.get(i).tags.contains(tag)) locations.get(i).tags.remove(tag);
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).uid.equals(uid)) if (items.get(i).tags.contains(tag)) items.get(i).tags.remove(tag);
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid))
-                if (inventories.get(i).tags.contains(tag)) inventories.get(i).tags.remove(tag);
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid))
-                if (battleMaps.get(i).tags.contains(tag)) battleMaps.get(i).tags.remove(tag);
-        for (int i = 0; i < events.size(); i++)
-            if (events.get(i).uid.equals(uid)) if (events.get(i).tags.contains(tag)) events.get(i).tags.remove(tag);
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(uid))
-                if (lootTable.get(i).tags.contains(tag)) lootTable.get(i).tags.remove(tag);
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid))
-                if (customCommands.get(i).tags.contains(tag)) customCommands.get(i).tags.remove(tag);
-        for (int i = 0; i < colors.size(); i++)
-            if (colors.get(i).uid.equals(uid)) if (colors.get(i).tags.contains(tag)) colors.get(i).tags.remove(tag);
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) npc.tags.remove(tag);
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid))
+                inventory.tags.remove(tag);
+        for (Location location : locations)
+            if (location.uid.equals(uid))
+                location.tags.remove(tag);
+        for (Item item : items) if (item.uid.equals(uid)) item.tags.remove(tag);
+        for (Inventory inventory : inventories)
+            if (inventory.uid.equals(uid))
+                inventory.tags.remove(tag);
+        for (BattleMap battleMap : battleMaps)
+            if (battleMap.uid.equals(uid))
+                battleMap.tags.remove(tag);
+        for (Event event : events) if (event.uid.equals(uid)) event.tags.remove(tag);
+        for (LootTable table : lootTable)
+            if (table.uid.equals(uid))
+                table.tags.remove(tag);
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.uid.equals(uid))
+                customCommand.tags.remove(tag);
+        for (ColorObject color : colors) if (color.uid.equals(uid)) color.tags.remove(tag);
         for (FileObject object : fileObjects)
             if (object.uid.equals(uid))
-                if (object.tags.contains(tag)) object.tags.remove(tag);
+                object.tags.remove(tag);
         for (CustomPopup popup : popups)
             if (popup.uid.equals(uid))
-                if (popup.tags.contains(tag)) popup.tags.remove(tag);
+                popup.tags.remove(tag);
     }
 
     public String[] getEventCode(String uid, String eventName) {
-        for (int i = 0; i < npcs.size(); i++)
-            if (npcs.get(i).uid.equals(uid)) return npcs.get(i).getEventCode(eventName);
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) return inventories.get(i).getEventCode(eventName);
-        for (int i = 0; i < locations.size(); i++)
-            if (locations.get(i).uid.equals(uid)) return locations.get(i).getEventCode(eventName);
-        for (int i = 0; i < items.size(); i++)
-            if (items.get(i).uid.equals(uid)) return items.get(i).getEventCode(eventName);
-        for (int i = 0; i < inventories.size(); i++)
-            if (inventories.get(i).uid.equals(uid)) return inventories.get(i).getEventCode(eventName);
-        for (int i = 0; i < battleMaps.size(); i++)
-            if (battleMaps.get(i).uid.equals(uid)) return battleMaps.get(i).getEventCode(eventName);
-        for (int i = 0; i < events.size(); i++)
-            if (events.get(i).uid.equals(uid)) return events.get(i).getEventCode(eventName);
-        for (int i = 0; i < lootTable.size(); i++)
-            if (lootTable.get(i).uid.equals(uid)) return lootTable.get(i).getEventCode(eventName);
-        for (int i = 0; i < customCommands.size(); i++)
-            if (customCommands.get(i).uid.equals(uid)) return customCommands.get(i).getEventCode(eventName);
-        for (int i = 0; i < colors.size(); i++)
-            if (colors.get(i).uid.equals(uid)) return colors.get(i).getEventCode(eventName);
+        for (NPC npc : npcs) if (npc.uid.equals(uid)) return npc.getEventCode(eventName);
+        for (Inventory value : inventories) if (value.uid.equals(uid)) return value.getEventCode(eventName);
+        for (Location location : locations) if (location.uid.equals(uid)) return location.getEventCode(eventName);
+        for (Item item : items) if (item.uid.equals(uid)) return item.getEventCode(eventName);
+        for (Inventory inventory : inventories) if (inventory.uid.equals(uid)) return inventory.getEventCode(eventName);
+        for (BattleMap battleMap : battleMaps) if (battleMap.uid.equals(uid)) return battleMap.getEventCode(eventName);
+        for (Event event : events) if (event.uid.equals(uid)) return event.getEventCode(eventName);
+        for (LootTable table : lootTable) if (table.uid.equals(uid)) return table.getEventCode(eventName);
+        for (CustomCommand customCommand : customCommands)
+            if (customCommand.uid.equals(uid)) return customCommand.getEventCode(eventName);
+        for (ColorObject color : colors) if (color.uid.equals(uid)) return color.getEventCode(eventName);
         for (FileObject fileObject : fileObjects)
             if (fileObject.uid.equals(uid)) return fileObject.getEventCode(eventName);
         for (CustomPopup popup : popups)
@@ -889,7 +876,12 @@ public class Manager {
         return new String[]{""};
     }
 
+    private int allowFileObjects = -1;
+
     public void openFileObjectFile(String uid) {
+        if (allowFileObjects == -1)
+            allowFileObjects = StaticStuff.openPopup(Interpreter.lang("permissionRequestOpenFileObject"), new String[]{Interpreter.lang("permissionRequestAccept"), Interpreter.lang("permissionRequestDeny")});
+        if (allowFileObjects == 1) return;
         Log.add("Opening fileObject file " + uid);
         for (FileObject fileObject : fileObjects) if (fileObject.uid.equals(uid)) fileObject.openFile();
     }
@@ -1197,7 +1189,7 @@ public class Manager {
                 FileManager.writeFileFromByteArray(SAVESTATES_DIRECTORY + localFilename + "/fileObjects/" + fileObject.uid + ".file", fileObject.getByteArray());
             }
             for (CustomPopup popup : popups)
-                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/colors/" + popup.uid + "" + StaticStuff.dataFileEnding, popup.generateSaveString());
+                FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/popups/" + popup.uid + "" + StaticStuff.dataFileEnding, popup.generateSaveString());
             FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/variables/vars" + StaticStuff.dataFileEnding, variables.generateSaveString());
             FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/images/imagelist" + StaticStuff.dataFileEnding, images.generateSaveString(SAVESTATES_DIRECTORY + localFilename + "/images/"));
             FileManager.writeToFile(SAVESTATES_DIRECTORY + localFilename + "/audio/audiolist" + StaticStuff.dataFileEnding, audios.generateSaveString(SAVESTATES_DIRECTORY + localFilename + "/audio/"));

@@ -9,7 +9,7 @@ public class GuiLoading extends JFrame {
     private int pX, pY;
 
     public GuiLoading() {
-        this.setTitle(StaticStuff.projectName);
+        this.setTitle(StaticStuff.PROJECT_NAME);
         this.setSize(498, 290);
         setUndecorated(true);
 

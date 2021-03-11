@@ -132,9 +132,10 @@ public class FileManager {
             });
 
             int counter = 0;
+            assert files != null;
             for (File file : files)
                 counter++;
-            String allFiles[] = new String[counter];
+            String[] allFiles = new String[counter];
             counter = 0;
             for (File file : files) {
                 allFiles[counter] = file.getName();
@@ -154,8 +155,7 @@ public class FileManager {
         chooser.showOpenDialog(null);
         lastPickLocation = chooser.getSelectedFile().getAbsolutePath();
         try{return chooser.getSelectedFile().getAbsolutePath();}catch(Exception e){return "";}*/
-        String ret[] = windowsFilePicker();
-        if (ret == null) return "";
+        String[] ret = windowsFilePicker();
         if (ret.length == 0) return "";
         return ret[0];
     }
@@ -311,8 +311,10 @@ public class FileManager {
         return fileSignature == 0x504B0304 || fileSignature == 0x504B0506 || fileSignature == 0x504B0708;
     }
 
-    public static String[] getStringArrayFromURL(String pUrl) {
-        ArrayList<String> lines = new ArrayList<String>();
+    public static String[] getResponseFromURL(String pUrl) {
+        pUrl = pUrl.replace(" ", "%20");
+        //System.out.println(pUrl);
+        ArrayList<String> lines = new ArrayList<>();
         try {
             URL url = new URL(pUrl);
             BufferedReader read = new BufferedReader(new InputStreamReader(url.openStream()));

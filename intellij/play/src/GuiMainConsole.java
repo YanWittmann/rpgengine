@@ -326,6 +326,7 @@ public class GuiMainConsole extends JFrame {
     String ownText = "";
 
     private void keyPressedEvent(KeyEvent evt) {
+        if (evt.getKeyCode() != 9 && autoCompleteIndex >= 0) autoCompleteIndex = -1;
         if (evt.getKeyCode() == 10) { //enter
             if (playerInputActive) {
                 playerAppend(ta_input.getText());
@@ -368,17 +369,31 @@ public class GuiMainConsole extends JFrame {
         Collections.addAll(autoCompleteWords, words);
     }
 
+    private int autoCompleteIndex = -1;
+    private ArrayList<String> currentAutocompletion = new ArrayList<>();
+
     private void autoComplete() {
+        if (autoCompleteIndex >= 0) {
+            autoCompleteIndex = (autoCompleteIndex + 1) % currentAutocompletion.size();
+            ta_input.setText(currentAutocompletion.get(autoCompleteIndex));
+            return;
+        }
         if (ta_input.getText().length() <= 0) return;
         int curorPos = ta_input.getCaretPosition();
         String text = ta_input.getText();
         String beforeCursor = text.substring(0, curorPos), afterCursor = text.substring(curorPos);
         String[] words = beforeCursor.split(" ");
         String completeWord = words[words.length - 1];
+        boolean found = false;
+        currentAutocompletion.clear();
         for (String s : autoCompleteWords) {
             if (s.matches(completeWord + ".+")) {
-                ta_input.setText(StaticStuff.replaceLast(beforeCursor, completeWord, s) + afterCursor);
-                return;
+                if (!found) {
+                    found = true;
+                    ta_input.setText(StaticStuff.replaceLast(beforeCursor, completeWord, s) + afterCursor);
+                    autoCompleteIndex = 0;
+                }
+                currentAutocompletion.add(StaticStuff.replaceLast(beforeCursor, completeWord, s) + afterCursor);
             }
         }
     }

@@ -39,7 +39,7 @@ public class Images extends JFrame {
                 }
             }
         } catch (Exception e) {
-            Popup.error(StaticStuff.projectName, "Image '" + files[lastImage] + "' contains invalid data.\n" + e);
+            Popup.error(StaticStuff.PROJECT_NAME, "Image '" + files[lastImage] + "' contains invalid data.\n" + e);
         }
     }
 
@@ -52,7 +52,7 @@ public class Images extends JFrame {
             try {
                 ImageIO.write(images.get(i), "png", new File(Manager.pathExtension + "adventures/" + namespace + "/images/" + uids.get(i) + ".png"));
             } catch (Exception e) {
-                Popup.error(StaticStuff.projectName, "Image '" + filename.get(i) + "' contains invalid data.\n" + e);
+                Popup.error(StaticStuff.PROJECT_NAME, "Image '" + filename.get(i) + "' contains invalid data.\n" + e);
             }
         }
         String str = "";
@@ -76,7 +76,7 @@ public class Images extends JFrame {
             this.images.add(ImageIO.read(new File(path)));
         } catch (Exception e) {
             e.printStackTrace();
-            Popup.error(StaticStuff.projectName, "Unable to get image.");
+            Popup.error(StaticStuff.PROJECT_NAME, "Unable to get image.");
         }
         filename.add(name);
         StaticStuff.setLastCreatedUID(UID.generateUID());
@@ -105,7 +105,7 @@ public class Images extends JFrame {
         if (firstTimeOpen.get(index))
             firstTimeOpen.set(index, false);
         else {
-            int selected = Popup.selectButton(StaticStuff.projectName, "What do you want to do?", new String[]{"Nothing", "Edit name", "Edit image"});
+            int selected = Popup.selectButton(StaticStuff.PROJECT_NAME, "What do you want to do?", new String[]{"Nothing", "Edit name", "Edit image"});
             if (selected == -1 || selected == 0) return true;
             if (selected == 1) {
                 String rename = Popup.input("Enter new name:", filename.get(index));
@@ -131,6 +131,10 @@ public class Images extends JFrame {
 
     public static String getImageUID(String name) {
         return uids.get(filename.indexOf(name));
+    }
+
+    public static ArrayList<String> getUids() {
+        return uids;
     }
 
     public BufferedImage getBufferedImage(String uid) {

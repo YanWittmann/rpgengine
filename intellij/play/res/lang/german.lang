@@ -42,6 +42,7 @@ permissionRequestDeny:Verweigern
 permissionRequestRetry:Dieses Abenteuer kann nicht ohne die Berechtigungen arbeiten.<br>Moechtest du das [[red:Abenteuer wirklich beenden]]?
 permissionRequestRetryNotExit:[[green:Nochmal versuchen]]
 permissionRequestRetryExit:[[red:Abenteuer beenden]]
+permissionRequestOpenFileObject:Dieses Abenteuer moechte [[red:eine im Abenteuer gespeicherte Datei oeffnen]].
 
 playerAttrMU:Mut
 playerAttrKL:Klugheit
@@ -102,6 +103,7 @@ battleMapDamageEntity:Erlittener Schaden: {1}
 battleMapFightOver:Der Kampf ist vorbei!
 battleMapPlayerDefeated:Du wurdest geschlagen...
 battleMapPlayerWins:Du hast alle Gegner besiegt!
+battleMapNPCdefeated:{1} wurde besiegt!
 battleMapClose:[[red:Beenden]]
 battleMapCloseCheck:Bist du dir sicher, dass du das [[red:Abenteuer verlassen moechtest]]?<br>Du wirst vom [[red:Anfang aus neu starten]] muessen wenn du es nochmal versuchen willst!
 battleMapCloseCheckClose:Beenden
